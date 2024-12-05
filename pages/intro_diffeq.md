@@ -1,55 +1,35 @@
-# Introduction to Differential Equations in Julia
+# Differential Equations in Julia
 
-Let us start with a simple system with a single differential equation.
+Let us start with a simple two-dimensional model of a neuron. This is a popular model, known as Izhikevich neuron [reference].
 
 ````julia
-# The first step is to install and import these packages
-using Pkg
-Pkg.add("ModelingToolkit")
-Pkg.add("DifferentialEquations")
-Pkg.add("CairoMakie")
-using ModelingToolkit: t_nounits as t, D_nounits as D   # Define the time variable and the differentiation operator
+using ModelingToolkit: t_nounits as t, D_nounits as D
 using DifferentialEquations
 
-# Define the time-dependent variable u
-@variables u(t)
+@variables v(t) u(t)
+@parameters a b c d I
 
-# Define the parameter a
-@parameters a
+equation = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I
+           D(u) ~ a * (b * v - u)]
 
-# Define the differential equation du/dt = -a * u
-equation = D(u) ~ -a * u
 
-# Build the ODE system and assign it a name
-@named system = ODESystem(equation, t)
+event = [[v ~ 30.0] => [u ~ u + d]
+        [v ~ 30.0] => [v ~ c]]
 
-# Define the initial conditions and parameters
-u0 = [u => 1.0]
-p = [a => 2.0]
-tspan = (0.0 , 5.0)
+@named izh_system = ODESystem(equation, t, [v, u], [a, b, c, d, I]; continuous_events = event)
+````
 
-# Set up the problem
-problem = ODEProblem(complete(system), u0, tspan, p)
+Those below can change; I'm using the parameters for a chattering dynamic
 
-# Solve the problem
-solution = solve(problem)
+````julia
+p = [a =>  0.02, b => 0.2, c => -50.0, d => 2.0, I => 10.0]
 
-times = solution.t
+u0 = [v => -65.0, u => -13.0]
 
-# The 1 here means we're extracting the values from the first variable
-values = sol[1, :]
+tspan = (0.0, 100.0)
 
-using CairoMakie
-
-fig, ax, plt = lines(times, values, color=:black, label="u(t)")
-
-ax.xlabel = "Time"
-ax.ylabel = "u(t)"
-ax.title = "Solution of the ODE"
-axislegend(ax)
-
-# Display the figure in a new panel in VS Code
-fig
+izh_prob = ODEProblem(complete(izh_system), u0, tspan, p)
+izh_sol = solve(izh_prob)
 ````
 
 ---

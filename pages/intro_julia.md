@@ -1,7 +1,7 @@
 # Introduction to Julia
 
 ## Prerequisites :
-- [Installing instructionsfor every OS.](https://julialang.org/downloads/)  
+- [Installing instructions for every OS.](https://julialang.org/downloads/)  
 
 - [Syntax translation cheatsheet between Julia, Python & MATLAB](https://cheatsheets.quantecon.org/)
 
