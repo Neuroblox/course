@@ -1,12 +1,8 @@
-```@meta
-EditURL = "_literate/intro_diffeq.jl"
-```
-v
 # Introduction to Differential Equations in Julia
 
 Let us start with a simple system with a single differential equation.
 
-````@example intro_diffeq
+````julia
 # The first step is to install and import these packages
 using Pkg
 Pkg.add("ModelingToolkit")
