@@ -1,47 +1,21 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Vela Template</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/menu1/">Code blocks</a> <li><a href="" class=has-arrow >Topic</a> <ul> <li><a href="/course/menu2/">More goodies</a> </ul> <li><a href="/course/menu3/">Tags</a> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Introduction to Differential Equations in Julia</h1> <hr> <div class=franklin-content ><h1 id=introduction_to_differential_equations_in_julia ><a href="#introduction_to_differential_equations_in_julia" class=header-anchor >Introduction to Differential Equations in Julia</a></h1> <p>Let us start with a simple system with a single differential equation.</p> <pre><code class="julia hljs"><span class=hljs-comment ># The first step is to install and import these packages</span>
-<span class=hljs-keyword >using</span> Pkg
-Pkg.add(<span class=hljs-string >&quot;ModelingToolkit&quot;</span>)
-Pkg.add(<span class=hljs-string >&quot;DifferentialEquations&quot;</span>)
-Pkg.add(<span class=hljs-string >&quot;CairoMakie&quot;</span>)
-<span class=hljs-keyword >using</span> ModelingToolkit: t_nounits as t, D_nounits as D   <span class=hljs-comment ># Define the time variable and the differentiation operator</span>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox Course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">How to install</a> <li><a href="" class=has-arrow >Introduction to Julia</a> <ul> <li><a href="/course/pages/intro_julia">Base language</a> <li><a href="/course/pages/intro_diffeq">Differential Equations</a> </ul> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Differential Equations in Julia</h1> <hr> <div class=franklin-content ><h1 id=differential_equations_in_julia ><a href="#differential_equations_in_julia" class=header-anchor >Differential Equations in Julia</a></h1> <p>Let us start with a simple two-dimensional model of a neuron. This is a popular model, known as Izhikevich neuron &#91;reference&#93;.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> ModelingToolkit: t_nounits as t, D_nounits as D
 <span class=hljs-keyword >using</span> DifferentialEquations
 
-<span class=hljs-comment ># Define the time-dependent variable u</span>
-<span class=hljs-meta >@variables</span> u(t)
+<span class=hljs-meta >@variables</span> v(t) u(t)
+<span class=hljs-meta >@parameters</span> a b c d I
 
-<span class=hljs-comment ># Define the parameter a</span>
-<span class=hljs-meta >@parameters</span> a
+equation = [D(v) ~ <span class=hljs-number >0.04</span> * v ^ <span class=hljs-number >2</span> + <span class=hljs-number >5</span> * v + <span class=hljs-number >140</span> - u + I
+           D(u) ~ a * (b * v - u)]
 
-<span class=hljs-comment ># Define the differential equation du/dt = -a * u</span>
-equation = D(u) ~ -a * u
 
-<span class=hljs-comment ># Build the ODE system and assign it a name</span>
-<span class=hljs-meta >@named</span> system = ODESystem(equation, t)
+event = [[v ~ <span class=hljs-number >30.0</span>] =&gt; [u ~ u + d]
+        [v ~ <span class=hljs-number >30.0</span>] =&gt; [v ~ c]]
 
-<span class=hljs-comment ># Define the initial conditions and parameters</span>
-u0 = [u =&gt; <span class=hljs-number >1.0</span>]
-p = [a =&gt; <span class=hljs-number >2.0</span>]
-tspan = (<span class=hljs-number >0.0</span> , <span class=hljs-number >5.0</span>)
+<span class=hljs-meta >@named</span> izh_system = ODESystem(equation, t, [v, u], [a, b, c, d, I]; continuous_events = event)</code></pre> <p>Those below can change; I&#39;m using the parameters for a chattering dynamic</p> <pre><code class="julia hljs">p = [a =&gt;  <span class=hljs-number >0.02</span>, b =&gt; <span class=hljs-number >0.2</span>, c =&gt; -<span class=hljs-number >50.0</span>, d =&gt; <span class=hljs-number >2.0</span>, I =&gt; <span class=hljs-number >10.0</span>]
 
-<span class=hljs-comment ># Set up the problem</span>
-problem = ODEProblem(complete(system), u0, tspan, p)
+u0 = [v =&gt; -<span class=hljs-number >65.0</span>, u =&gt; -<span class=hljs-number >13.0</span>]
 
-<span class=hljs-comment ># Solve the problem</span>
-solution = solve(problem)
+tspan = (<span class=hljs-number >0.0</span>, <span class=hljs-number >100.0</span>)
 
-times = solution.t
-
-<span class=hljs-comment ># The 1 here means we&#x27;re extracting the values from the first variable</span>
-values = sol[<span class=hljs-number >1</span>, :]
-
-<span class=hljs-keyword >using</span> CairoMakie
-
-fig, ax, plt = lines(times, values, color=:black, label=<span class=hljs-string >&quot;u(t)&quot;</span>)
-
-ax.xlabel = <span class=hljs-string >&quot;Time&quot;</span>
-ax.ylabel = <span class=hljs-string >&quot;u(t)&quot;</span>
-ax.title = <span class=hljs-string >&quot;Solution of the ODE&quot;</span>
-axislegend(ax)
-
-<span class=hljs-comment ># Display the figure in a new panel in VS Code</span>
-fig</code></pre> <hr /> <p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p> <div class=page-foot > <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: December 05, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </main> <script src="/course/libs/vela/metisMenu.min.js"></script> <script src="/course/libs/vela/slideout.min.js"></script> <script src="/course/libs/highlight/highlight.min.js"></script> <script>hljs.highlightAll();hljs.configure({tabReplace: ' '});</script>
+izh_prob = ODEProblem(complete(izh_system), u0, tspan, p)
+izh_sol = solve(izh_prob)</code></pre> <hr /> <p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p> <div class=page-foot > <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: December 05, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </main> <script src="/course/libs/vela/metisMenu.min.js"></script> <script src="/course/libs/vela/slideout.min.js"></script> <script src="/course/libs/highlight/highlight.min.js"></script> <script>hljs.highlightAll();hljs.configure({tabReplace: ' '});</script>
