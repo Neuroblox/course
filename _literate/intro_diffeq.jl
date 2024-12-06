@@ -70,13 +70,16 @@ izh_simple = structural_simplify(izh_system)
 u0 = [v => -65.0, u => -13.0]
 
 ## Simulation timespan
-tspan = (0.0, 100.0)
+tspan = (0.0, 400.0)
 
 izh_prob = ODEProblem(izh_simple, u0, tspan)
 
 izh_sol = solve(izh_prob)
 
 plot(izh_sol)
+# or if we want to plot just the voltage timeseries with its spiking pattern
+plot(izh_sol; idxs=[v])
+
 
 # References
 # [1] : E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
