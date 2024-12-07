@@ -38,6 +38,7 @@ jobs:
             using Pkg; Pkg.activate("."); Pkg.instantiate();
             using NodeJS; run(`$(npm_cmd()) install highlight.js`);
             using Franklin;
+            Pkg.add("PkgAuthentication"); using PkgAuthentication; PkgAuthentication.install("juliahub.com"); Pkg.Registry.add();
             optimize()'
     - name: Build and Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3
