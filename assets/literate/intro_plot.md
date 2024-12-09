@@ -26,6 +26,8 @@ fig
 save(joinpath(@OUTPUT, "layout.svg"), fig); # hide
 ````
 
+\fig{layout}
+
 > Note: Plot functions in Makie also work without defining a `Figure` and an `Axis` object explicitly.
 > E.g. plotting with `lines(seconds, measurements)` or `scatter(seconds, measurements)` .
 > However in this case we won't have all the customization options for the plot axes readily available.
@@ -43,6 +45,8 @@ hidexdecorations!(axs[1], grid=false)
 fig
 save(joinpath(@OUTPUT, "layout_hidex.svg"), fig); # hide
 ````
+
+\fig{layout_hidex}
 
 ## Plotting spikes
 
@@ -109,4 +113,6 @@ axislegend(position = :lt)
 fig
 save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide
 ````
+
+\fig{spikes}
 

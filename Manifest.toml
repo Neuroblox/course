@@ -2228,10 +2228,10 @@ weakdeps = ["BoundaryValueDiffEq", "Colors", "DiffEqCallbacks", "NLsolve", "Ordi
     ManifoldsTestExt = "Test"
 
 [[deps.ManifoldsBase]]
-deps = ["LinearAlgebra", "Markdown", "Printf", "Random", "Requires"]
-git-tree-sha1 = "2bddabebe8f7ec16cdd693ce8615fb5d3625af87"
+deps = ["LinearAlgebra", "Markdown", "Printf", "Random"]
+git-tree-sha1 = "57df0b7daa74bf82d3367702e133d936c28882ff"
 uuid = "3362f125-f0bb-47a3-aa74-596ffd7ef2fb"
-version = "0.15.22"
+version = "0.15.23"
 
     [deps.ManifoldsBase.extensions]
     ManifoldsBasePlotsExt = "Plots"
