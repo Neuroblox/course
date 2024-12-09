@@ -7,3 +7,4 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol; idxs=[v])
 fig
+save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide

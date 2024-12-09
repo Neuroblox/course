@@ -13,3 +13,4 @@ lines!(axs[1], seconds, measurements)
 scatter!(axs[2], seconds, measurements)
 
 fig
+save(joinpath(@OUTPUT, "layout.svg"), fig); # hide

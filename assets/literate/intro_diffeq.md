@@ -49,6 +49,7 @@ Finally we can plot the timeseries of both variables of the solution in a line p
 fig = plot(sol)
 # display the figure
 fig
+save(joinpath(@OUTPUT, "mtk1.svg"), fig); # hide
 ````
 
 We will shortly see more plot types and options.
@@ -98,6 +99,7 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol)
 fig
+save(joinpath(@OUTPUT, "mtk2.svg"), fig); # hide
 ````
 
 or if we want to plot just the voltage timeseries with its spiking pattern
@@ -105,6 +107,7 @@ or if we want to plot just the voltage timeseries with its spiking pattern
 ````julia:ex7
 fig = plot(izh_sol; idxs=[v])
 fig
+save(joinpath(@OUTPUT, "mtk3.svg"), fig); # hide
 ````
 
 ### Changing parameter values and initial conditions
@@ -121,6 +124,7 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol; idxs=[v])
 fig
+save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide
 ````
 
 Notice how the spiking pattern has changed compared to the previous simulation.
@@ -170,6 +174,7 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol; idxs=[v, I])
 fig
+save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide
 ````
 
 Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset.

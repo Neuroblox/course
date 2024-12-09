@@ -37,6 +37,7 @@ sol[x] ## or similarly sol[y]
 fig = plot(sol)
 # display the figure
 fig
+save(joinpath(@OUTPUT, "mtk1.svg"), fig); # hide
 
 @variables v(t)=-65 u(t)=-13
 # The following parameter values correspond to chattering spiking.
@@ -63,9 +64,11 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol)
 fig
+save(joinpath(@OUTPUT, "mtk2.svg"), fig); # hide
 
 fig = plot(izh_sol; idxs=[v])
 fig
+save(joinpath(@OUTPUT, "mtk3.svg"), fig); # hide
 
 izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2])
 # or we can change the initial conditions along with the parameters as
@@ -75,6 +78,7 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol; idxs=[v])
 fig
+save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide
 
 @variables v(t)=-65 u(t)=-13 I(t)
 # The following parameter values correspond to regular spiking.
@@ -103,3 +107,4 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol; idxs=[v, I])
 fig
+save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide

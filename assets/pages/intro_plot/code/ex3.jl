@@ -55,3 +55,4 @@ vlines!(ax, [t_bigger_stimulation]; color=:tomato, linestyle=:dash, linewidth=4,
 # display the legend
 axislegend(position = :lt)
 fig
+save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide

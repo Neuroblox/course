@@ -15,3 +15,4 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol)
 fig
+save(joinpath(@OUTPUT, "mtk2.svg"), fig); # hide

@@ -14,12 +14,14 @@ lines!(axs[1], seconds, measurements)
 scatter!(axs[2], seconds, measurements)
 
 fig
+save(joinpath(@OUTPUT, "layout.svg"), fig); # hide
 
 # `grid=false` avoids hiding the x grid lines
 hidexdecorations!(axs[1], grid=false)
 
 # Now we can display the figure again with the updated axes
 fig
+save(joinpath(@OUTPUT, "layout_hidex.svg"), fig); # hide
 
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
@@ -77,3 +79,4 @@ vlines!(ax, [t_bigger_stimulation]; color=:tomato, linestyle=:dash, linewidth=4,
 # display the legend
 axislegend(position = :lt)
 fig
+save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide
