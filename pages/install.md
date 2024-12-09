@@ -27,3 +27,7 @@ Please note that after running these commands `Neuroblox` will also be installed
 > ```julia 
 > Pkg.add("Neuroblox")
 > ```
+
+# Installing Julia
+
+Please follow the [installation instructions](https://julialang.org/downloads/) to install Julia on any Operating System.
