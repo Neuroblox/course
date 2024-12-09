@@ -13,6 +13,5 @@ izh_prob = ODEProblem(izh_simple, u0, tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol)
-# or if we want to plot just the voltage timeseries with its spiking pattern
-plot(izh_sol; idxs=[v])
+fig = plot(izh_sol)
+fig

@@ -1,14 +1,9 @@
 # This file was generated, do not modify it. # hide
-@variables v(t)=-65 u(t)=-13 I(t)
-# The following parameter values correspond to regular spiking.
-@parameters a=0.02 b=0.2 c=-65 d=8
+izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2])
+# or we can change the initial conditions along with the parameters as
+izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2], u0 = [v => -70, u => -10])
 
-eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
-        D(u) ~ a * (b * v - u),
-        I ~ 10*sin(0.5*t)]
+izh_sol = solve(izh_prob)
 
-event = (v > 30.0) => [u ~ u + d, v ~ c]
-
-# Notice how `I` was moved from the parameter list to the variable list in the following call.
-@named izh_system = ODESystem(eqs, t, [v, u, I], [a, b, c, d]; discrete_events = event)
-izh_simple = structural_simplify(izh_system)
+fig = plot(izh_sol; idxs=[v])
+fig

@@ -1,4 +1,4 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox Course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">How to install</a> <li><a href="" class=has-arrow >Introduction to Julia</a> <ul> <li><a href="/course/pages/intro_julia">Base language</a> <li><a href="/course/pages/intro_diffeq">Differential Equations</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/intro_challenge">Challenge Problems</a> </ul> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Introduction to Differential Equations in Julia</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#lotka-volterra_system">Lotka-Volterra system</a><li><a href="#izhikevich_neuron">Izhikevich Neuron</a><ol><li><a href="#simulating_spikes">Simulating spikes</a><li><a href="#changing_parameter_values_and_initial_conditions">Changing parameter values and initial conditions</a><li><a href="#adding_external_currents">Adding external currents</a></ol></ol></div> <h1 id=introduction_to_differential_equations_in_julia ><a href="#introduction_to_differential_equations_in_julia" class=header-anchor >Introduction to Differential Equations in Julia</a></h1> <h2 id=lotka-volterra_system ><a href="#lotka-volterra_system" class=header-anchor >Lotka-Volterra system</a></h2> <pre><code class="julia hljs"><span class=hljs-comment ># Import the packages we need</span>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox Course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">How to install</a> <li><a href="" class=has-arrow >Introduction to Julia</a> <ul> <li><a href="/course/pages/intro_julia">Base language</a> <li><a href="/course/pages/intro_diffeq">Differential Equations</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/intro_challenge">Challenge Problems</a> </ul> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Differential Equations in Julia</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#lotka-volterra_system">Lotka-Volterra system</a><li><a href="#izhikevich_neuron">Izhikevich Neuron</a><ol><li><a href="#simulating_spikes">Simulating spikes</a><li><a href="#changing_parameter_values_and_initial_conditions">Changing parameter values and initial conditions</a><li><a href="#adding_external_currents">Adding external currents</a></ol></ol></div> <h1 id=differential_equations_in_julia ><a href="#differential_equations_in_julia" class=header-anchor >Differential Equations in Julia</a></h1> <h2 id=lotka-volterra_system ><a href="#lotka-volterra_system" class=header-anchor >Lotka-Volterra system</a></h2> <pre><code class="julia hljs"><span class=hljs-comment ># Import the packages we need</span>
 <span class=hljs-keyword >using</span> ModelingToolkit <span class=hljs-comment >## for symbolic system definition</span>
 <span class=hljs-keyword >using</span> ModelingToolkit: t_nounits as t, D_nounits as D <span class=hljs-comment >## generic symbolic time variable and derivative operator</span>
 <span class=hljs-keyword >using</span> OrdinaryDiffEq <span class=hljs-comment >## for ODE solvers</span>
@@ -124,7 +124,9 @@ u: 31-element Vector{Vector{Float64}}:
  5.1545522666136785
  3.7679793462689086
  2.227954470813059
- 1.946115942732129</code></pre> <p>Finally we can plot the timeseries of both variables of the solution in a line plot using</p> <pre><code class="julia hljs">plot(sol)</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
+ 1.946115942732129</code></pre> <p>Finally we can plot the timeseries of both variables of the solution in a line plot using</p> <pre><code class="julia hljs">fig = plot(sol)
+<span class=hljs-comment ># display the figure</span>
+fig</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <p>We will shortly see more plot types and options.</p>
 <h2 id=izhikevich_neuron ><a href="#izhikevich_neuron" class=header-anchor >Izhikevich Neuron</a></h2>
 <h3 id=simulating_spikes ><a href="#simulating_spikes" class=header-anchor >Simulating spikes</a></h3>
@@ -161,9 +163,11 @@ izh_prob = ODEProblem(izh_simple, u0, tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol)
-<span class=hljs-comment ># or if we want to plot just the voltage timeseries with its spiking pattern</span>
-plot(izh_sol; idxs=[v])</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
+fig = plot(izh_sol)
+fig</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
+<p>or if we want to plot just the voltage timeseries with its spiking pattern</p>
+<pre><code class="julia hljs">fig = plot(izh_sol; idxs=[v])
+fig</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <h3 id=changing_parameter_values_and_initial_conditions ><a href="#changing_parameter_values_and_initial_conditions" class=header-anchor >Changing parameter values and initial conditions</a></h3>
 <p>After defining and simulating a system we might want to run another simulation by changing either or both of the parameter values and the initial conditions. The Izhikevich neuron that we simulated above has multiple spiking regimes that correspond to different parameter value combinations. If we have our <code>ODEProblem</code> already defined as the <code>izh_prob</code> variable above, we can remake it by keeping everything the same except for the fields that we choose to alter. Here we will change only the model parameters to change from chattering to fast spiking.</p>
 <pre><code class="julia hljs">izh_prob = remake(izh_prob; p = [a =&gt; <span class=hljs-number >0.1</span>, b =&gt; <span class=hljs-number >0.2</span>, c =&gt; -<span class=hljs-number >65</span>, d =&gt; <span class=hljs-number >2</span>])
@@ -172,7 +176,8 @@ izh_prob = remake(izh_prob; p = [a =&gt; <span class=hljs-number >0.1</span>, b 
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v])</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
+fig = plot(izh_sol; idxs=[v])
+fig</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <p>Notice how the spiking pattern has changed compared to the previous simulation.</p>
 <h3 id=adding_external_currents ><a href="#adding_external_currents" class=header-anchor >Adding external currents</a></h3>
 <p>Until now we have been simulating the Izhikevich neuron by injecting it with a constant external DC current <code>I&#61;10</code>. We&#39;ll now see how we can expand the <code>I</code> input to a dynamic current, which is more realistic &#40;currents do not remain constant in the brain for too long&#41;. Since <code>I</code> will change dynamically in time, it will be a time-dependent variable of the system and not a constant parameter.</p>
@@ -217,7 +222,8 @@ izh_prob = ODEProblem(izh_simple, [], tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v, I])</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
+fig = plot(izh_sol; idxs=[v, I])
+fig</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <p>Notice how the external current is slowly being accumulated in the neuron&#39;s potential <code>v</code> until the eventual spike and reset.</p>
 <p>References &#91;1&#93; : E. M. Izhikevich, &quot;Simple model of spiking neurons,&quot; in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440</p>
 

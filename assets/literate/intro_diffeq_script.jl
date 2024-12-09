@@ -34,7 +34,9 @@ sol = solve(prob, Tsit5())
 
 sol[x] ## or similarly sol[y]
 
-plot(sol)
+fig = plot(sol)
+# display the figure
+fig
 
 @variables v(t)=-65 u(t)=-13
 # The following parameter values correspond to chattering spiking.
@@ -59,9 +61,11 @@ izh_prob = ODEProblem(izh_simple, u0, tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol)
-# or if we want to plot just the voltage timeseries with its spiking pattern
-plot(izh_sol; idxs=[v])
+fig = plot(izh_sol)
+fig
+
+fig = plot(izh_sol; idxs=[v])
+fig
 
 izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2])
 # or we can change the initial conditions along with the parameters as
@@ -69,7 +73,8 @@ izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2], u0 = [v 
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v])
+fig = plot(izh_sol; idxs=[v])
+fig
 
 @variables v(t)=-65 u(t)=-13 I(t)
 # The following parameter values correspond to regular spiking.
@@ -96,4 +101,5 @@ izh_prob = ODEProblem(izh_simple, [], tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v, I])
+fig = plot(izh_sol; idxs=[v, I])
+fig

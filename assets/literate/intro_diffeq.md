@@ -1,5 +1,5 @@
 <!--This file was generated, do not modify it.-->
-# Introduction to Differential Equations in Julia
+# Differential Equations in Julia
 
 ## Lotka-Volterra system
 
@@ -46,7 +46,9 @@ sol[x] ## or similarly sol[y]
 Finally we can plot the timeseries of both variables of the solution in a line plot using
 
 ````julia:ex3
-plot(sol)
+fig = plot(sol)
+# display the figure
+fig
 ````
 
 We will shortly see more plot types and options.
@@ -94,9 +96,15 @@ izh_prob = ODEProblem(izh_simple, u0, tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol)
-# or if we want to plot just the voltage timeseries with its spiking pattern
-plot(izh_sol; idxs=[v])
+fig = plot(izh_sol)
+fig
+````
+
+or if we want to plot just the voltage timeseries with its spiking pattern
+
+````julia:ex7
+fig = plot(izh_sol; idxs=[v])
+fig
 ````
 
 ### Changing parameter values and initial conditions
@@ -104,14 +112,15 @@ After defining and simulating a system we might want to run another simulation b
 The Izhikevich neuron that we simulated above has multiple spiking regimes that correspond to different parameter value combinations. If we have our `ODEProblem` already defined as the `izh_prob` variable above, we can remake it by keeping everything the same except for the fields that we choose to alter.
 Here we will change only the model parameters to change from chattering to fast spiking.
 
-````julia:ex7
+````julia:ex8
 izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2])
 # or we can change the initial conditions along with the parameters as
 izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2], u0 = [v => -70, u => -10])
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v])
+fig = plot(izh_sol; idxs=[v])
+fig
 ````
 
 Notice how the spiking pattern has changed compared to the previous simulation.
@@ -120,7 +129,7 @@ Notice how the spiking pattern has changed compared to the previous simulation.
 Until now we have been simulating the Izhikevich neuron by injecting it with a constant external DC current `I=10`. We'll now see how we can expand the `I` input to a dynamic current, which is more realistic (currents do not remain constant in the brain for too long).
 Since `I` will change dynamically in time, it will be a time-dependent variable of the system and not a constant parameter.
 
-````julia:ex8
+````julia:ex9
 @variables v(t)=-65 u(t)=-13 I(t)
 # The following parameter values correspond to regular spiking.
 @parameters a=0.02 b=0.2 c=-65 d=8
@@ -138,20 +147,20 @@ izh_simple = structural_simplify(izh_system)
 
 Let's display the equations of the original and the simplified system to see the effect of `structural_simplify`.
 
-````julia:ex9
+````julia:ex10
 equations(izh_system)
 ````
 
 The original system contains the algebraic equation for the external current `I`.
 
-````julia:ex10
+````julia:ex11
 equations(izh_simple)
 ````
 
 However the `I` equation has been simplified away in `izh_simple`, since it was substituted into the differential equation `D(v)`.
 This is an important functionality of `structural_simplify` as it has turned a system of Differential Algebraic Equations (DAE) to one of Ordinary Differential Equations (ODE). ODEs can be integrated (solved) much more efficiently compared to DAEs.
 
-````julia:ex11
+````julia:ex12
 tspan = (0.0, 400.0)
 
 # We do not provide initial conditions, so the default values for `v` and `u` from above will be used.
@@ -159,7 +168,8 @@ izh_prob = ODEProblem(izh_simple, [], tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v, I])
+fig = plot(izh_sol; idxs=[v, I])
+fig
 ````
 
 Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset.

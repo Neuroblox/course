@@ -1,2 +1,4 @@
 # This file was generated, do not modify it. # hide
-plot(sol)
+fig = plot(sol)
+# display the figure
+fig
