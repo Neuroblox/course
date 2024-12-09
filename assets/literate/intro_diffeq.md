@@ -190,5 +190,5 @@ save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide
 Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset.
 
 References
-[1] : E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
+* [1] : E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
 
