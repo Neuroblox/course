@@ -1,4 +1,4 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox Course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">How to install</a> <li><a href="" class=has-arrow >Introduction to Julia</a> <ul> <li><a href="/course/pages/intro_julia">Base language</a> <li><a href="/course/pages/intro_diffeq">Differential Equations</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/intro_challenge">Challenge Problems</a> </ul> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Introduction to Differential Equations in Julia</h1> <hr> <div class=franklin-content ><h1 id=introduction_to_differential_equations_in_julia ><a href="#introduction_to_differential_equations_in_julia" class=header-anchor >Introduction to Differential Equations in Julia</a></h1> <h2 id=lotka-volterra_system ><a href="#lotka-volterra_system" class=header-anchor >Lotka-Volterra system</a></h2> <pre><code class="julia hljs"><span class=hljs-comment ># Import the packages we need</span>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox Course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">How to install</a> <li><a href="" class=has-arrow >Introduction to Julia</a> <ul> <li><a href="/course/pages/intro_julia">Base language</a> <li><a href="/course/pages/intro_diffeq">Differential Equations</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/intro_challenge">Challenge Problems</a> </ul> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Introduction to Differential Equations in Julia</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#lotka-volterra_system">Lotka-Volterra system</a><li><a href="#izhikevich_neuron">Izhikevich Neuron</a><ol><li><a href="#simulating_spikes">Simulating spikes</a><li><a href="#changing_parameter_values_and_initial_conditions">Changing parameter values and initial conditions</a><li><a href="#adding_external_currents">Adding external currents</a></ol></ol></div> <h1 id=introduction_to_differential_equations_in_julia ><a href="#introduction_to_differential_equations_in_julia" class=header-anchor >Introduction to Differential Equations in Julia</a></h1> <h2 id=lotka-volterra_system ><a href="#lotka-volterra_system" class=header-anchor >Lotka-Volterra system</a></h2> <pre><code class="julia hljs"><span class=hljs-comment ># Import the packages we need</span>
 <span class=hljs-keyword >using</span> ModelingToolkit <span class=hljs-comment >## for symbolic system definition</span>
 <span class=hljs-keyword >using</span> ModelingToolkit: t_nounits as t, D_nounits as D <span class=hljs-comment >## generic symbolic time variable and derivative operator</span>
 <span class=hljs-keyword >using</span> OrdinaryDiffEq <span class=hljs-comment >## for ODE solvers</span>
@@ -28,9 +28,103 @@ u0 = [x =&gt; <span class=hljs-number >5</span>, y =&gt; <span class=hljs-number
 <span class=hljs-comment ># Problem to be solved</span>
 prob = ODEProblem(simpsys, u0, tspan)
 <span class=hljs-comment ># Solution of the problem using the Tsit5 solver</span>
-sol = solve(prob, Tsit5())</code></pre> <p>The solution object contains the values of every variable of the system &#40;<code>x</code> and <code>y</code>&#41; for every simulated timestep. One can easily access the values of a specific variable using its symbolic name</p> <pre><code class="julia hljs">sol[x] <span class=hljs-comment >## or similarly sol[y]</span></code></pre>
-<p>Finally we can plot the timeseries of both variables of the solution in a line plot using</p>
-<pre><code class="julia hljs">plot(sol)</code></pre>
+sol = solve(prob, Tsit5())</code></pre><pre><code class="plaintext hljs">retcode: Success
+Interpolation: specialized 4th order &quot;free&quot; interpolation
+t: 31-element Vector{Float64}:
+  0.0
+  0.08117449098753833
+  0.2033472146318696
+  0.34481923758030086
+  0.5133453442586928
+  0.6997205942636654
+  0.9518449632884769
+  1.2078720930549587
+  1.5117501225731436
+  1.8960367593015124
+  2.3419689205858836
+  2.8001611761311196
+  3.154617596349518
+  3.446603431988819
+  3.816591344004686
+  4.104070083015805
+  4.50104637647137
+  4.897856816920354
+  5.496187010603642
+  6.017436474469348
+  6.362775057001467
+  6.659006719074707
+  6.972834263097586
+  7.347100606008145
+  7.7074811126632445
+  8.176455290373381
+  8.672007583256836
+  9.165339638990314
+  9.559050370550041
+  9.893470554340231
+ 10.0
+u: 31-element Vector{Vector{Float64}}:
+ [5.0, 2.0]
+ [4.737486951537538, 2.329442325406833]
+ [4.159128176496565, 2.7852722096289324]
+ [3.378232286801216, 3.105606216306078]
+ [2.5672395472069955, 3.0811885263548477]
+ [1.9773834953757778, 2.676854050573453]
+ [1.609406579313759, 1.9582843875373555]
+ [1.552749513812718, 1.3546873132985058]
+ [1.7519768926099824, 0.8937306633628304]
+ [2.3546312250537205, 0.61337657523862]
+ [3.5563657586661104, 0.5897128591272462]
+ [4.981843895194956, 1.0731410601672249]
+ [4.818950256230912, 2.2392637119053838]
+ [3.343661157987135, 3.1118008426116455]
+ [1.9313561988828034, 2.6139960476246533]
+ [1.5774359332463672, 1.8066110816035383]
+ [1.6566423633822205, 1.02648877617623]
+ [2.174120423530587, 0.6583968490231039]
+ [3.750824823666615, 0.6146437130025499]
+ [5.148338613885276, 1.3873773408422705]
+ [4.315048391711306, 2.6760882747903865]
+ [2.757183955074088, 3.1223343036598226]
+ [1.814291633172061, 2.437547442159294]
+ [1.5487493568378434, 1.4588265428851046]
+ [1.761324481429152, 0.8887489752549641]
+ [2.557619101510861, 0.5854753413658367]
+ [4.022955232810912, 0.6610024111093685]
+ [5.1545522666136785, 1.5571104452908116]
+ [3.7679793462689086, 2.9724967230117327]
+ [2.227954470813059, 2.900435675873252]
+ [1.946115942732129, 2.6293333027601915]</code></pre> <p>The solution object contains the values of every variable of the system &#40;<code>x</code> and <code>y</code>&#41; for every simulated timestep. One can easily access the values of a specific variable using its symbolic name</p> <pre><code class="julia hljs">sol[x] <span class=hljs-comment >## or similarly sol[y]</span></code></pre><pre><code class="plaintext hljs">31-element Vector{Float64}:
+ 5.0
+ 4.737486951537538
+ 4.159128176496565
+ 3.378232286801216
+ 2.5672395472069955
+ 1.9773834953757778
+ 1.609406579313759
+ 1.552749513812718
+ 1.7519768926099824
+ 2.3546312250537205
+ 3.5563657586661104
+ 4.981843895194956
+ 4.818950256230912
+ 3.343661157987135
+ 1.9313561988828034
+ 1.5774359332463672
+ 1.6566423633822205
+ 2.174120423530587
+ 3.750824823666615
+ 5.148338613885276
+ 4.315048391711306
+ 2.757183955074088
+ 1.814291633172061
+ 1.5487493568378434
+ 1.761324481429152
+ 2.557619101510861
+ 4.022955232810912
+ 5.1545522666136785
+ 3.7679793462689086
+ 2.227954470813059
+ 1.946115942732129</code></pre> <p>Finally we can plot the timeseries of both variables of the solution in a line plot using</p> <pre><code class="julia hljs">plot(sol)</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <p>We will shortly see more plot types and options.</p>
 <h2 id=izhikevich_neuron ><a href="#izhikevich_neuron" class=header-anchor >Izhikevich Neuron</a></h2>
 <h3 id=simulating_spikes ><a href="#simulating_spikes" class=header-anchor >Simulating spikes</a></h3>
@@ -40,7 +134,9 @@ sol = solve(prob, Tsit5())</code></pre> <p>The solution object contains the valu
 <span class=hljs-meta >@parameters</span> a=<span class=hljs-number >0.02</span> b=<span class=hljs-number >0.2</span> c=-<span class=hljs-number >50</span> d=<span class=hljs-number >2</span> I=<span class=hljs-number >10</span>
 
 eqs = [D(v) ~ <span class=hljs-number >0.04</span> * v ^ <span class=hljs-number >2</span> + <span class=hljs-number >5</span> * v + <span class=hljs-number >140</span> - u + I,
-        D(u) ~ a * (b * v - u)]</code></pre>
+        D(u) ~ a * (b * v - u)]</code></pre><pre><code class="plaintext hljs">2-element Vector{Symbolics.Equation}:
+ Differential(t)(v(t)) ~ 140 + I - u(t) + 5v(t) + 0.04(v(t)^2)
+ Differential(t)(u(t)) ~ a*(-u(t) + b*v(t))</code></pre>
 <p>Now we need to define the callback to simulate spikes. Spiking callbacks belong to the family of discrete callbacks and are defined by two parts :</p>
 <ul>
 <li><p>a condition which  triggers the callback every timestep it evaluates as <code>true</code>, e.g. <code>v &gt; 30</code> means that each time the neuron voltage <code>v</code> rises above <code>30</code> mV a spike is triggered.</p>
@@ -49,7 +145,7 @@ eqs = [D(v) ~ <span class=hljs-number >0.04</span> * v ^ <span class=hljs-number
 
 </ul>
 <p>The spiking event for this model looks like this</p>
-<pre><code class="julia hljs">event = (v &gt; <span class=hljs-number >30.0</span>) =&gt; [u ~ u + d, v ~ c]</code></pre>
+<pre><code class="julia hljs">event = (v &gt; <span class=hljs-number >30.0</span>) =&gt; [u ~ u + d, v ~ c]</code></pre><pre><code class="plaintext hljs">v(t) &gt; 30.0 =&gt; Symbolics.Equation[u(t) ~ d + u(t), v(t) ~ c]</code></pre>
 <p>Now we can move on to define the system including the spiking event, create a problem and solve it.</p>
 <pre><code class="julia hljs"><span class=hljs-comment ># Model system and simplification.</span>
 <span class=hljs-meta >@named</span> izh_system = ODESystem(eqs, t, [v, u], [a, b, c, d, I]; discrete_events = event)
@@ -67,7 +163,7 @@ izh_sol = solve(izh_prob)
 
 plot(izh_sol)
 <span class=hljs-comment ># or if we want to plot just the voltage timeseries with its spiking pattern</span>
-plot(izh_sol; idxs=[v])</code></pre>
+plot(izh_sol; idxs=[v])</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <h3 id=changing_parameter_values_and_initial_conditions ><a href="#changing_parameter_values_and_initial_conditions" class=header-anchor >Changing parameter values and initial conditions</a></h3>
 <p>After defining and simulating a system we might want to run another simulation by changing either or both of the parameter values and the initial conditions. The Izhikevich neuron that we simulated above has multiple spiking regimes that correspond to different parameter value combinations. If we have our <code>ODEProblem</code> already defined as the <code>izh_prob</code> variable above, we can remake it by keeping everything the same except for the fields that we choose to alter. Here we will change only the model parameters to change from chattering to fast spiking.</p>
 <pre><code class="julia hljs">izh_prob = remake(izh_prob; p = [a =&gt; <span class=hljs-number >0.1</span>, b =&gt; <span class=hljs-number >0.2</span>, c =&gt; -<span class=hljs-number >65</span>, d =&gt; <span class=hljs-number >2</span>])
@@ -76,7 +172,7 @@ izh_prob = remake(izh_prob; p = [a =&gt; <span class=hljs-number >0.1</span>, b 
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v])</code></pre>
+plot(izh_sol; idxs=[v])</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <p>Notice how the spiking pattern has changed compared to the previous simulation.</p>
 <h3 id=adding_external_currents ><a href="#adding_external_currents" class=header-anchor >Adding external currents</a></h3>
 <p>Until now we have been simulating the Izhikevich neuron by injecting it with a constant external DC current <code>I&#61;10</code>. We&#39;ll now see how we can expand the <code>I</code> input to a dynamic current, which is more realistic &#40;currents do not remain constant in the brain for too long&#41;. Since <code>I</code> will change dynamically in time, it will be a time-dependent variable of the system and not a constant parameter.</p>
@@ -92,11 +188,27 @@ event = (v &gt; <span class=hljs-number >30.0</span>) =&gt; [u ~ u + d, v ~ c]
 
 <span class=hljs-comment ># Notice how `I` was moved from the parameter list to the variable list in the following call.</span>
 <span class=hljs-meta >@named</span> izh_system = ODESystem(eqs, t, [v, u, I], [a, b, c, d]; discrete_events = event)
-izh_simple = structural_simplify(izh_system)</code></pre>
+izh_simple = structural_simplify(izh_system)</code></pre><pre><code class="plaintext hljs">Model izh_system:
+Equations (2):
+  2 standard: see equations(izh_system)
+Unknowns (2): see unknowns(izh_system)
+  v(t) [defaults to -65]
+  u(t) [defaults to -13]
+Parameters (4): see parameters(izh_system)
+  a [defaults to 0.02]
+  d [defaults to 8]
+  b [defaults to 0.2]
+  c [defaults to -65]
+Observed (1): see observed(izh_system)</code></pre>
 <p>Let&#39;s display the equations of the original and the simplified system to see the effect of <code>structural_simplify</code>.</p>
-<pre><code class="julia hljs">equations(izh_system)</code></pre>
+<pre><code class="julia hljs">equations(izh_system)</code></pre><pre><code class="plaintext hljs">3-element Vector{Symbolics.Equation}:
+ Differential(t)(v(t)) ~ 140 - u(t) + 5v(t) + I(t) + 0.04(v(t)^2)
+ Differential(t)(u(t)) ~ a*(-u(t) + b*v(t))
+ I(t) ~ 10sin(0.5t)</code></pre>
 <p>The original system contains the algebraic equation for the external current <code>I</code>.</p>
-<pre><code class="julia hljs">equations(izh_simple)</code></pre>
+<pre><code class="julia hljs">equations(izh_simple)</code></pre><pre><code class="plaintext hljs">2-element Vector{Symbolics.Equation}:
+ Differential(t)(v(t)) ~ 140.0 - u(t) + 5.0v(t) + I(t) + 0.04(v(t)^2)
+ Differential(t)(u(t)) ~ a*(-u(t) + b*v(t))</code></pre>
 <p>However the <code>I</code> equation has been simplified away in <code>izh_simple</code>, since it was substituted into the differential equation <code>D&#40;v&#41;</code>. This is an important functionality of <code>structural_simplify</code> as it has turned a system of Differential Algebraic Equations &#40;DAE&#41; to one of Ordinary Differential Equations &#40;ODE&#41;. ODEs can be integrated &#40;solved&#41; much more efficiently compared to DAEs.</p>
 <pre><code class="julia hljs">tspan = (<span class=hljs-number >0.0</span>, <span class=hljs-number >400.0</span>)
 
@@ -105,13 +217,12 @@ izh_prob = ODEProblem(izh_simple, [], tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v, I])</code></pre>
+plot(izh_sol; idxs=[v, I])</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
 <p>Notice how the external current is slowly being accumulated in the neuron&#39;s potential <code>v</code> until the eventual spike and reset.</p>
 <p>References &#91;1&#93; : E. M. Izhikevich, &quot;Simple model of spiking neurons,&quot; in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440</p>
-<hr />
-<p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p>
+
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: December 07, 2024.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: December 09, 2024.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
