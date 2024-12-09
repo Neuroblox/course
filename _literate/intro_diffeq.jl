@@ -1,4 +1,4 @@
-# # Introduction to Differential Equations in Julia
+# # Differential Equations in Julia
 
 # ## Lotka-Volterra system
 
@@ -38,7 +38,10 @@ sol = solve(prob, Tsit5())
 sol[x] ## or similarly sol[y]
 
 # Finally we can plot the timeseries of both variables of the solution in a line plot using
-plot(sol)
+fig = plot(sol)
+## display the figure
+fig
+
 # We will shortly see more plot types and options.
 
 
@@ -79,9 +82,11 @@ izh_prob = ODEProblem(izh_simple, u0, tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol)
-## or if we want to plot just the voltage timeseries with its spiking pattern
-plot(izh_sol; idxs=[v])
+fig = plot(izh_sol)
+fig
+# or if we want to plot just the voltage timeseries with its spiking pattern
+fig = plot(izh_sol; idxs=[v])
+fig
 
 # ### Changing parameter values and initial conditions
 # After defining and simulating a system we might want to run another simulation by changing either or both of the parameter values and the initial conditions. 
@@ -94,7 +99,8 @@ izh_prob = remake(izh_prob; p = [a => 0.1, b => 0.2, c => -65, d => 2], u0 = [v 
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v])
+fig = plot(izh_sol; idxs=[v])
+fig
 
 # Notice how the spiking pattern has changed compared to the previous simulation.
 
@@ -129,7 +135,8 @@ izh_prob = ODEProblem(izh_simple, [], tspan)
 
 izh_sol = solve(izh_prob)
 
-plot(izh_sol; idxs=[v, I])
+fig = plot(izh_sol; idxs=[v, I])
+fig
 
 # Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset. 
 
