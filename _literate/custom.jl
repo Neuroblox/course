@@ -21,6 +21,7 @@
 # For example let's consider a `LIFNeuron`, which is a Leaky Integrate-and-Fire (LIF) neuron in Neuroblox.
 
 using Neuroblox
+using OrdinaryDiffEq
 
 @named lif = LIFNeuron()
 
@@ -65,8 +66,6 @@ sol = solve(prob, Tsit5());
 # - `namespace` that holds the namespace to which the object belongs. This field is not relevant for the current session and it will be left to its default value of `namespace=nothing`. Namespaces are important in hierarchical models though, where we have Bloxs that contain other Bloxs in them. We will see such an example later on.
 # We will only include these two fields and write an inner constructor function for our `struct IzhNeuron`. 
 
-using OrdinaryDiffEq
-
 struct IzhNeuron <: Neuron
     system
     namespace
@@ -91,6 +90,7 @@ end
 
 # > **_Note:_** In `IzhNeuron` the `jcn` variable does not get a default value, only the [input=true] tag.
 # > This means that other Bloxs will connect to a `IzhNeuron` through `jcn`.
+# >
 # > Neuroblox automatically initializes a `jcn ~ 0` equation and then accumulates connection terms in it.
 # > This happens with all input variables of Bloxs.
 # >
