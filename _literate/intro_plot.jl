@@ -1,4 +1,7 @@
 # # Plotting with Makie
+# Learning goals:
+# - Design layouts with multiple axes in figures.
+# - Use Makie's functionality to plot neuron-specific figures.
 
 # ## Introduction
 # Makie is a plotting ecosystem based in Julia. It comes with multiple backends for rendering and displaying plots. For this course we will be using `CairoMakie` as it has a lot of features for 2D static plots and most computers should support it as it only requires a CPU and no GPU.
@@ -104,3 +107,10 @@ axislegend(position = :lt)
 fig
 save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide
 # \fig{spikes}
+
+# # Challenge Problems
+# See the [Differential Equations in Julia](./intro_diffeq/)
+
+# # References
+# - Danisch et al., (2021). Makie.jl: Flexible high-performance data visualization for Julia. Journal of Open Source Software, 6(65), 3349, https://doi.org/10.21105/joss.03349
+# - https://docs.makie.org/stable/

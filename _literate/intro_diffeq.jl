@@ -1,4 +1,7 @@
 # # Differential Equations in Julia
+# Learning goals:
+# - Learn about ModelingToolkit, the symbolic way to define differential equation systems.
+# - Implement a neuron model using ModelingToolkit and simulate spiking
 
 # ## Lotka-Volterra system
 
@@ -51,7 +54,7 @@ save(joinpath(@OUTPUT, "mtk1.svg"), fig); # hide
 
 # ### Simulating spikes
 
-# Let's now move on to a two-dimensional model of a neuron. This is a popular model, known as the Izhikevich neuron [1]. Even though the model appears simple, it can exhibit many different spiking patterns (e.g. regular and fast spiking, bursting, chattering) by changing its parameters.
+# Let's now move on to a two-dimensional model of a neuron. This is a popular model, known as the Izhikevich neuron. Even though the model appears simple, it can exhibit many different spiking patterns (e.g. regular and fast spiking, bursting, chattering) by changing its parameters.
 # The Izhikevich neuron is a similar system of ODEs like the Lotka-Volterra example above. One notable difference however is the spiking mechanism.
 # Spiking in the Izhikevich neuron needs to be implemented "manually". That is we need to detect when the voltage variable crosses a spiking threshold and every time this event happens we need to reset the neuron's voltage to a more polarized value and potentially alter other variables too.
 
@@ -151,5 +154,11 @@ save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide
 
 # Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset. 
 
-# References
-# * [1] : E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
+# # Challenge Problems
+#- Define a [Generalized Integrate-and-Fire neuron](https://neuronaldynamics.epfl.ch/online/Pt2.html) as an `ODESystem` and simulate it. 
+#- Pick a neuron model of your choice and perform a sensitivity analysis on the system. How is its spiking behavior change as its parameters change? Summarize the results in one (or several) plots.
+
+# # References
+# - E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
+# - Ma, Yingbo, Shashi Gowda, Ranjan Anantharaman, Chris Laughman, Viral Shah, and Chris Rackauckas. "Modelingtoolkit: A composable graph transformation system for equation-based modeling." arXiv preprint arXiv:2103.05244 (2021).
+# - https://docs.sciml.ai/ModelingToolkit/stable/

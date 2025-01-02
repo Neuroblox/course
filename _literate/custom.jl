@@ -1,4 +1,9 @@
 # # Blox and Connections in Neuroblox
+# Learning goals:
+# - Learn about how Bloxs and their connections are structured in Neuroblox.
+# - Implement new Bloxs in code.
+# - Implement new connection rules between the new Bloxs and existing ones from Neuroblox.
+
 # Neuroblox comes with a library of many components already, which we call Blox. Such Blox are neuron models, neural masses, circuits of these, input sources, observers etc. Additionally there are connection rules that dictate how types of components connect with one another. Over the rest of this course we will encounter multiple examples of models made by Neuroblox components and connected by rules already implemented in the package.
 
 # It is also possible though to design custom Blox components and connection rules that do not exist in Neuroblox yet. This feature allows us to easily extend the capabilities of Neuroblox towards our specific needs. 
@@ -60,7 +65,6 @@ sol = solve(prob, Tsit5());
 # - `namespace` that holds the namespace to which the object belongs. This field is not relevant for the current session and it will be left to its default value of `namespace=nothing`. Namespaces are important in hierarchical models though, where we have Bloxs that contain other Bloxs in them. We will see such an example later on.
 # We will only include these two fields and write an inner constructor function for our `struct IzhNeuron`. 
 
-using Neuroblox
 using OrdinaryDiffEq
 
 struct IzhNeuron <: Neuron
@@ -192,3 +196,14 @@ sol = solve(prob, Tsit5());
 # > then create a graph with one connection of this kind and simulate it. 
 # > Consider which variable or parameter of `IzhNeuron` should be affected by such a spike.
 # > Hint: Look at how a `IzhNeuron` spike affects its own dynamics.
+
+# # Challenge Problems
+#- Implement a Morris-Lecar neuron as a new Blox and add connection rules to interface it with itself and Hodgkin-Huxley neurons from Neuroblox (`HHNeuronExciBlox` and `HHNeuronInhibBlox`). 
+#   - Morris C, Lecar H. Voltage oscillations in the barnacle giant muscle fiber. Biophys J. 1981 Jul;35(1):193-213. doi: 10.1016/S0006-3495(81)84782-0. PMID: 7260316; PMCID: PMC1327511.
+#   - http://www.scholarpedia.org/article/Morris-Lecar_model
+
+#- Implement a spiking neural network of Generalized Leaky Integrate-and-Fire neurons. Section 2.1 from the paper. 
+#   - Lorenzi RM, Geminiani A, Zerlaut Y, De Grazia M, Destexhe A, Gandini Wheeler-Kingshott CAM, Palesi F, Casellato C, D'Angelo E. A multi-layer mean-field model of the cerebellum embedding microstructure and population-specific dynamics. PLoS Comput Biol. 2023 Sep 1;19(9):e1011434. doi: 10.1371/journal.pcbi.1011434. PMID: 37656758; PMCID: PMC10501640.
+    
+#- Implement a Hopf network model with stochastic dynamics.
+#   - Ponce-Alvarez, A., Deco, G. The Hopf whole-brain model and its linear approximation. Sci Rep 14, 2615 (2024). https://doi.org/10.1038/s41598-024-53105-0
