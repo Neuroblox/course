@@ -203,6 +203,11 @@ sol = solve(prob, Vern7());
 # > **_Exercise:_** : Use the plotting functions from above to visualize the simulation results for any Blox of your choice. 
 # > Try changing the image samples and notice the change in the spatial firing patterns in VAC and AC neurons. 
 
-# ## References
+# # Challenge Problems
+# - Try changing parameters of ASC1, which is modeled as Next Generation Neural Mass Model to generate different cortical rhythms. See how the peak shifts in the power spectrum when you connect AC1 to a cortical block CB. Currently it’s set for 16 hz oscillation. See if you can get it to oscillate at 5 Hz, 10 Hz and 20 Hz.
+# - In the circuit with ASC1, VAC, AC and stimuli, add another ascending input ‘ASC2’ such that ASC1 connects only to VAC and ASC2 connects only to AC. Now set the parameters of ASC2 to oscillate at different frequencies (5 Hz, 10 Hz etc.). Observe the power spectrum of the activity of AC, does it show two peaks?
+# - Try different values of t_stimulus and t_pause that are set during defining the stimulus (such that t_stimulus + t_pause = 1000 msec). See the effect in the activities of VAC and AC in their stack plots. You will notice that the activity in the cortical blocks stops after t=t_stimulus. Now try making multiple cortical blocks similar to AC (AC1, AC2 say). Try connecting them in different topologies. One possibility is a chain i.e VAC -> AC1 -> AC2 … so on. Another possibility is of a loop i.e. VAC -> AC1 -> AC2 …. -> AC1. In this loop, the activity can sustain even in the absence of stimulus (during t_pause) due to the feedback loop. Try and see if you can create a loop where activity persists even after t=t_stimulus.
+
+# # References
 # [1] Pathak A., Brincat S., Organtzidis H., Strey H., Senneff S., Antzoulatos E., Mujica-Parodi L., Miller E., Granger R. Biomimetic model of corticostriatal micro-assemblies discovers new neural code., bioRxiv 2023.11.06.565902, 2024
 # [2] Byrne Á, O'Dea RD, Forrester M, Ross J, Coombes S. Next-generation neural mass and field modeling. J Neurophysiol. 2020 Feb 1;123(2):726-742. doi: 10.1152/jn.00406.2019. Epub 2019 Nov 27. PMID: 31774370.
