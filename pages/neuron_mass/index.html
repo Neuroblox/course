@@ -1,0 +1,201 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox Course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">How to install</a> <li><a href="" class=has-arrow >Introduction to Julia</a> <ul> <li><a href="/course/pages/intro_julia">Base language</a> <li><a href="/course/pages/intro_diffeq">Differential Equations</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/intro_challenge">Challenge Problems</a> </ul> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Neurons, Neural Masses and Sources</h1> <hr> <div class=franklin-content ><h1 id=neurons_neural_masses_and_sources ><a href="#neurons_neural_masses_and_sources" class=header-anchor >Neurons, Neural Masses and Sources</a></h1> <p>Learning goals :</p> <ul> <li><p>visualize results from neuron and neural mass Blox simulations</p> <li><p>introduce external sources as Blox</p> <li><p>drive single neuron and neural mass activity using external sources</p> </ul> <p>The main distinction between the neuron, neural mass and source Blox we will encounter on this session is the mechanism by which they communicate with other Bloxs. All neural mass Bloxs, some sources, and neurons of the Hodgkin-Huxley &#40;HH&#41; family have continuous output variables which are included as terms in the postsynaptic Blox&#39;s differential equations. The alternative is an event-based connection. Neurons of the Izhikevich and the Integrate-and-fire families of models operate this way as we have previosuly seen. Sources that simulate spike trains may also operate the same way via callbacks.</p> <h2 id=neurons_and_neural_masses ><a href="#neurons_and_neural_masses" class=header-anchor >Neurons and neural masses</a></h2> <p>As a first example we will consider a neural mass <code>WilsonCowan</code> Blox of Exhitatation-Inhibition &#40;E-I&#41; balance. This is a two-dimensional reduction over a population of excitatory and inhibitory neurons with continuous dynamics.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Neuroblox
+<span class=hljs-keyword >using</span> OrdinaryDiffEq
+<span class=hljs-keyword >using</span> CairoMakie
+
+<span class=hljs-meta >@named</span> nm = WilsonCowan()
+<span class=hljs-comment ># Retrieve the simplified ODESystem of the Blox</span>
+sys = system(nm)
+tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >100</span>) <span class=hljs-comment ># ms</span>
+prob = ODEProblem(sys, [], tspan)
+sol = solve(prob, Tsit5())
+
+fig, ax = plot(sol);
+axislegend(ax) <span class=hljs-comment >## add legend to the plot</span>
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/wc_all' not found. //</span></p> <p>Using the generic <code>plot</code> function we visualize all states of our model. We can retrieve specific variables by using</p> <pre><code class="julia hljs">E = state_timeseries(nm, sol, <span class=hljs-string >&quot;E&quot;</span>) <span class=hljs-comment >## retrieves state `E` of Blox `nm`</span>
+fig = lines(E); <span class=hljs-comment >## simple line plot</span>
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/wc_timeseries' not found. //</span></p> <p>Moving on to neurons, we will use a Quadratic Integrate-and-fire &#40;QIF&#41; neuron model with an added callback that increases the input current after 60 ms.</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> qif = QIFNeuron(; I_in=<span class=hljs-number >4</span>)
+<span class=hljs-comment ># We can pass additional events to be included in the final system.</span>
+sys = system(qif; discrete_events = [<span class=hljs-number >60</span>] =&gt; [qif.I_in ~ <span class=hljs-number >10</span>])
+tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >100</span>) <span class=hljs-comment ># ms</span>
+prob = ODEProblem(sys, [], tspan)
+sol = solve(prob, Tsit5())</code></pre> <p>Besides the generic <code>plot</code> function, Neuroblox includes some plotting recipes specifically for neuron models. A raster plot with chosen spike threshold</p> <pre><code class="julia hljs">fig = rasterplot(qif, sol; threshold=-<span class=hljs-number >40</span>);
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/qif_raster' not found. //</span></p> <p>and a firing rate plot, again by setting the spike threshold and the window size for averaging</p> <pre><code class="julia hljs">fig = frplot(qif, sol; threshold=-<span class=hljs-number >40</span>, win_size=<span class=hljs-number >20</span>);
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/qif_fr' not found. //</span></p> <p>We can easily extract the voltage timeseries of neurons by</p> <pre><code class="julia hljs">V = voltage_timeseries(qif, sol) <span class=hljs-comment >## equivalent to `state_timeseries(qif, sol, &quot;V&quot;)`</span>
+fig = lines(V);
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/qif_timeseries' not found. //</span></p> <p>Finally we simulate an HH neuron with stochastic dynamics which was introduced in <a href="https://doi.org/10.1073/pnas.2120808119">this article on deep brain stimulation int he subthalamic nucleus</a>. The model includes a brownian noise term affecting <code>D&#40;V&#41;</code> which you can inspect using the <code>equations</code> function.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> StochasticDiffEq <span class=hljs-comment >## to access stochastic DE solvers</span>
+
+<span class=hljs-meta >@named</span> hh = HHNeuronExci_STN_Adam_Blox(; σ=<span class=hljs-number >2</span>) <span class=hljs-comment >## σ is the brownian noise amplitude</span>
+
+sys = system(hh)
+prob = SDEProblem(sys, [], (<span class=hljs-number >0</span>, <span class=hljs-number >1000</span>))
+sol = solve(prob, RKMil())
+
+<span class=hljs-comment ># Plot the powerspectrum of the solution</span>
+fig = powerspectrumplot(hh, sol; samplig_rate=<span class=hljs-number >0.01</span>);
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/hh_power' not found. //</span></p> <p>We can use all other plots from above with this stochastic HH neuron since it is a subtype of <code>Neuron</code>. Given its stochastic nature it might be additionally meaningful to show the powerspectrum of its activity.</p> <blockquote> <p><strong><em>Exercise:</em></strong> Try changing the influence of the stochastic term. What do you notice about the powerspectrum of <code>HHNeuronExci_STN_Adam_Blox</code>?</p> </blockquote> <h2 id=sources ><a href="#sources" class=header-anchor >Sources</a></h2> <p>External sources in Neuroblox as a particular Blox subtype &#40;<code>&lt;: AbstractBlox</code>&#41; which contains a system with output and no input variables. Naturally source Bloxs can only connect <strong>to</strong> other &#40;non-source&#41; Blox and can not receive connections from any Blox. There are two main categories of sources, ones with continuous dynamics for their variables and ones that operate through events &#40;callbacks&#41;.</p> <h3 id=continuous_input_sources ><a href="#continuous_input_sources" class=header-anchor >Continuous input sources</a></h3> <p>These sources are comprised of algebraic &#40;and potentially differential&#41; equations that become part of the dynamics of Bloxs that the source connects to. We will drive the <code>WilsonCowan</code> Blox above with a <code>ConstantInput</code> source. The connection between the two Bloxs looks like</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> inp = ConstantInput(; I=<span class=hljs-number >3</span>)
+
+connection_rule(inp, nm)</code></pre> <p>This source simply adds a fixed current to the input variable &#40;<code>nm₊jcn</code>&#41; of the downstream &#40;destination&#41; Blox.</p> <pre><code class="julia hljs">g = MetaDiGraph()
+add_edge!(g, inp =&gt; nm, weight = <span class=hljs-number >1</span>)
+
+<span class=hljs-meta >@named</span> sys = system_from_graph(g)
+prob = ODEProblem(sys, [], tspan)
+sol = solve(prob, Tsit5())
+
+fig, ax = plot(sol);
+axislegend(ax)
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/wc_input' not found. //</span></p> <p>Notice how the E-I balance has shiften after adding our input. We will work with a more complex circuit for E-I balance on the next session and learn more about its intricacies.</p> <p>We can create custom sources with continuous input the same way we create custom Bloxs and write custom connection rules for them as we have seen in the previous session.</p> <h3 id=event-based_spike_sources ><a href="#event-based_spike_sources" class=header-anchor >Event-based spike sources</a></h3> <p>This type of source operates entirely through callbacks. One common example is a source that simulates spiking from presynaptic neurons that we do not explicitly include in our model. Each time the source&#39;s callback is triggered, it affects parameters and/or variables of its postsynaptic neurons which are part of our model. Commonly it is assumed that the spiking of neurons follows a Poisson process. Therefore we have implemented a source in Neuroblox that generates spikes that are distributed according to a Poisson distribution for any finite length of time.</p> <pre><code class="julia hljs">tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >200</span>) <span class=hljs-comment ># ms</span>
+spike_rate = <span class=hljs-number >0.01</span> <span class=hljs-comment ># spikes / ms</span>
+
+<span class=hljs-meta >@named</span> spike_train_rate = PoissonSpikeTrain(spike_rate, tspan)</code></pre> <p>The <code>PoissonSpikeTrain</code> needs a timespan <code>Tuple</code> &#40;<code>tspan</code>&#41; to generate spikes within it. Above we have set a fixed <code>spike_rate</code> for our process. Alternatively we can also define the spike train with a variable <code>spike_rate</code> that is sampled according to any univariate distribution.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Distributions
+
+tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >200</span>) <span class=hljs-comment ># ms</span>
+<span class=hljs-comment ># Define a `NamedTuple` holding a `distribution` and a `dt` field</span>
+spike_rate = (distibution = Normal(<span class=hljs-number >1</span>, <span class=hljs-number >0.1</span>), dt = <span class=hljs-number >10</span>)
+
+<span class=hljs-meta >@named</span> spike_train_dist = PoissonSpikeTrain(spike_rate, tspan)</code></pre> <p>When choosing a variable <code>spike_rate</code> we need to set a <code>dt</code> that dictates how often the <code>distribution</code> will generate a new <code>spike_rate</code> sample. The units of <code>dt</code> match the units of <code>tspan</code> which by default is ms in Neuroblox.</p> <blockquote> <p><strong><em>Exercise:</em></strong> Define a <code>LIFExciNeuron</code>, connect a <code>PoissonSpikeTrain</code> to it and tune the source parameters to make the neuron spike. You can visualize spiking using <code>rasterplot</code> and <code>frplot</code> as above.</p> </blockquote> <p>We can create custom event-based spike sources with a bit more effort compared to continuous ones. Here is a worked example with comments on the necessary steps :</p> <pre><code class="julia hljs"><span class=hljs-keyword >struct</span> BernoulliSpikes &lt;: SpikeSource
+    name <span class=hljs-comment >## necessary field</span>
+    namespace <span class=hljs-comment >## necessary field</span>
+    tspan <span class=hljs-comment >## necessary field</span>
+    probability_spike
+    dt
+    <span class=hljs-keyword >function</span> BernoulliSpikes(probability_spike, tspan, dt; name, namespace=<span class=hljs-literal >nothing</span>)
+        new(name, namespace, tspan, probability_spike, dt)
+    <span class=hljs-keyword >end</span>
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-keyword >import</span> Neuroblox: generate_spike_times, connection_spike_affects
+
+<span class=hljs-keyword >function</span> generate_spike_times(source::BernoulliSpikes)
+    <span class=hljs-comment ># Write a function that generates and returns a vector of spike times.</span>
+
+    t_range = source.tspan[<span class=hljs-number >1</span>]:source.dt:source.tspan[<span class=hljs-number >2</span>]
+    t_spikes = <span class=hljs-built_in >Float64</span>[]
+    <span class=hljs-keyword >for</span> t <span class=hljs-keyword >in</span> t_range
+        <span class=hljs-keyword >if</span> rand(Bernoulli(source.probability_spike))
+            push!(t_spikes, t)
+        <span class=hljs-keyword >end</span>
+    <span class=hljs-keyword >end</span>
+    <span class=hljs-keyword >return</span> t_spikes
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-keyword >function</span> connection_spike_affects(source::BernoulliSpikes, ifn::IFNeuron, w)
+    <span class=hljs-comment ># Write all equations that should be evaluated each time `source` spikes.</span>
+    <span class=hljs-comment ># `w` is the symbolic connection weight, same as in `connection_equations`.</span>
+
+    eqs = [ifn.I_in ~ ifn.I_in + w]
+    <span class=hljs-keyword >return</span> eqs
+<span class=hljs-keyword >end</span>
+
+tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >500</span>)
+<span class=hljs-meta >@named</span> s = BernoulliSpikes(<span class=hljs-number >0.05</span>, tspan, <span class=hljs-number >5</span>)
+<span class=hljs-meta >@named</span> ifn = IFNeuron()
+
+g = MetaDiGraph()
+add_edge!(g, s =&gt; ifn, weight=<span class=hljs-number >1</span>)
+<span class=hljs-meta >@named</span> sys = system_from_graph(g)
+
+prob = ODEProblem(sys, [], tspan)
+sol = solve(prob, Tsit5())
+
+fig = rasterplot(ifn, sol);
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/ifn_input' not found. //</span></p> <p>Notice how spikes become more and more frequently over time. Can you tell why this is happening?</p> <h3 id=deep_brain_stimulation ><a href="#deep_brain_stimulation" class=header-anchor >Deep Brain Stimulation</a></h3> <p>Neuroblox contains specialized sources that are common to the field of Deep Brain Stimulation &#40;DBS&#41;. These sources simulate stimulation patterns by external probes that are continuous in time, yet contain discrete changes &#40;jumps&#41; on their variables. Even though these sources are often used in DBS protocols, they are implemented as any other source so they can be connected to any other Bloxs given a connection rule. We will first visualize the sources on their own and then connect them to an HH excitatory neuron.</p> <pre><code class="julia hljs"><span class=hljs-comment ># Set the random seed for reproducible results</span>
+<span class=hljs-keyword >using</span> Random
+Random.seed!(<span class=hljs-number >1</span>)
+
+<span class=hljs-comment ># Square pulse stimulus</span>
+<span class=hljs-meta >@named</span> stim = DBS(
+                frequency=<span class=hljs-number >100.0</span>, <span class=hljs-comment >## Hz</span>
+                amplitude=<span class=hljs-number >200.0</span>, <span class=hljs-comment >## arbitrary units, depends on how the stimulus is used in the model</span>
+                pulse_width=<span class=hljs-number >0.5</span>, <span class=hljs-comment >## ms</span>
+                offset=<span class=hljs-number >0.0</span>,
+                start_time=<span class=hljs-number >5.0</span>, <span class=hljs-comment >## ms</span>
+                smooth=<span class=hljs-number >0.0</span> <span class=hljs-comment >## modulates smoothing effect</span>
+);
+
+tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >100</span>) <span class=hljs-comment >## ms</span>
+dt = <span class=hljs-number >0.001</span> <span class=hljs-comment >## ms</span>
+
+time = tspan[<span class=hljs-number >1</span>]:dt:tspan[<span class=hljs-number >2</span>]
+<span class=hljs-comment ># `stimulus` is a function that is also a field of `DBS` objects.</span>
+<span class=hljs-comment ># It turns a time vector into a vector of stimulus values of the same length given the object&#x27;s parameters.</span>
+stimulus = stim.stimulus.(time)
+
+fig = Figure();
+ax1 = Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;stimulus&quot;</span>)
+lines!(ax1, time, stimulus)
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim' not found. //</span></p> <p>We can also generate a smoothed pulse train as</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> stim_smooth = DBS(
+                frequency=<span class=hljs-number >100.0</span>,
+                amplitude=<span class=hljs-number >200.0</span>,
+                pulse_width=<span class=hljs-number >0.5</span>,
+                offset=<span class=hljs-number >0.0</span>,
+                start_time=<span class=hljs-number >5.0</span>,
+                smooth=<span class=hljs-number >1e-3</span>
+);
+
+smooth_stimulus = stim_smooth.stimulus.(time)
+
+fig = Figure();
+ax1 = Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;stimulus&quot;</span>)
+lines!(ax1, time, stimulus) <span class=hljs-comment >## plot the un-smoothed stimulus from above</span>
+xlims!(ax1, <span class=hljs-number >4.9</span>, <span class=hljs-number >5.6</span>) <span class=hljs-comment >## set the x-axis limits for better visibility of a smoothed pulse</span>
+
+ax2 = Axis(fig[<span class=hljs-number >2</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;stimulus&quot;</span>)
+lines!(ax2, time, smooth_stimulus) <span class=hljs-comment >## plot the smoothed stimulus</span>
+xlims!(ax2, <span class=hljs-number >4.9</span>, <span class=hljs-number >5.6</span>) <span class=hljs-comment >## set the x-axis limits for better visibility of a smoothed pulse</span>
+
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim_comparison' not found. //</span></p> <p>It is also possible to create a stimulus protocol that does not follow a simple periodic stimulation schedule as above and contains multiple pulses before a quiet time window:</p> <pre><code class="julia hljs">frequency = <span class=hljs-number >20.0</span>
+amplitude = <span class=hljs-number >1.0</span>
+pulse_width = <span class=hljs-number >20.0</span>
+smooth = <span class=hljs-number >3e-4</span>
+pulse_start_time = <span class=hljs-number >0.01</span>
+offset = <span class=hljs-number >0</span>
+pulses_per_burst = <span class=hljs-number >3</span>
+bursts_per_block = <span class=hljs-number >2</span>
+pre_block_time = <span class=hljs-number >200.0</span>
+inter_burst_time = <span class=hljs-number >200.0</span>
+
+<span class=hljs-meta >@named</span> dbs = ProtocolDBS(
+                frequency=frequency,
+                amplitude=amplitude,
+                pulse_width=pulse_width,
+                smooth=smooth,
+                offset=offset,
+                pulses_per_burst=pulses_per_burst,
+                bursts_per_block=bursts_per_block,
+                pre_block_time=pre_block_time,
+                inter_burst_time=inter_burst_time,
+                start_time = pulse_start_time);
+
+t_end = get_protocol_duration(dbs)
+t_end = t_end + inter_burst_time
+tspan = (<span class=hljs-number >0.0</span>, t_end)
+dt = <span class=hljs-number >0.001</span>
+
+time = tspan[<span class=hljs-number >1</span>]:dt:tspan[<span class=hljs-number >2</span>]
+stimulus = dbs.stimulus.(time)
+
+fig = Figure();
+ax1 = Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;stimulus&quot;</span>)
+lines!(ax1, time, stimulus)
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim_protocol' not found. //</span></p> <p>Now let&#39;s finally connect our <code>ProtocolDBS</code> source to an HH excitatory neuron and simulate</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> nn = HHNeuronExciBlox(I_bg=<span class=hljs-number >0.4</span>)
+
+g = MetaDiGraph()
+add_edge!(g, dbs =&gt; nn, weight = <span class=hljs-number >10.0</span>)
+
+<span class=hljs-meta >@named</span> sys = system_from_graph(g)
+prob = ODEProblem(sys, [], tspan)
+
+transitions_inds = detect_transitions(time, stimulus; atol=<span class=hljs-number >0.001</span>)
+transition_times = time[transitions_inds]
+transition_values = stimulus[transitions_inds]
+sol = solve(prob, Vern7(), saveat=dt, tstops = transition_times);</code></pre> <blockquote> <p><strong><em>Note:</em></strong> We have used <code>detect_transitions</code> to find all points where the stimulation switches on and off. Such points can lead to discontinuities in the dynamics of our model and thus to imprecise solutions. Adding the transition points explicitly as <code>tstops</code> when solving will force the chosen solver to stop righ before and after each transition and evaluate the equations for greater precision and stability.</p> </blockquote> <pre><code class="julia hljs"><span class=hljs-comment ># Retrive the timeseries of the voltage variable (`nn₊V`) from the solution</span>
+v = voltage_timeseries(nn, sol)
+
+<span class=hljs-comment ># Plot the voltage and stimulation timeseries on two axes on the same window.</span>
+fig = Figure();
+ax1 = Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;Voltage (mV)&quot;</span>)
+lines!(ax1, sol.t, v)
+
+ax2 = Axis(fig[<span class=hljs-number >2</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;Stimulus (μA/cm²)&quot;</span>)
+lines!(ax2, sol.t, stimulus)
+fig</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim_hh' not found. //</span></p> <h1 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h1> <ul> <li><p>Implement a custom <code>SpikeSource</code> of your choice. Hint: the <code>BernoulliSpikes</code> implementation above.</p> <li><p>Write a function that plots the <a href="https://en.wikipedia.org/wiki/F-I_curve">f-I curve</a> of a Blox. Hint: Consider a <code>ContantInput</code> source to vary input currents and <code>firing_rate&#40;blox, solution; threshold&#61;...&#41;</code> to calculate firing rates.</p> <li><p>Write a function that plots the <a href="https://en.wikipedia.org/wiki/Peristimulus_time_histogram">Peristimulus time histogram</a> of a Blox around a given timepoint. Hint: use the <code>hist</code> or <code>barplot</code> plotting functions from <code>Makie</code> and <code>detect_spikes&#40;blox, solution; threshold&#61;...&#41;</code> to find spikes.</p> </ul> <h1 id=references ><a href="#references" class=header-anchor >References</a></h1> <ul> <li><p>Gerstner W, Kistler WM, Naud R, Paninski L. Neuronal Dynamics: From Single Neurons to Networks and Models of Cognition, Parts I &amp; II. Cambridge University Press; 2014.</p> <li><p>Adam, Elie M., et al. &quot;Deep brain stimulation in the subthalamic nucleus for Parkinson&#39;s disease can restore dynamics of striatal networks.&quot; Proceedings of the National Academy of Sciences 119.19 &#40;2022&#41;: e2120808119.</p> </ul> <hr /> <p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p> <div class=page-foot > <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 02, 2025. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </main> <script src="/course/libs/vela/metisMenu.min.js"></script> <script src="/course/libs/vela/slideout.min.js"></script> <script src="/course/libs/highlight/highlight.min.js"></script> <script>hljs.highlightAll();hljs.configure({tabReplace: ' '});</script>
