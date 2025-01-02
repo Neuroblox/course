@@ -37,7 +37,7 @@ jobs:
     - run: julia -e '
             using Pkg; 
             Pkg.activate("."); 
-            Pkg.add(url="https://github.com/Neuroblox/Neuroblox.jl", rev="v0.5.1")
+            Pkg.add(url="https://github.com/Neuroblox/Neuroblox.jl", rev="v0.5.1");
             Pkg.instantiate();
             using NodeJS; run(`$(npm_cmd()) install highlight.js`);
             using Franklin;
