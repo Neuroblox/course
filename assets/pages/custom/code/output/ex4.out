@@ -1,0 +1,37 @@
+UndefVarError: `solve` not defined in `Main.FD_SANDBOX_13439752999271061286`
+Suggestion: check for spelling errors or missing imports.
+Hint: a global variable of this name may be made accessible by importing SciMLBase in the current active module Main
+Hint: a global variable of this name may be made accessible by importing DiffEqBase in the current active module Main
+Hint: a global variable of this name may be made accessible by importing JumpProcesses in the current active module Main
+Hint: a global variable of this name may be made accessible by importing LinearSolve in the current active module Main
+Hint: a global variable of this name may be made accessible by importing BracketingNonlinearSolve in the current active module Main
+Hint: a global variable of this name may be made accessible by importing SimpleNonlinearSolve in the current active module Main
+Hint: a global variable of this name may be made accessible by importing NonlinearSolve in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqExtrapolation in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqStabilizedRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqStabilizedIRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqLowStorageRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqSSPRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqFeagin in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqSymplecticRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqRKN in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqVerner in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqSDIRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqBDF in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqTsit5 in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqRosenbrock in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqDefault in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqFIRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqQPRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqPDIRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqPRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqHighOrderRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqLowOrderRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqFunctionMap in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqAdamsBashforthMoulton in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqNordsieck in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqExplicitRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqLinear in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqIMEXMultistep in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEqExponentialRK in the current active module Main
+Hint: a global variable of this name may be made accessible by importing OrdinaryDiffEq in the current active module Main
