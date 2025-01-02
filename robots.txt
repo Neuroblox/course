@@ -1,4 +1,4 @@
-Sitemap: https://neuroblox.github.io/course/sitemap.xml
+Sitemap: https://tlienart.github.io/FranklinTemplates.jl/sitemap.xml
 
 User-agent: *
 Disallow:
