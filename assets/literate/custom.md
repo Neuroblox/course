@@ -23,6 +23,7 @@ For example let's consider a `LIFNeuron`, which is a Leaky Integrate-and-Fire (L
 
 ````julia:ex1
 using Neuroblox
+using OrdinaryDiffEq
 
 @named lif = LIFNeuron()
 
@@ -80,8 +81,6 @@ We will implement the Izhikevich neuron from the previous session into a Blox. E
 We will only include these two fields and write an inner constructor function for our `struct IzhNeuron`.
 
 ````julia:ex5
-using OrdinaryDiffEq
-
 struct IzhNeuron <: Neuron
     system
     namespace
@@ -107,6 +106,7 @@ end
 
 > **_Note:_** In `IzhNeuron` the `jcn` variable does not get a default value, only the [input=true] tag.
 > This means that other Bloxs will connect to a `IzhNeuron` through `jcn`.
+>
 > Neuroblox automatically initializes a `jcn ~ 0` equation and then accumulates connection terms in it.
 > This happens with all input variables of Bloxs.
 >
