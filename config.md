@@ -2,7 +2,7 @@
 Add here global page variables to use throughout your website.
 -->
 +++
-author = "Neuroblox Inc"
+author = "Septimia Zenobia"
 mintoclevel = 2
 
 # uncomment and adjust the following line if the expected base URL of your website is something like [www.thebase.com/yourproject/]
@@ -17,10 +17,9 @@ ignore = ["node_modules/"]
 
 # RSS (the website_{title, descr, url} must be defined to get RSS)
 generate_rss = true
-website_title = "Neuroblox Course"
-website_descr = "Educational material for Neuroblox.jl in the form of a 5 day course."
-website_url   = "https://neuroblox.github.io/course/"
-prepath = "course"
+website_title = "Franklin Template"
+website_descr = "Example website using Franklin"
+website_url   = "https://tlienart.github.io/FranklinTemplates.jl/"
 +++
 
 <!--
@@ -28,4 +27,3 @@ Add here global latex commands to use throughout your pages.
 -->
 \newcommand{\R}{\mathbb R}
 \newcommand{\scal}[1]{\langle #1 \rangle}
-\newcommand{\center}[1]{@@text-center #1 @@}
