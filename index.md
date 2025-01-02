@@ -9,7 +9,7 @@ We will go over the following units in this course :
 * [Plotting with Makie](/pages/intro_plot/)
 * [Blox and Connections in Neuroblox](/pages/custom/)
 * [Neurons, Neural Masses and Sources](/pages/neuron_mass/)
-* [Biomimetic model of corticostriatal micro-assemblies](/pages/CS_circuit/) 
+* [Circuit Models](/pages/circuits/) 
 
 ## References (general, not session-specific ones can go here)
 
