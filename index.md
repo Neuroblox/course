@@ -1,6 +1,13 @@
 @def title = "Neuroblox course"
+# Introduction
 
-## Course units
+Computational neuroscience aims to simulate the brain in silico, from single synapses to brain-wide networks. The field has matured in tandem with experimental neuroscience, to the point where computational modeling has become an indispensable tool for understanding neuroscience data and motivating future experiments. However, building such models can involve a painstaking process of translating concepts from the literature into working code, then optimizing it to run in a reasonable timeframe.
+
+Neuroblox is a new software platform for computational neuroscience that aims to break down these barriers. It is based on the Julia programming language, and is built with simplicity, modularity, and performance in mind. It consists of a library of modular computational building blocks (“blox”) that can be easily assembled to simulate brain dynamics, either in code or via an easy-to-use graphical interface. Our tools bridge scales from spiking neurons to brain waves and fMRI, and have applications to neurology and psychiatry. Moreover, the behavior of multiple model variants can be compared to discriminate between competing hypotheses.
+
+In this course, you will learn the basics of computational neuroscience via hands-on model building in Neuroblox and Julia. You will simulate models from the literature, from single neurons to large circuits with synaptic plasticity, and fit them to neural data. By the end of the course, you will be able to model your own data and build your own custom “blox” that may be incorporated into the Neuroblox library.
+
+# Course units
 
 We will go over the following units in this course :
 
@@ -11,7 +18,3 @@ We will go over the following units in this course :
 * [Neurons, Neural Masses and Sources](/pages/neuron_mass/)
 * [Circuit Models](/pages/circuits/) 
 
-## References (general, not session-specific ones can go here)
-
-* \biblabel{noether15}{Noether (1915)} **Noether**,  Körper und Systeme rationaler Funktionen, 1915.
-* \biblabel{bezanson17}{Bezanson et al. (2017)} **Bezanson**, **Edelman**, **Karpinski** and **Shah**, [Julia: a fresh approach to numerical computing](https://julialang.org/research/julia-fresh-approach-BEKS.pdf), SIAM review 2017.
