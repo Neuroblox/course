@@ -5,7 +5,11 @@
 We will go over the following units in this course :
 
 * [Introduction to Julia](/pages/intro_julia/)
-* [Introduction to Differential Equations in Julia](/pages/intro_diffeq/)
+* [Differential Equations in Julia](/pages/intro_diffeq/)
+* [Plotting with Makie](/pages/intro_plot.md)
+* [Blox and Connections in Neuroblox](/pages/custom.md)
+* [Neurons, Neural Masses and Sources](/pages/neuron_mass.md)
+* [Biomimetic model of corticostriatal micro-assemblies](/pages/CS_circuit.md) 
 
 ## References (general, not session-specific ones can go here)
 
