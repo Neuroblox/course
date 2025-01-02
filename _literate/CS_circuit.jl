@@ -42,7 +42,7 @@ save(joinpath(@OUTPUT, "wta_stack.svg"), fig); # hide
 # `stackplot` stacks the voltage timeseries of each input neuron on top of each other. The y-axis scale is meaningless due to timeseries offsets, yet the plot offers a useful look into spiking patterns in a population.
 # > **_Exercise:_** Try varying the size of the circuit by changing the number of excitatory neurons, while keeping the same structure (all of them connect to the inhibitory neuron and vice versa).
 
-# The circuit we just built is implemented as a single Blox in Neuroblox. The `WinnerTakeAllBlox` is a subtype of `CompositeBlox`. All `CompositeBlox`s do not have their own dynamics, but they contain either other `CompositeBlox`s or Bloxs with dynamics such as `Neuron` and/or `NeuralMass` types.
+# The circuit we just built is implemented as a single Blox in Neuroblox. The `WinnerTakeAllBlox` is a subtype of `CompositeBlox`.
 
 N_exci = 5 ## number of excitatory neurons in each WTA circuit
 ## For a single-valued input `I_bg`, each neuron in the WTA Blox will receive a uniformly distributed random background current from 0 to `I_bg`  
