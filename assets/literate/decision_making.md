@@ -56,7 +56,7 @@ spike_rate_A = (distribution=Normal(μ_A, σ), dt=dt_spike_rate) # spike rate di
 spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate distribution for selective population B
 
 # background input
-@named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name, N_trains=1);
+@named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name);
 
 # stimulation inputs to selective populations A and B
 @named stim_A = PoissonSpikeTrain(spike_rate_A, tspan; namespace = model_name);

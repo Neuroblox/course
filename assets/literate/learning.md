@@ -132,7 +132,7 @@ trace = run_experiment!(agent, env; t_warmup=200.0, alg=Vern7(), verbose=true)
 `trace` is a `NamedTuple` containing useful outcomes for each trial of the experiment:
 
 ````julia:ex4
-trace.trials ## trial indices
+trace.trial ## trial indices
 trace.correct ## whether the response was correct or not on each trial
 trace.action; ## what responce was made on each trial, 1 is left and 2 is right
 
