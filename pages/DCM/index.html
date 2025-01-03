@@ -217,36 +217,70 @@ Parameters (16): see parameters(r3₊bm)
 <p>With the function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimizatoin procedure. For instance the the effective connections that are set to zero in the simulation:</p>
 <pre><code class="julia hljs">untune = <span class=hljs-built_in >Dict</span>(A[<span class=hljs-number >3</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >7</span>] =&gt; <span class=hljs-literal >false</span>)
 fitmodel = changetune(fitmodel, untune)                 <span class=hljs-comment ># 3 and 7 are not present in the simulation model</span>
-fitmodel = structural_simplify(fitmodel, split=<span class=hljs-literal >false</span>)   <span class=hljs-comment ># and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don&#x27;t lose time with it ;)</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `changetune` not defined in `Main.FD_SANDBOX_2630177278844153205`
-Suggestion: check for spelling errors or missing imports.
-</code></pre>
+fitmodel = structural_simplify(fitmodel, split=<span class=hljs-literal >false</span>)   <span class=hljs-comment ># and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don&#x27;t lose time with it ;)</span></code></pre><pre><code class="plaintext hljs">Model fitmodel:
+Equations (21):
+  21 standard: see equations(fitmodel)
+Unknowns (21): see unknowns(fitmodel)
+  r1₊lm₊x(t) [defaults to 0.0]
+  r1₊bm₊s(t) [defaults to 1.0]
+  r1₊bm₊lnu(t) [defaults to 0.0]
+  r1₊bm₊lnν(t) [defaults to 0.0]
+  r1₊bm₊lnq(t) [defaults to 0.0]
+  r2₊lm₊x(t) [defaults to 0.0]
+  r2₊bm₊s(t) [defaults to 1.0]
+  r2₊bm₊lnu(t) [defaults to 0.0]
+  r2₊bm₊lnν(t) [defaults to 0.0]
+  r2₊bm₊lnq(t) [defaults to 0.0]
+  r3₊lm₊x(t) [defaults to 0.0]
+  r3₊bm₊s(t) [defaults to 1.0]
+  r3₊bm₊lnu(t) [defaults to 0.0]
+  r3₊bm₊lnν(t) [defaults to 0.0]
+  r3₊bm₊lnq(t) [defaults to 0.0]
+  r1₊ei₊u(t): ext_input
+  r2₊ei₊u(t): ext_input
+  r3₊ei₊u(t): ext_input
+  r1₊bm₊bold(t) [defaults to 0.0]: measurement
+  r2₊bm₊bold(t) [defaults to 0.0]: measurement
+  r3₊bm₊bold(t) [defaults to 0.0]: measurement
+Parameters (16): see parameters(fitmodel)
+  C [defaults to 0.0625]
+  A1 [defaults to 0.0]
+  w_r1₊lm_r1₊bm [defaults to 1.0]
+  A2 [defaults to 0.0148102]
+  A3 [defaults to -0.00716553]
+  A4 [defaults to 0.00345049]
+  A5 [defaults to 0.0]
+  w_r2₊lm_r2₊bm [defaults to 1.0]
+  A6 [defaults to 0.00429191]
+  A7 [defaults to -0.0122152]
+  A8 [defaults to 0.00437472]
+  A9 [defaults to 0.0]
+  w_r3₊lm_r3₊bm [defaults to 1.0]
+  lnκ [defaults to 0.0]
+  lnτ [defaults to 0.0]
+  lnϵ [defaults to 0.0]
+Observed (6): see observed(fitmodel)</code></pre>
 <h2 id=setup_spectral_dcm ><a href="#setup_spectral_dcm" class=header-anchor >Setup spectral DCM</a></h2>
 <pre><code class="julia hljs">max_iter = <span class=hljs-number >128</span>; <span class=hljs-comment ># maximum number of iterations</span>
 <span class=hljs-comment ># attribute initial conditions to states</span>
 sts, _ = get_dynamic_states(fitmodel);</code></pre>
 <p>the following step is needed if the model&#39;s Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 &#40;which is the default expansion&#41;. We simply add small random values to avoid this degeneracy:</p>
-<pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >0.001</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">Dict{SymbolicUtils.BasicSymbolic{Real}, Float64} with 21 entries:
-  r2₊lm₊jcn(t) =&gt; 0.000264768
-  r3₊lm₊x(t) =&gt; 0.000219429
-  r3₊bm₊lnq(t) =&gt; 0.000388604
-  r3₊bm₊jcn(t) =&gt; 0.000169086
-  r2₊bm₊lnq(t) =&gt; 0.000883897
-  r1₊bm₊lnν(t) =&gt; 0.000808084
-  r2₊bm₊s(t) =&gt; 0.000153122
-  r3₊lm₊jcn(t) =&gt; 0.000663521
-  r3₊bm₊lnu(t) =&gt; 0.000210419
-  r2₊bm₊jcn(t) =&gt; 0.000297727
-  r1₊bm₊jcn(t) =&gt; 0.000397204
-  r2₊bm₊lnν(t) =&gt; 0.000817439
-  r1₊bm₊s(t) =&gt; 0.000896385
-  r1₊lm₊jcn(t) =&gt; 0.000138322
-  r3₊bm₊lnν(t) =&gt; 0.000489568
+<pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >0.001</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">Dict{SymbolicUtils.BasicSymbolic{Real}, Float64} with 15 entries:
+  r3₊lm₊x(t) =&gt; 0.000489568
+  r3₊bm₊lnq(t) =&gt; 0.000198145
+  r2₊bm₊lnq(t) =&gt; 0.000210419
+  r1₊bm₊lnν(t) =&gt; 0.000541726
+  r2₊bm₊s(t) =&gt; 0.000397204
+  r3₊bm₊lnu(t) =&gt; 0.000169086
+  r2₊bm₊lnν(t) =&gt; 0.000646358
+  r1₊bm₊s(t) =&gt; 0.000138322
+  r3₊bm₊lnν(t) =&gt; 0.000570881
   r1₊lm₊x(t) =&gt; 4.49163e-6
-  r1₊bm₊lnu(t) =&gt; 0.000541726
-  r3₊bm₊s(t) =&gt; 0.000646358
-  r2₊lm₊x(t) =&gt; 0.000747008
-  r2₊bm₊lnu(t) =&gt; 0.000656112
-  r1₊bm₊lnq(t) =&gt; 0.000928402</code></pre>
+  r1₊bm₊lnu(t) =&gt; 0.000896385
+  r3₊bm₊s(t) =&gt; 0.000388604
+  r2₊lm₊x(t) =&gt; 0.000928402
+  r2₊bm₊lnu(t) =&gt; 0.000747008
+  r1₊bm₊lnq(t) =&gt; 0.000808084</code></pre>
 <p>For convenience we can use the default prior function to use standardized prior values as given in SPM:</p>
 <pre><code class="julia hljs">pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
@@ -281,50 +315,32 @@ with_stack(f, n) = fetch(schedule(<span class=hljs-built_in >Task</span>(f, n)))
             <span class=hljs-keyword >end</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">TaskFailedException
-
-    nested task error: LinearAlgebra.SingularException(18)
-    Stacktrace:
-      [1] checknonsingular
-        @ /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/factorization.jl:69 [inlined]
-      [2] _check_lu_success
-        @ /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/lu.jl:84 [inlined]
-      [3] #lu!#182
-        @ /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/lu.jl:92 [inlined]
-      [4] lu!
-        @ /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/lu.jl:90 [inlined]
-      [5] lu!
-        @ /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/lu.jl:89 [inlined]
-      [6] _lu
-        @ /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/lu.jl:347 [inlined]
-      [7] lu(::Matrix{ComplexF64}; kwargs::@Kwargs{})
-        @ LinearAlgebra /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/lu.jl:341
-      [8] lu
-        @ /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/lu.jl:341 [inlined]
-      [9] \(A::Matrix{ComplexF64}, B::Matrix{Float64})
-        @ LinearAlgebra /opt/hostedtoolcache/julia/1.11.2/x64/share/julia/stdlib/v1.11/LinearAlgebra/src/generic.jl:1132
-     [10] eigen(M::Matrix{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/datafitting/spDCM_VL.jl:66
-     [11] transferfunction(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, derivatives::Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8}}, indices::Dict{Symbol, Vector{Int64}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/datafitting/spDCM_VL.jl:116
-     [12] csd_approx(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, derivatives::Function, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8}}, indices::Dict{Symbol, Vector{Int64}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/datafitting/spDCM_VL.jl:182
-     [13] csd_mtf(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, p::Int64, derivatives::Function, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8}}, params_idx::Dict{Symbol, Vector{Int64}}, modality::String)
-        @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/datafitting/spDCM_VL.jl:233
-     [14] #52
-        @ ~/.julia/packages/Neuroblox/uguZs/src/datafitting/spDCM_VL.jl:426 [inlined]
-     [15] chunk_mode_jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8, Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8}}})
-        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:187
-     [16] jacobian
-        @ ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:24 [inlined]
-     [17] jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8, Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 8}}})
-        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:19
-     [18] jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64})
-        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:19
-     [19] run_sDCM_iteration!(state::Neuroblox.VLState, setup::Neuroblox.VLSetup{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0xddb4b557, 0x728ee2e3, 0x8915193d, 0x4309e5d2, 0x09b58774), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Array{ComplexF64, 3}, Matrix{ComplexF64}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/datafitting/spDCM_VL.jl:470
-     [20] (::Main.FD_SANDBOX_2630177278844153205.var&quot;#1#2&quot;)()
-        @ Main.FD_SANDBOX_2630177278844153205 ./none:4
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:0.0 - dF predicted:1151.645766452124
+iteration: 2 - F:720.5547736157578 - dF predicted:570.6511079784511
+iteration: 3 - F:1215.6518683848608 - dF predicted:524.3646402342182
+iteration: 4 - F:1665.722169689831 - dF predicted:478.76839953696805
+iteration: 5 - F:2082.993250412941 - dF predicted:453.2489798680496
+iteration: 6 - F:2471.3382742885374 - dF predicted:365.08220043740664
+iteration: 7 - F:2764.4593506953092 - dF predicted:210.20136064526912
+iteration: 8 - F:2924.709003099365 - dF predicted:100.06125194189815
+iteration: 9 - F:3004.593138037215 - dF predicted:53.19735621866338
+iteration: 10 - F:3046.491041829753 - dF predicted:24.073777898343582
+iteration: 11 - F:3064.4438352630955 - dF predicted:8.90206505174811
+iteration: 12 - F:3071.3642526244244 - dF predicted:3.9011652163031827
+iteration: 13 - F:3074.5761926879595 - dF predicted:2.236425597482659
+iteration: 14 - F:3076.454990714618 - dF predicted:1.4295039738103021
+iteration: 15 - F:3077.6440773251416 - dF predicted:0.8876270589060057
+iteration: 16 - F:3078.3717218868333 - dF predicted:0.5419600356309695
+iteration: 17 - F:3078.817628139951 - dF predicted:0.32462393587937843
+iteration: 18 - F:3079.067898187026 - dF predicted:0.1953923146142779
+iteration: 19 - F:3079.222726485119 - dF predicted:0.1356567213936276
+iteration: 20 - F:3079.26816440303 - dF predicted:0.1876142673830501
+iteration: 21 - F:3079.277567704102 - dF predicted:0.6009586099207189
+iteration: 22 - F:3079.277567704102 - dF predicted:0.0024760626876751974
+iteration: 23 - F:3079.279392680642 - dF predicted:0.0037885150649157704
+iteration: 24 - F:3079.282627218574 - dF predicted:0.00593298656638601
+iteration: 25 - F:3079.2878438837383 - dF predicted:0.009058419383521577
+convergence
 </code></pre>
 <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2>
 <p>Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound &#40;ELBO&#41;. Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a &#40;potentially local&#41; optimum:</p>

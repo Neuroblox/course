@@ -8,12 +8,8 @@ Please contact sales@neuroblox.org for purchasing information.
 To report any bugs, issues, or feature requests for Neuroblox software,
 please use the public Github repository NeurobloxIssues, located at
 https://github.com/Neuroblox/NeurobloxIssues.
-MethodError: no method matching Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus, ::Int64; name::Symbol, namespace::Symbol)
-The type `Neuroblox.ClassificationEnvironment` exists, but no method is defined for this combination of argument types when trying to construct it.
-
-Closest candidates are:
-  Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus; name, namespace)
-   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:127
-  Neuroblox.ClassificationEnvironment(!Matched::DataFrames.DataFrame; name, namespace, t_stimulus, t_pause)
-   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:111
-
+Trial = 1, Category choice = 0, Response = Correct
+Trial = 2, Category choice = 0, Response = Correct
+Trial = 3, Category choice = 0, Response = Correct
+Trial = 4, Category choice = 0, Response = Correct
+Trial = 5, Category choice = 0, Response = Correct

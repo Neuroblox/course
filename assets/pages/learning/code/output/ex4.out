@@ -1,2 +1,1 @@
-UndefVarError: `trace` not defined in `Main.FD_SANDBOX_13203191008430087757`
-Suggestion: check for spelling errors or missing imports.
+type NamedTuple has no field trials
