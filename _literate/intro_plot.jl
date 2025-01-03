@@ -1,11 +1,11 @@
 # # Plotting with Makie
-# Learning goals:
-# - Design layouts with multiple axes in figures.
-# - Use Makie's functionality to plot neuron-specific figures.
-
 # ## Introduction
 # Makie is a plotting ecosystem based in Julia. It comes with multiple backends for rendering and displaying plots. For this course we will be using `CairoMakie` as it has a lot of features for 2D static plots and most computers should support it as it only requires a CPU and no GPU.
 # Makie has a great [Getting Started page](https://docs.makie.org/stable/tutorials/getting-started). We will make use of this tutorial to introduce some basic plotting functions and labelling options.
+
+# Learning goals:
+# - Design layouts with multiple axes in figures.
+# - Use Makie's functionality to plot neuron-specific figures.
 
 # ## Plotting layouts
 # We'll now see how to create layouts of multiple subplots within a single window. We'll use the same data from the Makie tutorial linked above.

@@ -1,12 +1,13 @@
 # # Neurons, Neural Masses and Sources
+# ## Introduction
+# The main distinction between the neuron, neural mass and source Blox we will encounter on this session is the mechanism by which they communicate with other Bloxs.
+# All neural mass Bloxs, some sources, and neurons of the Hodgkin-Huxley (HH) family have continuous output variables which are included as terms in the postsynaptic Blox's differential equations.
+# The alternative is an event-based connection. Neurons of the Izhikevich and the Integrate-and-fire families of models operate this way as we have previosuly seen. Sources that simulate spike trains may also operate the same way via callbacks. 
+
 # Learning goals :
 # - visualize results from neuron and neural mass Blox simulations
 # - introduce external sources as Blox
 # - drive single neuron and neural mass activity using external sources 
-
-# The main distinction between the neuron, neural mass and source Blox we will encounter on this session is the mechanism by which they communicate with other Bloxs.
-# All neural mass Bloxs, some sources, and neurons of the Hodgkin-Huxley (HH) family have continuous output variables which are included as terms in the postsynaptic Blox's differential equations.
-# The alternative is an event-based connection. Neurons of the Izhikevich and the Integrate-and-fire families of models operate this way as we have previosuly seen. Sources that simulate spike trains may also operate the same way via callbacks. 
 
 # ## Neurons and neural masses
 # As a first example we will consider a neural mass `WilsonCowan` Blox of Exhitatation-Inhibition (E-I) balance. This is a two-dimensional reduction over a population of excitatory and inhibitory neurons with continuous dynamics.
@@ -326,11 +327,11 @@ fig
 save(joinpath(@OUTPUT, "stim_hh.svg"), fig); # hide
 # \fig{stim_hh}
 
-# # Challenge Problems
+# ## Challenge Problems
 # - Implement a custom `SpikeSource` of your choice. Hint: the `BernoulliSpikes` implementation above.
 # - Write a function that plots the [f-I curve](https://en.wikipedia.org/wiki/F-I_curve) of a Blox. Hint: Consider a `ContantInput` source to vary input currents and `firing_rate(blox, solution; threshold=...)` to calculate firing rates. 
 # - Write a function that plots the [Peristimulus time histogram](https://en.wikipedia.org/wiki/Peristimulus_time_histogram) of a Blox around a given timepoint. Hint: use the `hist` or `barplot` plotting functions from `Makie` and `detect_spikes(blox, solution; threshold=...)` to find spikes.
 
-# # References
+# ## References
 # - [1] Gerstner W, Kistler WM, Naud R, Paninski L. Neuronal Dynamics: From Single Neurons to Networks and Models of Cognition, Parts I & II. Cambridge University Press; 2014. 
 # - [2] Adam, Elie M., et al. "Deep brain stimulation in the subthalamic nucleus for Parkinson's disease can restore dynamics of striatal networks." Proceedings of the National Academy of Sciences 119.19 (2022): e2120808119.

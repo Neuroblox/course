@@ -4,12 +4,6 @@
 
 # In a later session we will extend this model and add synaptic plasticity to it to perform category learning, as a simplified version of [1].
 
-# Learnin goals
-# - define a "winner-takes-all" (WTA) circuit with lateral inhibition.
-# - build a Cortical Blox by connecting multiple WTAs together with feed-forward inhibition.
-# - use a next-generation neural mass Blox to modulate the firing frequency of the Cortical Blox.
-# - define a source of visual input (images) and simulate visual processing.
-
 using Neuroblox
 using OrdinaryDiffEq 
 using Random 
