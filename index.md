@@ -18,3 +18,6 @@ We will go over the following units in this course :
 * [Blox and Connections in Neuroblox](/pages/custom/)
 * [Neurons, Neural Masses and Sources](/pages/neuron_mass/)
 * [Circuit Models](/pages/circuits/) 
+* [Decision Making](/pages/decision_making)
+* [Synaptic Plasticity and Reinforcement Learning](/pages/learning)
+* [Spectral Dynamic Causal Modeling](/pages/DCM)
