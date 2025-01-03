@@ -25,7 +25,6 @@ using CairoMakie
 using ModelingToolkit
 using Random
 
-# # Model simulation
 # ## Define the model
 # We will define a model of 3 regions. This means first of all to define a graph.
 # To this graph we will add three linear neuronal mass models which constitute the (hidden) neuronal dynamics.
@@ -107,7 +106,7 @@ for i = 1:nr
 end
 fig
 
-# # Model Inference
+# ## Model Inference
 
 # We will now assemble a new model that is used for fitting the previous simulations.
 # This procedure is similar to before with the difference that we will define global parameters and use tags such as [tunable=false/true] to define which parameters we will want to estimate.
@@ -204,7 +203,7 @@ with_stack(5_000_000) do  # 5MB of stack space
     end
 end
 
-# # Plot Results
+# ## Results
 # Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound (ELBO). 
 # Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a (potentially local) optimum:
 freeenergy(state)
@@ -212,6 +211,11 @@ freeenergy(state)
 # Plot the estimated posterior of the effective connectivity and compare that to the true parameter values.
 # Bar hight are the posterior mean and error bars are the standard deviation of the posterior.
 ecbarplot(state, setup, A_true)
+
+# ## Challenge Problems
+# - Explore susceptibility with respect to noise. Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy (compare the different free energies of the models and their respective parameter values with ground truth)?
+# - Averaging over patients. Now repeat the simulation and inference again with 10 different seeds (you can just remove the number in Random.seed() to use current time stamps as seeds) and store the results of each run, such that you get several models based on the same ground truth but with different instances of the noise. Can you extract the average value of the effective connectivity from the ensemble?
+# - Changing neuronal dynamics model. Now change the model and test the whole procedure with a different underlying neuronal mass model, for instance the Jansen-Rit model. Note that there are no default priors for the Jansen-Rit model, you will have to provide priors for the extra parameters or remove them from the optimization procedure by setting their tunable to false.
 
 # ## References
 # - [1] [Novelli, Leonardo, Karl Friston, and Adeel Razi. “Spectral Dynamic Causal Modeling: A Didactic Introduction and Its Relationship with Functional Connectivity.” Network Neuroscience 8, no. 1 (April 1, 2024): 178–202.](https://doi.org/10.1162/netn_a_00348) \
