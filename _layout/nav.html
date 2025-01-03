@@ -1,13 +1,29 @@
-<div id="layout">
-  <div id="menu">
-    <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/pages/install">Installing Julia</a></li>
-      <li><a href="/pages/intro_julia">Introduction to Julia</a></li>
-      <li><a href="/pages/intro_diffeq">Differential Equations with ModelingToolkit</a></li>
-      <li><a href="/pages/intro_plot">Plotting with Makie</a></li>
-      <li><a href="/pages/custom">Bloxs and Connections</a></li>
-      <li><a href="/pages/neuron_mass">Neurons, Neural Masses & Sources</a></li>
+<div class="main-nav slideout-menu slideout-menu-left" id="menu">
+  <div class="flex-container">
+    <span class="sidebar-brand">
+      <h3 style='font-size: 25px'>Vela Template</h3>
+    </span>
+  </div> <!-- class="flex-container" -->
+
+  <nav class="sidebar-nav">
+    <ul class="metismenu"  id="metismenu" >
+      <li><a href="/index.html">Home</a></li>
+      <li><a href="/menu1/">Code blocks</a></li>
+      <li><a href="" class="has-arrow">Topic</a>
+        <ul>
+          <li><a href="/menu2/">More goodies</a></li>
+        </ul>
+      </li>
+      <li><a href="/menu3/">Tags</a></li>
     </ul>
+  </nav>
+</div> <!-- main nav menu -->
+
+<main id="panel" class="slidout-panel slideout-panel-left">
+  <div class="toggle-button hamburger hamburger--spin">
+    <div class="hamburger-box">
+      <div class="hamburger-inner"></div>
+    </div>
   </div>
-  <div id="main">
+  <h1 class="page title">{{isdef title}}{{fill title}}{{end}}</h1>
+  <hr>

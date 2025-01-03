@@ -16,11 +16,15 @@ using Neuroblox
 using OrdinaryDiffEq 
 using Distributions 
 using CairoMakie
+using Random
+
+Random.seed!(1)
 
 model_name = :g 
 tspan = (0, 1000) ## Simulation time span [ms]
 spike_rate = 2.4 ## spikes / ms
 
+N = 150 ## total number of neurons
 f = 0.15 ## ratio of selective excitatory to non-selective excitatory neurons
 f_inh = 0.2 ## ratio of inhibitory neurons to all neurons
 N_E = Int(N * (1 - f_inh)) 
@@ -46,8 +50,8 @@ dt_spike_rate = 50 # update interval for the stimulus spike rate [ms]
 μ_B = μ_0 + ρ_B * coherence 
 σ = 4e-3 # standard deviation of stimulus spike rate [spikes / ms]
 
-spike_rate_A = Normal(μ_A, σ) => dt_spike_rate # spike rate distribution for selective population A
-spike_rate_B = Normal(μ_B, σ) => dt_spike_rate # spike rate distribution for selective population B
+spike_rate_A = (distribution=Normal(μ_A, σ), dt=dt_spike_rate) # spike rate distribution for selective population A
+spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate distribution for selective population B
 
 ## background input
 @named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name, N_trains=1);
@@ -95,6 +99,25 @@ sol = solve(prob, Euler(); dt = 0.01);
     
 # ## Results
 
-rasterplot(n_inh, sol; color=:red)
-rasterplot(n_A, sol)
-rasterplot(n_B, sol)
+fig = Figure()
+rasterplot(fig[1,1], n_A, sol; title = "Population A")
+rasterplot(fig[1,2], n_B, sol; title = "Population B")
+rasterplot(fig[2,1], n_inh, sol; color=:red, title = "Inhibitory Population")
+fig
+save(joinpath(@OUTPUT, "dm_raster.svg"), fig); # hide
+# \fig{dm_raster}
+
+# Notice how the activity of neurons in population B is quickly ramping up and the activity in population A is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.
+
+fig = Figure()
+ax = Axis(fig[1,1], title = "Competing Firing Rates")
+frplot!(ax, n_A, sol; color=:black, win_size=50)
+frplot!(ax, n_B, sol; color=:red, win_size=50)
+fig
+save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
+# \fig{dm_fr}
+
+# We observe the same result qualitatively when plotting the firing rates instead of spikes. Using a single axis we can better see the magnitude of the competition in the difference between the firing rates over time.
+
+# ## References
+# - [1]  Wang XJ. Probabilistic decision making by slow reverberation in cortical circuits. Neuron. 2002 Dec;36(5):955-968. DOI: 10.1016/s0896-6273(02)01092-9. PMID: 12467598. 
