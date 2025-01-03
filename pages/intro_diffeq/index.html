@@ -1,4 +1,4 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/libs/highlight/styles/github.min.css"> <link href="/css/franklin.css" rel=stylesheet > <link href="/css/vela.css" rel=stylesheet > <script src="/libs/vela/jquery.min.js"></script> <link rel=icon  href="/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Vela Template</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/index.html">Home</a> <li><a href="/menu1/">Code blocks</a> <li><a href="" class=has-arrow >Topic</a> <ul> <li><a href="/menu2/">More goodies</a> </ul> <li><a href="/menu3/">Tags</a> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Differential Equations in Julia</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#lotka-volterra_system">Lotka-Volterra system</a><li><a href="#izhikevich_neuron">Izhikevich Neuron</a><ol><li><a href="#simulating_spikes">Simulating spikes</a><li><a href="#changing_parameter_values_and_initial_conditions">Changing parameter values and initial conditions</a><li><a href="#adding_external_currents">Adding external currents</a></ol></ol></div> <h1 id=differential_equations_in_julia ><a href="#differential_equations_in_julia" class=header-anchor >Differential Equations in Julia</a></h1> <p>Learning goals:</p> <ul> <li><p>Learn about ModelingToolkit, the symbolic way to define differential equation systems.</p> <li><p>Implement a neuron model using ModelingToolkit and simulate spiking</p> </ul> <h2 id=lotka-volterra_system ><a href="#lotka-volterra_system" class=header-anchor >Lotka-Volterra system</a></h2> <pre><code class="julia hljs"><span class=hljs-comment ># Import the packages we need</span>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Vela Template</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/menu1/">Code blocks</a> <li><a href="" class=has-arrow >Topic</a> <ul> <li><a href="/course/menu2/">More goodies</a> </ul> <li><a href="/course/menu3/">Tags</a> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Differential Equations in Julia</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#lotka-volterra_system">Lotka-Volterra system</a><li><a href="#izhikevich_neuron">Izhikevich Neuron</a><ol><li><a href="#simulating_spikes">Simulating spikes</a><li><a href="#changing_parameter_values_and_initial_conditions">Changing parameter values and initial conditions</a><li><a href="#adding_external_currents">Adding external currents</a></ol></ol></div> <h1 id=differential_equations_in_julia ><a href="#differential_equations_in_julia" class=header-anchor >Differential Equations in Julia</a></h1> <p>Learning goals:</p> <ul> <li><p>Learn about ModelingToolkit, the symbolic way to define differential equation systems.</p> <li><p>Implement a neuron model using ModelingToolkit and simulate spiking</p> </ul> <h2 id=lotka-volterra_system ><a href="#lotka-volterra_system" class=header-anchor >Lotka-Volterra system</a></h2> <pre><code class="julia hljs"><span class=hljs-comment ># Import the packages we need</span>
 <span class=hljs-keyword >using</span> ModelingToolkit <span class=hljs-comment >## for symbolic system definition</span>
 <span class=hljs-keyword >using</span> ModelingToolkit: t_nounits as t, D_nounits as D <span class=hljs-comment >## generic symbolic time variable and derivative operator</span>
 <span class=hljs-keyword >using</span> OrdinaryDiffEq <span class=hljs-comment >## for ODE solvers</span>
@@ -126,7 +126,7 @@ u: 31-element Vector{Vector{Float64}}:
  2.227954470813059
  1.946115942732129</code></pre> <p>Finally we can plot the timeseries of both variables of the solution in a line plot using</p> <pre><code class="julia hljs">fig = plot(sol)
 <span class=hljs-comment ># display the figure</span>
-fig</code></pre> <img src="/assets/pages/intro_diffeq/code/output/mtk1.svg" alt=""> <p>We will shortly see more plot types and options.</p> <h2 id=izhikevich_neuron ><a href="#izhikevich_neuron" class=header-anchor >Izhikevich Neuron</a></h2> <h3 id=simulating_spikes ><a href="#simulating_spikes" class=header-anchor >Simulating spikes</a></h3> <p>Let&#39;s now move on to a two-dimensional model of a neuron. This is a popular model, known as the Izhikevich neuron. Even though the model appears simple, it can exhibit many different spiking patterns &#40;e.g. regular and fast spiking, bursting, chattering&#41; by changing its parameters. The Izhikevich neuron is a similar system of ODEs like the Lotka-Volterra example above. One notable difference however is the spiking mechanism. Spiking in the Izhikevich neuron needs to be implemented &quot;manually&quot;. That is we need to detect when the voltage variable crosses a spiking threshold and every time this event happens we need to reset the neuron&#39;s voltage to a more polarized value and potentially alter other variables too.</p> <pre><code class="julia hljs"><span class=hljs-meta >@variables</span> v(t)=-<span class=hljs-number >65</span> u(t)=-<span class=hljs-number >13</span>
+fig</code></pre> <img src="/course/assets/pages/intro_diffeq/code/output/mtk1.svg" alt=""> <p>We will shortly see more plot types and options.</p> <h2 id=izhikevich_neuron ><a href="#izhikevich_neuron" class=header-anchor >Izhikevich Neuron</a></h2> <h3 id=simulating_spikes ><a href="#simulating_spikes" class=header-anchor >Simulating spikes</a></h3> <p>Let&#39;s now move on to a two-dimensional model of a neuron. This is a popular model, known as the Izhikevich neuron. Even though the model appears simple, it can exhibit many different spiking patterns &#40;e.g. regular and fast spiking, bursting, chattering&#41; by changing its parameters. The Izhikevich neuron is a similar system of ODEs like the Lotka-Volterra example above. One notable difference however is the spiking mechanism. Spiking in the Izhikevich neuron needs to be implemented &quot;manually&quot;. That is we need to detect when the voltage variable crosses a spiking threshold and every time this event happens we need to reset the neuron&#39;s voltage to a more polarized value and potentially alter other variables too.</p> <pre><code class="julia hljs"><span class=hljs-meta >@variables</span> v(t)=-<span class=hljs-number >65</span> u(t)=-<span class=hljs-number >13</span>
 <span class=hljs-comment ># The following parameter values correspond to chattering spiking.</span>
 <span class=hljs-meta >@parameters</span> a=<span class=hljs-number >0.02</span> b=<span class=hljs-number >0.2</span> c=-<span class=hljs-number >50</span> d=<span class=hljs-number >2</span> I=<span class=hljs-number >10</span>
 
@@ -151,11 +151,11 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol)
 fig</code></pre>
-<img src="/assets/pages/intro_diffeq/code/output/mtk2.svg" alt="">
+<img src="/course/assets/pages/intro_diffeq/code/output/mtk2.svg" alt="">
 <p>or if we want to plot just the voltage timeseries with its spiking pattern</p>
 <pre><code class="julia hljs">fig = plot(izh_sol; idxs=[v])
 fig</code></pre>
-<img src="/assets/pages/intro_diffeq/code/output/mtk3.svg" alt="">
+<img src="/course/assets/pages/intro_diffeq/code/output/mtk3.svg" alt="">
 <h3 id=changing_parameter_values_and_initial_conditions ><a href="#changing_parameter_values_and_initial_conditions" class=header-anchor >Changing parameter values and initial conditions</a></h3>
 <p>After defining and simulating a system we might want to run another simulation by changing either or both of the parameter values and the initial conditions. The Izhikevich neuron that we simulated above has multiple spiking regimes that correspond to different parameter value combinations. If we have our <code>ODEProblem</code> already defined as the <code>izh_prob</code> variable above, we can remake it by keeping everything the same except for the fields that we choose to alter. Here we will change only the model parameters to change from chattering to fast spiking.</p>
 <pre><code class="julia hljs">izh_prob = remake(izh_prob; p = [a =&gt; <span class=hljs-number >0.1</span>, b =&gt; <span class=hljs-number >0.2</span>, c =&gt; -<span class=hljs-number >65</span>, d =&gt; <span class=hljs-number >2</span>])
@@ -166,7 +166,7 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol; idxs=[v])
 fig</code></pre>
-<img src="/assets/pages/intro_diffeq/code/output/mtk4.svg" alt="">
+<img src="/course/assets/pages/intro_diffeq/code/output/mtk4.svg" alt="">
 <p>Notice how the spiking pattern has changed compared to the previous simulation.</p>
 <h3 id=adding_external_currents ><a href="#adding_external_currents" class=header-anchor >Adding external currents</a></h3>
 <p>Until now we have been simulating the Izhikevich neuron by injecting it with a constant external DC current <code>I&#61;10</code>. We&#39;ll now see how we can expand the <code>I</code> input to a dynamic current, which is more realistic &#40;currents do not remain constant in the brain for too long&#41;. Since <code>I</code> will change dynamically in time, it will be a time-dependent variable of the system and not a constant parameter.</p>
@@ -213,7 +213,7 @@ izh_sol = solve(izh_prob)
 
 fig = plot(izh_sol; idxs=[v, I])
 fig</code></pre>
-<img src="/assets/pages/intro_diffeq/code/output/mtk5.svg" alt="">
+<img src="/course/assets/pages/intro_diffeq/code/output/mtk5.svg" alt="">
 <p>Notice how the external current is slowly being accumulated in the neuron&#39;s potential <code>v</code> until the eventual spike and reset.</p>
 <h1 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h1>
 <ul>
@@ -226,14 +226,14 @@ fig</code></pre>
 <p>&#91;1&#93; E. M. Izhikevich, &quot;Simple model of spiking neurons,&quot; in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440 &#91;2&#93; Ma, Yingbo, Shashi Gowda, Ranjan Anantharaman, Chris Laughman, Viral Shah, and Chris Rackauckas. &quot;Modelingtoolkit: A composable graph transformation system for equation-based modeling.&quot; arXiv preprint arXiv:2103.05244 &#40;2021&#41;. &#91;3&#93; https://docs.sciml.ai/ModelingToolkit/stable/</p>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Septimia Zenobia. Last modified: January 03, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 03, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
   </main> 
-  <script src="/libs/vela/metisMenu.min.js"></script>
-  <script src="/libs/vela/slideout.min.js"></script>
+  <script src="/course/libs/vela/metisMenu.min.js"></script>
+  <script src="/course/libs/vela/slideout.min.js"></script>
   
   
-    <script src="/libs/highlight/highlight.min.js"></script>
+    <script src="/course/libs/highlight/highlight.min.js"></script>
 <script>hljs.highlightAll();hljs.configure({tabReplace: '    '});</script>
