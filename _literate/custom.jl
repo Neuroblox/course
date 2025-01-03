@@ -1,14 +1,15 @@
 # # Blox and Connections in Neuroblox
-# Learning goals:
-# - Learn about how Bloxs and their connections are structured in Neuroblox.
-# - Implement new Bloxs in code.
-# - Implement new connection rules between the new Bloxs and existing ones from Neuroblox.
-
+# ## Introduction
 # Neuroblox comes with a library of many components already, which we call Blox. Such Blox are neuron models, neural masses, circuits of these, input sources, observers etc. Additionally there are connection rules that dictate how types of components connect with one another. Over the rest of this course we will encounter multiple examples of models made by Neuroblox components and connected by rules already implemented in the package.
 
 # It is also possible though to design custom Blox components and connection rules that do not exist in Neuroblox yet. This feature allows us to easily extend the capabilities of Neuroblox towards our specific needs. 
 
 # Here we will learn how to define our own Blox components and write down connection rules to allow our Blox to connect to ones within Neuroblox.
+
+# Learning goals:
+# - Learn about how Bloxs and their connections are structured in Neuroblox.
+# - Implement new Bloxs in code.
+# - Implement new connection rules between the new Bloxs and existing ones from Neuroblox.
 
 # ## Type hierarchy
 # Neuroblox organizes its Bloxs into type hierarchies. There is `AbstractBlox` at the top level and then `Neuron` and `NeuralMass` that are subtypes of it. Then there are `ExciNeuron` and `InhNeuron` which are subtypes of `Neuron` specifically for Bloxs with excitatory and inhibitory dynamics respectively.
