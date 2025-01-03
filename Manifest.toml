@@ -286,9 +286,9 @@ version = "1.72.2"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra"]
-git-tree-sha1 = "3e4b134270b372f2ed4d4d0e936aabaefc1802bc"
+git-tree-sha1 = "1713c74e00545bfe14605d2a2be1712de8fbcb58"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "1.25.0"
+version = "1.25.1"
 weakdeps = ["SparseArrays"]
 
     [deps.ChainRulesCore.extensions]
@@ -1684,9 +1684,9 @@ version = "9.55.0"
 
 [[deps.ModelingToolkitStandardLibrary]]
 deps = ["ChainRulesCore", "DiffEqBase", "IfElse", "LinearAlgebra", "ModelingToolkit", "PreallocationTools", "Symbolics"]
-git-tree-sha1 = "7204df423ed01ee2b37eda322446f72a97664390"
+git-tree-sha1 = "2bfc84061d1aefd5b27cea4a355d5d81b2331879"
 uuid = "16a59e39-deab-5bd0-87e4-056b12336739"
-version = "2.18.0"
+version = "2.19.0"
 
 [[deps.MosaicViews]]
 deps = ["MappedArrays", "OffsetArrays", "PaddedViews", "StackViews"]
@@ -1961,10 +1961,10 @@ weakdeps = ["EnzymeCore"]
     OrdinaryDiffEqCoreEnzymeCoreExt = "EnzymeCore"
 
 [[deps.OrdinaryDiffEqDefault]]
-deps = ["DiffEqBase", "EnumX", "LinearAlgebra", "LinearSolve", "OrdinaryDiffEqBDF", "OrdinaryDiffEqCore", "OrdinaryDiffEqRosenbrock", "OrdinaryDiffEqTsit5", "OrdinaryDiffEqVerner", "PrecompileTools", "Preferences", "Reexport"]
-git-tree-sha1 = "c8223e487d58bef28a3535b33ddf8ffdb44f46fb"
+deps = ["ADTypes", "DiffEqBase", "EnumX", "LinearAlgebra", "LinearSolve", "OrdinaryDiffEqBDF", "OrdinaryDiffEqCore", "OrdinaryDiffEqRosenbrock", "OrdinaryDiffEqTsit5", "OrdinaryDiffEqVerner", "PrecompileTools", "Preferences", "Reexport"]
+git-tree-sha1 = "2ee6ef0bbed24976e4acfccf609801f8a5bf8223"
 uuid = "50262376-6c5a-4cf5-baba-aaf4f84d72d7"
-version = "1.1.0"
+version = "1.2.0"
 
 [[deps.OrdinaryDiffEqDifferentiation]]
 deps = ["ADTypes", "ArrayInterface", "DiffEqBase", "FastBroadcast", "FiniteDiff", "ForwardDiff", "FunctionWrappersWrappers", "LinearAlgebra", "LinearSolve", "OrdinaryDiffEqCore", "SciMLBase", "SparseArrays", "SparseDiffTools", "StaticArrayInterface", "StaticArrays"]
