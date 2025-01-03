@@ -1,6 +1,6 @@
 @def title = "Neuroblox course"
 # Introduction
-
+## TEST AGAIN
 Computational neuroscience aims to simulate the brain in silico, from single synapses to brain-wide networks. The field has matured in tandem with experimental neuroscience, to the point where computational modeling has become an indispensable tool for understanding neuroscience data and motivating future experiments. However, building such models can involve a painstaking process of translating concepts from the literature into working code, then optimizing it to run in a reasonable timeframe.
 
 Neuroblox is a new software platform for computational neuroscience that aims to break down these barriers. It is based on the Julia programming language, and is built with simplicity, modularity, and performance in mind. It consists of a library of modular computational building blocks (“Blox”) that can be easily assembled to simulate brain dynamics, either in code or via an easy-to-use graphical interface. Our tools bridge scales from spiking neurons to brain waves and fMRI, and have applications to neurology and psychiatry. Moreover, the behavior of multiple model variants can be compared to discriminate between competing hypotheses.
