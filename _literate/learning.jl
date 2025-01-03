@@ -135,7 +135,7 @@ save(joinpath(@OUTPUT, "adj_RL.svg"), fig); # hide
 
 # ## Challenge Problems
 # - Visualize the model's performance in the category learning task as a function of time (trials). Hint: For correct trials `trace.correct = 1` and for incorrect trials `trace.correct = 0`.
-# - Since this is an oversimplified instantiation of a cortico-striatal model, it is highly sensitive to the parameters, such that if we change the values of `TAN`` parameters (maximum activity `κ`), or learning rates in `HebbianModulationPlasticity` (learning rate constant `K`), the system won’t be able to learn. Try playing with these parameters and figure out at what range of these parameters the model works.
+# - Since this is an oversimplified instantiation of a cortico-striatal model, it is highly sensitive to the parameters, such that if we change the values of `TAN` parameters (maximum activity `κ`), or learning rates in `HebbianModulationPlasticity` (learning rate constant `K`), the system won’t be able to learn. Try playing with these parameters and figure out at what range of these parameters the model works.
 
 # ## References
 # - [1] Pathak A., Brincat S., Organtzidis H., Strey H., Senneff S., Antzoulatos E., Mujica-Parodi L., Miller E., Granger R. Biomimetic model of corticostriatal micro-assemblies discovers new neural code., bioRxiv 2023.11.06.565902, 2024

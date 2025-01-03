@@ -145,21 +145,21 @@ end
 
 for (i, idx) in enumerate(CartesianIndices(A_prior))
     if idx[1] == idx[2]
-        add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=-exp(A[i])/2)  # -exp(A[i])/2: treatement of diagonal elements in SPM12 to make diagonal dominance (see Gershgorin Theorem) more likely but it is not guaranteed
+        add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=-exp(A[i])/2)  ## -exp(A[i])/2: treatement of diagonal elements in SPM12 to make diagonal dominance (see Gershgorin Theorem) more likely but it is not guaranteed
     else
         add_edge!(g, regions[idx[2]] => regions[idx[1]], weight=A[i])
     end
 end
-# Avoid simplification of the model in order to be able to exclude some parameters from fitting
+## Avoid simplification of the model in order to be able to exclude some parameters from fitting
 @named fitmodel = system_from_graph(g, simplify=false)
-# With the function `changetune`` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimizatoin procedure.
+# With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimizatoin procedure.
 # For instance the the effective connections that are set to zero in the simulation:
 untune = Dict(A[3] => false, A[7] => false)
 fitmodel = changetune(fitmodel, untune)                 # 3 and 7 are not present in the simulation model
 fitmodel = structural_simplify(fitmodel, split=false)   # and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don't lose time with it ;)
 
 # ## Setup spectral DCM
-max_iter = 128;            # maximum number of iterations
+max_iter = 128; # maximum number of iterations
 ## attribute initial conditions to states
 sts, _ = get_dynamic_states(fitmodel);
 # the following step is needed if the model's Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 (which is the default expansion). We simply add small random values to avoid this degeneracy:
