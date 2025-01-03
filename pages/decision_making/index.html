@@ -1,0 +1,87 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Vela Template</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">Installing Julia</a> <li><a href="/course/pages/intro_julia">Introduction to Julia</a> <li><a href="/course/pages/intro_diffeq">Differential Equations with ModelingToolkit</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/custom">Custom Bloxs and Connections</a> <li><a href="/course/pages/neuron_mass">Neurons, Neural Masses and Sources</a> <li><a href="" class=has-arrow >Circuit Modelis</a> <ul> <li><a href="/course/pages/circuits">Introduction</a> <li><a href="/course/pages/CS_circuit">Biomimetic Corticostriatal assemblies</a> <li><a href="/course/pages/PING_circuit">Pyramidal-Interneuron Gamma network</a> </ul> <li><a href="/course/pages/decision_making">Decision Making</a> <li><a href="/course/pages/learning">Synaptic Plasticity and Reinforcement Learning</a> <li><a href="/course/pages/DCM">Spectral Dynamic Causal Modeling</a> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Decision Making in a Circuit Model</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#introduction">Introduction</a><li><a href="#model_definition">Model definition</a><li><a href="#system_construction_simulation">System construction &amp; Simulation</a><li><a href="#results">Results</a><li><a href="#challenge_problems">Challenge Problems</a><li><a href="#references">References</a></ol></div> <h1 id=decision_making_in_a_circuit_model ><a href="#decision_making_in_a_circuit_model" class=header-anchor >Decision Making in a Circuit Model</a></h1> <h2 id=introduction ><a href="#introduction" class=header-anchor >Introduction</a></h2> <p>The session covers the classic article by Wang &#91;1&#93; which presented a circuit model for decision making. The model consists of two selective excitatory populations, one for each possible choice, a non-selective excitatory population and an inhibitory population which facilitates the competition between the two selective ones. Each population is comprised of Leaky Integrate-and-Fire neurons, which include dynamics for NMDA, AMPA and GABA receptors, unlike the two-dimensional <code>LIFNeuron</code> we used before.</p> <p>The decision-making task that the circuit solves is the Random Dot Motion task. The participant &#40;our circuit model&#41; needs to decide whether a pool of dots on a screen move towards the left or the right direction on average. The coherence of the between-dot direction of movement can vary from trial to trial, thus making some trials more ambiguous than others.</p> <p>Learning goals</p> <ul> <li><p>Use circuit models in a behavioral task with stimulus inputs and action outputs.</p> <li><p>Model synaptic receptors explicitly and interventions on them.</p> </ul> <h2 id=model_definition ><a href="#model_definition" class=header-anchor >Model definition</a></h2> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Neuroblox
+<span class=hljs-keyword >using</span> OrdinaryDiffEq
+<span class=hljs-keyword >using</span> Distributions
+<span class=hljs-keyword >using</span> CairoMakie
+<span class=hljs-keyword >using</span> Random
+
+Random.seed!(<span class=hljs-number >1</span>)
+
+model_name = :g
+tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >1000</span>) <span class=hljs-comment >## Simulation time span [ms]</span>
+spike_rate = <span class=hljs-number >2.4</span> <span class=hljs-comment >## spikes / ms</span>
+
+N = <span class=hljs-number >150</span> <span class=hljs-comment >## total number of neurons</span>
+f = <span class=hljs-number >0.15</span> <span class=hljs-comment >## ratio of selective excitatory to non-selective excitatory neurons</span>
+f_inh = <span class=hljs-number >0.2</span> <span class=hljs-comment >## ratio of inhibitory neurons to all neurons</span>
+N_E = <span class=hljs-built_in >Int</span>(N * (<span class=hljs-number >1</span> - f_inh))
+N_I = <span class=hljs-built_in >Int</span>(ceil(N * f_inh)) <span class=hljs-comment >## total number of inhibitory neurons</span>
+N_E_selective = <span class=hljs-built_in >Int</span>(ceil(f * N_E)) <span class=hljs-comment >## number of selective excitatory neurons</span>
+N_E_nonselective = N_E - <span class=hljs-number >2</span> * N_E_selective <span class=hljs-comment >## number of non-selective excitatory neurons</span>
+
+<span class=hljs-comment ># Use two distinct weight values as per Wang [1]</span>
+w₊ = <span class=hljs-number >1.7</span>
+w₋ = <span class=hljs-number >1</span> - f * (w₊ - <span class=hljs-number >1</span>) / (<span class=hljs-number >1</span> - f)
+
+<span class=hljs-comment ># Use scaling factors for conductance parameters so that our abbreviated model</span>
+<span class=hljs-comment ># can exhibit the same competition behavior between the two selective excitatory populations</span>
+<span class=hljs-comment ># as the larger model in Wang [1] does.</span>
+exci_scaling_factor = <span class=hljs-number >1600</span> / N_E
+inh_scaling_factor = <span class=hljs-number >400</span> / N_I
+
+coherence = <span class=hljs-number >0</span> <span class=hljs-comment ># random dot motion coherence [%]</span>
+dt_spike_rate = <span class=hljs-number >50</span> <span class=hljs-comment ># update interval for the stimulus spike rate [ms]</span>
+μ_0 = <span class=hljs-number >40e-3</span> <span class=hljs-comment ># mean stimulus spike rate [spikes / ms]</span>
+ρ_A = ρ_B = μ_0 / <span class=hljs-number >100</span>
+μ_A = μ_0 + ρ_A * coherence
+μ_B = μ_0 + ρ_B * coherence
+σ = <span class=hljs-number >4e-3</span> <span class=hljs-comment ># standard deviation of stimulus spike rate [spikes / ms]</span>
+
+spike_rate_A = (distribution=Normal(μ_A, σ), dt=dt_spike_rate) <span class=hljs-comment ># spike rate distribution for selective population A</span>
+spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) <span class=hljs-comment ># spike rate distribution for selective population B</span>
+
+<span class=hljs-comment ># background input</span>
+<span class=hljs-meta >@named</span> background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name, N_trains=<span class=hljs-number >1</span>);
+
+<span class=hljs-comment ># stimulation inputs to selective populations A and B</span>
+<span class=hljs-meta >@named</span> stim_A = PoissonSpikeTrain(spike_rate_A, tspan; namespace = model_name);
+<span class=hljs-meta >@named</span> stim_B = PoissonSpikeTrain(spike_rate_B, tspan; namespace = model_name);
+
+<span class=hljs-meta >@named</span> n_A = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor);
+<span class=hljs-meta >@named</span> n_B = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor) ;
+<span class=hljs-meta >@named</span> n_ns = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_nonselective, weight = <span class=hljs-number >1.0</span>, exci_scaling_factor, inh_scaling_factor);
+<span class=hljs-meta >@named</span> n_inh = LIFInhCircuitBlox(; namespace = model_name, N_neurons = N_I, weight = <span class=hljs-number >1.0</span>, exci_scaling_factor, inh_scaling_factor);</code></pre> <p>As we can see, each selective population <code>n_A</code> and <code>n_B</code> receives a separate spike train input <code>stim_A</code> and <code>stim_B</code> respectively. These inputs model visual processing that is selective for the left and right dot directions. All Bloxs also receive background inputs of the same rate from neurons we do not explicitly model. The Bloxs we use here are subtypes of <code>CompositeBlox</code> and contain either <code>LIFExciNeuron</code>s or <code>LIFInhNeuron</code>s in them.</p> <h2 id=system_construction_simulation ><a href="#system_construction_simulation" class=header-anchor >System construction &amp; Simulation</a></h2> <pre><code class="julia hljs">g = MetaDiGraph()
+add_edge!(g, background_input =&gt; n_A; weight = <span class=hljs-number >1</span>);
+add_edge!(g, background_input =&gt; n_B; weight = <span class=hljs-number >1</span>);
+add_edge!(g, background_input =&gt; n_ns; weight = <span class=hljs-number >1</span>);
+add_edge!(g, background_input =&gt; n_inh; weight = <span class=hljs-number >1</span>);
+
+add_edge!(g, stim_A =&gt; n_A; weight = <span class=hljs-number >1</span>);
+add_edge!(g, stim_B =&gt; n_B; weight = <span class=hljs-number >1</span>);
+
+add_edge!(g, n_A =&gt; n_B; weight = w₋);
+add_edge!(g, n_A =&gt; n_ns; weight = <span class=hljs-number >1</span>);
+add_edge!(g, n_A =&gt; n_inh; weight = <span class=hljs-number >1</span>);
+
+add_edge!(g, n_B =&gt; n_A; weight = w₋);
+add_edge!(g, n_B =&gt; n_ns; weight = <span class=hljs-number >1</span>);
+add_edge!(g, n_B =&gt; n_inh; weight = <span class=hljs-number >1</span>);
+
+add_edge!(g, n_ns =&gt; n_A; weight = w₋);
+add_edge!(g, n_ns =&gt; n_B; weight = w₋);
+add_edge!(g, n_ns =&gt; n_inh; weight = <span class=hljs-number >1</span>);
+
+add_edge!(g, n_inh =&gt; n_A; weight = <span class=hljs-number >1</span>);
+add_edge!(g, n_inh =&gt; n_B; weight = <span class=hljs-number >1</span>);
+add_edge!(g, n_inh =&gt; n_ns; weight = <span class=hljs-number >1</span>);
+
+sys = system_from_graph(g; name=model_name, graphdynamics = <span class=hljs-literal >true</span>);
+prob = ODEProblem(sys, [], tspan);
+sol = solve(prob, Euler(); dt = <span class=hljs-number >0.01</span>);</code></pre> <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2> <pre><code class="julia hljs">fig = Figure()
+rasterplot(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>], n_A, sol; title = <span class=hljs-string >&quot;Population A&quot;</span>)
+rasterplot(fig[<span class=hljs-number >1</span>,<span class=hljs-number >2</span>], n_B, sol; title = <span class=hljs-string >&quot;Population B&quot;</span>)
+rasterplot(fig[<span class=hljs-number >2</span>,<span class=hljs-number >1</span>], n_inh, sol; color=:red, title = <span class=hljs-string >&quot;Inhibitory Population&quot;</span>)
+fig</code></pre> <img src="/course/assets/pages/decision_making/code/output/dm_raster.svg" alt=""> <p>Notice how the activity of neurons in population B is quickly ramping up and the activity in population A is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.</p> <pre><code class="julia hljs">fig = Figure()
+ax = Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>], title = <span class=hljs-string >&quot;Competing Firing Rates&quot;</span>)
+frplot!(ax, n_A, sol; color=:black, win_size=<span class=hljs-number >50</span>)
+frplot!(ax, n_B, sol; color=:red, win_size=<span class=hljs-number >50</span>)
+fig</code></pre> <img src="/course/assets/pages/decision_making/code/output/dm_fr.svg" alt=""> <p>We observe the same result qualitatively when plotting the firing rates instead of spikes. Using a single axis we can better see the magnitude of the competition in the difference between the firing rates over time.</p> <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2> <ul> <li><p>The circuit makes a decision in real time. Can you calculate and plot a response time distribution? Try changing the dot coherence level and see how it affects the response times.</p> <li><p>Which receptor type &#40;NMDA, AMPA or GABA&#41; is the most crucial one for the competition behavior of the circuit? Hint: simulate interventions on the circuit to ablate a receptor type. Look into the equations of <code>LIFExciNeuron</code> and <code>LIFInhNeuron</code> and affect the receptors&#39; conductance.</p> </ul> <h2 id=references ><a href="#references" class=header-anchor >References</a></h2> <ul> <li><p>&#91;1&#93; Wang XJ. Probabilistic decision making by slow reverberation in cortical circuits. Neuron. 2002 Dec;36&#40;5&#41;:955-968. DOI: 10.1016/s0896-6273&#40;02&#41;01092-9. PMID: 12467598.</p> </ul> <div class=page-foot > <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 03, 2025. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </main> <script src="/course/libs/vela/metisMenu.min.js"></script> <script src="/course/libs/vela/slideout.min.js"></script> <script src="/course/libs/highlight/highlight.min.js"></script> <script>hljs.highlightAll();hljs.configure({tabReplace: ' '});</script>

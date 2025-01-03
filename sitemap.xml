@@ -2,6 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
+    <loc>https://neuroblox.github.io/course/pages/learning/index.html</loc>
+    <lastmod>2025-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://neuroblox.github.io/course/pages/CS_circuit/index.html</loc>
     <lastmod>2025-01-03</lastmod>
     <changefreq>monthly</changefreq>
@@ -75,6 +81,18 @@
 </url>
 <url>
     <loc>https://neuroblox.github.io/course/menu2/index.html</loc>
+    <lastmod>2025-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://neuroblox.github.io/course/pages/DCM/index.html</loc>
+    <lastmod>2025-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://neuroblox.github.io/course/pages/decision_making/index.html</loc>
     <lastmod>2025-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

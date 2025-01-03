@@ -87,7 +87,7 @@ exci        = [exci_driven; exci_other] ## Concatenate the driven and undriven e
 inhib       = [PINGNeuronInhib(name=Symbol("ID$i"), I_ext=rand(I_driveI) + rand(I_base) + I_bath) for i in 1:NI_driven]; ## In-line loop to create the inhibitory neurons, named ID1, ID2, etc.
 ````
 
-> **_Note:_** If you want to explore the details of these Bloxs, try typing ``?PINGNeuronExci`` or ``?PINGNeuronInhib`` in your Julia REPL
+> **_NOTE_:** If you want to explore the details of these Bloxs, try typing ``?PINGNeuronExci`` or ``?PINGNeuronInhib`` in your Julia REPL
 > to see the full details of the blocks. If you really want to dig into the details,
 > type ``@edit PINGNeuronExci()`` to open the source code and see how the equations are written.
 

@@ -1,15 +1,16 @@
 <!--This file was generated, do not modify it.-->
 # Blox and Connections in Neuroblox
-Learning goals:
-- Learn about how Bloxs and their connections are structured in Neuroblox.
-- Implement new Bloxs in code.
-- Implement new connection rules between the new Bloxs and existing ones from Neuroblox.
-
+## Introduction
 Neuroblox comes with a library of many components already, which we call Blox. Such Blox are neuron models, neural masses, circuits of these, input sources, observers etc. Additionally there are connection rules that dictate how types of components connect with one another. Over the rest of this course we will encounter multiple examples of models made by Neuroblox components and connected by rules already implemented in the package.
 
 It is also possible though to design custom Blox components and connection rules that do not exist in Neuroblox yet. This feature allows us to easily extend the capabilities of Neuroblox towards our specific needs.
 
 Here we will learn how to define our own Blox components and write down connection rules to allow our Blox to connect to ones within Neuroblox.
+
+Learning goals:
+- Learn about how Bloxs and their connections are structured in Neuroblox.
+- Implement new Bloxs in code.
+- Implement new connection rules between the new Bloxs and existing ones from Neuroblox.
 
 ## Type hierarchy
 Neuroblox organizes its Bloxs into type hierarchies. There is `AbstractBlox` at the top level and then `Neuron` and `NeuralMass` that are subtypes of it. Then there are `ExciNeuron` and `InhNeuron` which are subtypes of `Neuron` specifically for Bloxs with excitatory and inhibitory dynamics respectively.
@@ -104,7 +105,7 @@ struct IzhNeuron <: Neuron
 end
 ````
 
-> **_Note:_** In `IzhNeuron` the `jcn` variable does not get a default value, only the [input=true] tag.
+> **_NOTE_:** In `IzhNeuron` the `jcn` variable does not get a default value, only the [input=true] tag.
 > This means that other Bloxs will connect to a `IzhNeuron` through `jcn`.
 >
 > Neuroblox automatically initializes a `jcn ~ 0` equation and then accumulates connection terms in it.
@@ -155,7 +156,7 @@ connection_equations(lif, izh)
 ````
 
 Notice how the equation has changed compared to above and it is equal to our latest `connection_equations` dispatch.
-> **_Note:_** When we define a new `connection_equations` dispatch we need to include three positional arguments, the source Blox, the destination Blox and a symbolic weight parameter that is generated internally in Neuroblox and assigned to a specific connection.
+> **_NOTE_:** When we define a new `connection_equations` dispatch we need to include three positional arguments, the source Blox, the destination Blox and a symbolic weight parameter that is generated internally in Neuroblox and assigned to a specific connection.
 >
 > We also include `kwargs...` which reads as an arbitrary number of keyword arguments. This is a placeholder for additional arguments that either Neuroblox uses internally or we want to pass as equation terms. We will see an example of the latter shortly.
 >
@@ -202,7 +203,7 @@ Algebraic connection equations is not the only way that a blox can interact with
 These callbacks will be applied at every timepoint during simulation where the callback condition is fulfilled.
 This mechanism is particularly useful for neuron models like the Izhikevich and the LIF neurons we saw above that use callbacks to implement spiking.
 
-> **_Note:_** The affect equations of a single event can change either only variables or parameters. Currenlty we can not mix variable and parameter changes within the same event.
+> **_NOTE_:** The affect equations of a single event can change either only variables or parameters. Currenlty we can not mix variable and parameter changes within the same event.
 > See the [ModelingToolkit documentation](https://docs.sciml.ai/ModelingToolkit/stable/basics/Events/#Discrete-events-support) for more details.
 
 ````julia:ex13
@@ -231,7 +232,7 @@ Here we have added `spike_conductance` as the value that increments the conducta
 > Consider which variable or parameter of `IzhNeuron` should be affected by such a spike.
 > Hint: Look at how a `IzhNeuron` spike affects its own dynamics.
 
-# Challenge Problems
+## Challenge Problems
 - Implement a Morris-Lecar neuron as a new Blox and add connection rules to interface it with itself and Hodgkin-Huxley neurons from Neuroblox (`HHNeuronExciBlox` and `HHNeuronInhibBlox`).
   - Morris C, Lecar H. Voltage oscillations in the barnacle giant muscle fiber. Biophys J. 1981 Jul;35(1):193-213. doi: 10.1016/S0006-3495(81)84782-0. PMID: 7260316; PMCID: PMC1327511.
   - http://www.scholarpedia.org/article/Morris-Lecar_model

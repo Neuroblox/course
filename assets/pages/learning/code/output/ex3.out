@@ -1,0 +1,9 @@
+MethodError: no method matching Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus, ::Int64; name::Symbol, namespace::Symbol)
+The type `Neuroblox.ClassificationEnvironment` exists, but no method is defined for this combination of argument types when trying to construct it.
+
+Closest candidates are:
+  Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus; name, namespace)
+   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:127
+  Neuroblox.ClassificationEnvironment(!Matched::DataFrames.DataFrame; name, namespace, t_stimulus, t_pause)
+   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:111
+

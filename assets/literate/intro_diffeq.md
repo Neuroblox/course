@@ -1,5 +1,7 @@
 <!--This file was generated, do not modify it.-->
 # Differential Equations in Julia
+Introduction
+
 Learning goals:
 - Learn about ModelingToolkit, the symbolic way to define differential equation systems.
 - Implement a neuron model using ModelingToolkit and simulate spiking
@@ -192,11 +194,11 @@ save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide
 
 Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset.
 
-# Challenge Problems
+## Challenge Problems
 - Define a [Generalized Integrate-and-Fire neuron](https://neuronaldynamics.epfl.ch/online/Pt2.html) as an `ODESystem` and simulate it.
 - Pick a neuron model of your choice and perform a sensitivity analysis on the system. How is its spiking behavior change as its parameters change? Summarize the results in one (or several) plots.
 
-# References
+## References
 [1] E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
 [2] Ma, Yingbo, Shashi Gowda, Ranjan Anantharaman, Chris Laughman, Viral Shah, and Chris Rackauckas. "Modelingtoolkit: A composable graph transformation system for equation-based modeling." arXiv preprint arXiv:2103.05244 (2021).
 [3] https://docs.sciml.ai/ModelingToolkit/stable/

@@ -1,0 +1,131 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/favicon.png"> <title>Franklin Example | Vela</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Vela Template</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/install">Installing Julia</a> <li><a href="/course/pages/intro_julia">Introduction to Julia</a> <li><a href="/course/pages/intro_diffeq">Differential Equations with ModelingToolkit</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/custom">Custom Bloxs and Connections</a> <li><a href="/course/pages/neuron_mass">Neurons, Neural Masses and Sources</a> <li><a href="" class=has-arrow >Circuit Modelis</a> <ul> <li><a href="/course/pages/circuits">Introduction</a> <li><a href="/course/pages/CS_circuit">Biomimetic Corticostriatal assemblies</a> <li><a href="/course/pages/PING_circuit">Pyramidal-Interneuron Gamma network</a> </ul> <li><a href="/course/pages/decision_making">Decision Making</a> <li><a href="/course/pages/learning">Synaptic Plasticity and Reinforcement Learning</a> <li><a href="/course/pages/DCM">Spectral Dynamic Causal Modeling</a> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Synaptic Plasticity and Reinforcement Learning</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#introduction">Introduction</a><li><a href="#cortico-cortical_plasticity">Cortico-Cortical Plasticity</a><li><a href="#cortico-striatal_circuit_performing_category_learning">Cortico-Striatal Circuit performing Category Learning</a><li><a href="#challenge_problems">Challenge Problems</a><li><a href="#references">References</a></ol></div> <h1 id=synaptic_plasticity_and_reinforcement_learning ><a href="#synaptic_plasticity_and_reinforcement_learning" class=header-anchor >Synaptic Plasticity and Reinforcement Learning</a></h1> <h2 id=introduction ><a href="#introduction" class=header-anchor >Introduction</a></h2> <p>In Neuroblox, we can add plasticity rules to our circuit models. The symbolic weights that are defined for every connection are the ones that are updated according to these plasticity rules after every simulation run. Weight updates are automatically handled after each simulation when doing reinforcement learning in Neuroblox. This is the topic that we will cover here.</p> <p>We will consider two examples. First, a cortical circuit with Hebbian plasticity and then an extended circuit which implements reinforcement learning to categorize image stimuli between two categories without any a priori knowledge of the categorization rule.</p> <p>In reinforcement learning &#40;RL&#41; we typically talk about an agent acting on an environment and then the environment returning new stimuli and rewards to the agent. We have used the same semantics in Neuroblox as we will see shortly. The <code>Agent</code> is constructed from the model graph and the <code>ClassificationEnvironment</code> is constructed by a Blox of multiple stimuli, which also contains information about the true category of each stimulus.</p> <p>Learning goals</p> <ul> <li><p>Simulate circuits with Hebbian synaptic plasticity.</p> <li><p>Simulate circuits performing reinforcement learning in a behavioral task.</p> </ul> <h2 id=cortico-cortical_plasticity ><a href="#cortico-cortical_plasticity" class=header-anchor >Cortico-Cortical Plasticity</a></h2> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Neuroblox
+<span class=hljs-keyword >using</span> OrdinaryDiffEq <span class=hljs-comment >## to build the ODE problem and solve it, gain access to multiple solvers from this</span>
+<span class=hljs-keyword >using</span> Random <span class=hljs-comment >## for generating random variables</span>
+<span class=hljs-keyword >using</span> CairoMakie <span class=hljs-comment >## for customized plotting recipies for blox</span>
+<span class=hljs-keyword >using</span> CSV <span class=hljs-comment >## to read data from CSV files</span>
+<span class=hljs-keyword >using</span> DataFrames <span class=hljs-comment >## to format the data into DataFrames</span>
+<span class=hljs-keyword >using</span> Downloads <span class=hljs-comment >## to download image stimuli files</span>
+
+N_trials = <span class=hljs-number >5</span> <span class=hljs-comment >## number of trials</span>
+trial_dur = <span class=hljs-number >1000</span> <span class=hljs-comment >## in ms</span>
+
+<span class=hljs-comment ># download the stimulus images</span>
+image_set = CSV.read(Downloads.download(<span class=hljs-string >&quot;raw.githubusercontent.com/Neuroblox/NeurobloxDocsHost/refs/heads/main/data/stimuli_set.csv&quot;</span>), DataFrame) <span class=hljs-comment >## reading data into DataFrame format</span>
+
+model_name = :g
+<span class=hljs-comment ># define stimulus Blox</span>
+<span class=hljs-comment ># t_stimulus: how long the stimulus is on (in ms)</span>
+<span class=hljs-comment ># t_pause : how long the stimulus is off (in ms)</span>
+<span class=hljs-meta >@named</span> stim = ImageStimulus(image_set; namespace=model_name, t_stimulus=trial_dur, t_pause=<span class=hljs-number >0</span>);
+
+<span class=hljs-comment ># Cortical Bloxs</span>
+<span class=hljs-meta >@named</span> VAC = CorticalBlox(; namespace=model_name, N_wta=<span class=hljs-number >4</span>, N_exci=<span class=hljs-number >5</span>,  density=<span class=hljs-number >0.05</span>, weight=<span class=hljs-number >1</span>)
+<span class=hljs-meta >@named</span> AC = CorticalBlox(; namespace=model_name, N_wta=<span class=hljs-number >2</span>, N_exci=<span class=hljs-number >5</span>, density=<span class=hljs-number >0.05</span>, weight=<span class=hljs-number >1</span>)
+<span class=hljs-comment ># ascending system Blox, modulating frequency set to 16 Hz</span>
+<span class=hljs-meta >@named</span> ASC1 = NextGenerationEIBlox(; namespace=model_name, Cₑ=<span class=hljs-number >2</span>*<span class=hljs-number >26</span>,Cᵢ=<span class=hljs-number >1</span>*<span class=hljs-number >26</span>, alpha_invₑₑ=<span class=hljs-number >10.0</span>/<span class=hljs-number >26</span>, alpha_invₑᵢ=<span class=hljs-number >0.8</span>/<span class=hljs-number >26</span>, alpha_invᵢₑ=<span class=hljs-number >10.0</span>/<span class=hljs-number >26</span>, alpha_invᵢᵢ=<span class=hljs-number >0.8</span>/<span class=hljs-number >26</span>, kₑᵢ=<span class=hljs-number >0.6</span>*<span class=hljs-number >26</span>, kᵢₑ=<span class=hljs-number >0.6</span>*<span class=hljs-number >26</span>)
+
+<span class=hljs-comment ># learning rule</span>
+hebbian_cort = HebbianPlasticity(K=<span class=hljs-number >5e-5</span>, W_lim=<span class=hljs-number >7</span>, t_pre=trial_dur, t_post=trial_dur)
+
+g = MetaDiGraph()
+
+add_edge!(g, stim =&gt; VAC, weight=<span class=hljs-number >14</span>)
+add_edge!(g, ASC1 =&gt; VAC, weight=<span class=hljs-number >44</span>)
+add_edge!(g, ASC1 =&gt; AC, weight=<span class=hljs-number >44</span>)
+add_edge!(g, VAC =&gt; AC, weight=<span class=hljs-number >3</span>, density=<span class=hljs-number >0.1</span>, learning_rule = hebbian_cort) <span class=hljs-comment >## give learning rule as parameter</span>
+
+agent = Agent(g; name=model_name);
+env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name);
+
+fig = Figure(title=<span class=hljs-string >&quot;Adjacency matrix&quot;</span>, size = (<span class=hljs-number >1600</span>, <span class=hljs-number >800</span>))
+
+adjacency(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>], agent; title=<span class=hljs-string >&quot;Initial weights&quot;</span>)
+
+run_experiment!(agent, env; t_warmup=<span class=hljs-number >200.0</span>, alg=Vern7(), verbose=<span class=hljs-literal >true</span>)
+
+adjacency(fig[<span class=hljs-number >1</span>,<span class=hljs-number >2</span>], agent; title=<span class=hljs-string >&quot;Final weights&quot;</span>)
+fig</code></pre><pre><code class="plaintext hljs">Important Note: Neuroblox is a commercial product of Neuroblox, Inc.
+It is free to use for non-commercial academic teaching
+and research purposes. For commercial users, license fees apply.
+Please refer to the End User License Agreement
+(https://github.com/Neuroblox/NeurobloxEULA) for details.
+Please contact sales@neuroblox.org for purchasing information.
+
+To report any bugs, issues, or feature requests for Neuroblox software,
+please use the public Github repository NeurobloxIssues, located at
+https://github.com/Neuroblox/NeurobloxIssues.
+MethodError: no method matching Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus, ::Int64; name::Symbol, namespace::Symbol)
+The type `Neuroblox.ClassificationEnvironment` exists, but no method is defined for this combination of argument types when trying to construct it.
+
+Closest candidates are:
+  Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus; name, namespace)
+   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:127
+  Neuroblox.ClassificationEnvironment(!Matched::DataFrames.DataFrame; name, namespace, t_stimulus, t_pause)
+   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:111
+
+</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/learning/code/adj_open' not found. //</span></p> <h2 id=cortico-striatal_circuit_performing_category_learning ><a href="#cortico-striatal_circuit_performing_category_learning" class=header-anchor >Cortico-Striatal Circuit performing Category Learning</a></h2> <p>This is one simplified biological instantiation of an RL system. It is carrying out a simple RL behavior but not faithfully simulating physiology. The experiment we are simulating here is the category learning experiment &#91;Antzoulatos2014&#93; which was successfully modeled through a detailed corticostriatal model &#91;2&#93;.</p> <pre><code class="julia hljs">time_block_dur = <span class=hljs-number >90.0</span> <span class=hljs-comment >## ms (size of discrete time blocks)</span>
+N_trials = <span class=hljs-number >100</span> <span class=hljs-comment >## number of trials</span>
+trial_dur = <span class=hljs-number >1000</span> <span class=hljs-comment >## ms</span>
+
+image_set = CSV.read(Downloads.download(<span class=hljs-string >&quot;raw.githubusercontent.com/Neuroblox/NeurobloxDocsHost/refs/heads/main/data/stimuli_set.csv&quot;</span>), DataFrame) <span class=hljs-comment >## reading data into DataFrame format</span>
+
+<span class=hljs-comment ># additional Striatum Bloxs</span>
+<span class=hljs-meta >@named</span> STR1 = Striatum(; namespace=model_name, N_inhib=<span class=hljs-number >5</span>)
+<span class=hljs-meta >@named</span> STR2 = Striatum(; namespace=model_name, N_inhib=<span class=hljs-number >5</span>)
+
+<span class=hljs-meta >@named</span> tan_pop1 = TAN(κ=<span class=hljs-number >10</span>; namespace=model_name)
+<span class=hljs-meta >@named</span> tan_pop2 = TAN(κ=<span class=hljs-number >10</span>; namespace=model_name)
+
+<span class=hljs-meta >@named</span> SNcb = SNc(κ_DA=<span class=hljs-number >1</span>; namespace=model_name)
+
+<span class=hljs-comment ># action selection Blox, necessary for making a choice</span>
+<span class=hljs-meta >@named</span> AS = GreedyPolicy(; namespace=model_name, t_decision=<span class=hljs-number >2</span>*time_block_dur)
+
+<span class=hljs-comment ># learning rules</span>
+hebbian_mod = HebbianModulationPlasticity(K=<span class=hljs-number >0.05</span>, decay=<span class=hljs-number >0.01</span>, α=<span class=hljs-number >2.5</span>, θₘ=<span class=hljs-number >1</span>, modulator=SNcb, t_pre=trial_dur, t_post=trial_dur, t_mod=time_block_dur)
+hebbian_cort = HebbianPlasticity(K=<span class=hljs-number >5e-4</span>, W_lim=<span class=hljs-number >7</span>, t_pre=trial_dur, t_post=trial_dur)
+
+g = MetaDiGraph()
+
+add_edge!(g, stim =&gt; VAC, weight=<span class=hljs-number >14</span>)
+add_edge!(g, ASC1 =&gt; VAC, weight=<span class=hljs-number >44</span>)
+add_edge!(g, ASC1 =&gt; AC, weight=<span class=hljs-number >44</span>)
+add_edge!(g, VAC =&gt; AC, weight=<span class=hljs-number >3</span>, density=<span class=hljs-number >0.1</span>, learning_rule = hebbian_cort)
+add_edge!(g, AC =&gt; STR1, weight = <span class=hljs-number >0.075</span>, density =  <span class=hljs-number >0.04</span>, learning_rule =  hebbian_mod)
+add_edge!(g, AC =&gt; STR2, weight =  <span class=hljs-number >0.075</span>, density =  <span class=hljs-number >0.04</span>, learning_rule =  hebbian_mod)
+add_edge!(g, tan_pop1 =&gt; STR1, weight = <span class=hljs-number >1</span>, t_event = time_block_dur)
+add_edge!(g, tan_pop2 =&gt; STR2, weight = <span class=hljs-number >1</span>, t_event = time_block_dur)
+add_edge!(g, STR1 =&gt; tan_pop1, weight = <span class=hljs-number >1</span>)
+add_edge!(g, STR2 =&gt; tan_pop1, weight = <span class=hljs-number >1</span>)
+add_edge!(g, STR1 =&gt; tan_pop2, weight = <span class=hljs-number >1</span>)
+add_edge!(g, STR2 =&gt; tan_pop2, weight = <span class=hljs-number >1</span>)
+add_edge!(g, STR1 =&gt; STR2, weight = <span class=hljs-number >1</span>, t_event = <span class=hljs-number >2</span>*time_block_dur)
+add_edge!(g, STR2 =&gt; STR1, weight = <span class=hljs-number >1</span>, t_event = <span class=hljs-number >2</span>*time_block_dur)
+add_edge!(g, STR1 =&gt; SNcb, weight = <span class=hljs-number >1</span>)
+add_edge!(g, STR2 =&gt; SNcb, weight = <span class=hljs-number >1</span>)
+<span class=hljs-comment ># action selection connections</span>
+add_edge!(g, STR1 =&gt; AS);
+add_edge!(g, STR2 =&gt; AS);</code></pre> <p>The last two connections add the ability to output actions. The <code>AS</code> Blox is a <code>GreedyPolicy</code> meaning that it will compare the activity of both Striatum Bloxs <code>STR1</code> and <code>STR2</code> and select the highest value. If <code>STR1</code> wins then the left choice is made and if <code>STR2</code> wins then the model chooses the right direction as the true dot movement direction.</p> <pre><code class="julia hljs">agent = Agent(g; name=model_name, t_block = time_block_dur); <span class=hljs-comment >## define agent</span>
+env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
+
+fig = Figure(title=<span class=hljs-string >&quot;Adjacency matrix&quot;</span>, size = (<span class=hljs-number >1600</span>, <span class=hljs-number >800</span>))
+
+adjacency(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>], agent; title = <span class=hljs-string >&quot;Before Learning&quot;</span>)
+
+trace = run_experiment!(agent, env; t_warmup=<span class=hljs-number >200.0</span>, alg=Vern7(), verbose=<span class=hljs-literal >true</span>)</code></pre><pre><code class="plaintext hljs">MethodError: no method matching Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus, ::Int64; name::Symbol, namespace::Symbol)
+The type `Neuroblox.ClassificationEnvironment` exists, but no method is defined for this combination of argument types when trying to construct it.
+
+Closest candidates are:
+  Neuroblox.ClassificationEnvironment(::Neuroblox.ImageStimulus; name, namespace)
+   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:127
+  Neuroblox.ClassificationEnvironment(!Matched::DataFrames.DataFrame; name, namespace, t_stimulus, t_pause)
+   @ Neuroblox ~/.julia/packages/Neuroblox/uguZs/src/blox/reinforcement_learning.jl:111
+
+</code></pre> <p><code>trace</code> is a <code>NamedTuple</code> containing useful outcomes for each trial of the experiment:</p> <pre><code class="julia hljs">trace.trials <span class=hljs-comment >## trial indices</span>
+trace.correct <span class=hljs-comment >## whether the response was correct or not on each trial</span>
+trace.action; <span class=hljs-comment >## what responce was made on each trial, 1 is left and 2 is right</span>
+
+adjacency(fig[<span class=hljs-number >1</span>,<span class=hljs-number >2</span>], agent; title = <span class=hljs-string >&quot;After Learning&quot;</span>)
+fig</code></pre><pre><code class="plaintext hljs">UndefVarError: `trace` not defined in `Main.FD_SANDBOX_13203191008430087757`
+Suggestion: check for spelling errors or missing imports.
+</code></pre> <p><span style="color:red;">// Image matching '/assets/pages/learning/code/adj_RL' not found. //</span></p> <p>Notice the changes in weight values after the RL experiment.</p> <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2> <ul> <li><p>Visualize the model&#39;s performance in the category learning task as a function of time &#40;trials&#41;. Hint: For correct trials <code>trace.correct &#61; 1</code> and for incorrect trials <code>trace.correct &#61; 0</code>.</p> <li><p>Since this is an oversimplified instantiation of a cortico-striatal model, it is highly sensitive to the parameters, such that if we change the values of <code>TAN</code> parameters &#40;maximum activity <code>κ</code>&#41;, or learning rates in <code>HebbianModulationPlasticity</code> &#40;learning rate constant <code>K</code>&#41;, the system won’t be able to learn. Try playing with these parameters and figure out at what range of these parameters the model works.</p> </ul> <h2 id=references ><a href="#references" class=header-anchor >References</a></h2> <ul> <li><p>&#91;1&#93; Pathak A., Brincat S., Organtzidis H., Strey H., Senneff S., Antzoulatos E., Mujica-Parodi L., Miller E., Granger R. Biomimetic model of corticostriatal micro-assemblies discovers new neural code., bioRxiv 2023.11.06.565902, 2024</p> <li><p>&#91;2&#93; Antzoulatos EG, Miller EK. Increases in functional connectivity between prefrontal cortex and striatum during category learning. Neuron. 2014 Jul 2;83&#40;1&#41;:216-25. doi: 10.1016/j.neuron.2014.05.005. Epub 2014 Jun 12. PMID: 24930701; PMCID: PMC4098789.</p> </ul> <div class=page-foot > <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 03, 2025. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </main> <script src="/course/libs/vela/metisMenu.min.js"></script> <script src="/course/libs/vela/slideout.min.js"></script> <script src="/course/libs/highlight/highlight.min.js"></script> <script>hljs.highlightAll();hljs.configure({tabReplace: ' '});</script>
