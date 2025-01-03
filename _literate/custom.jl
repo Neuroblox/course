@@ -198,7 +198,7 @@ sol = solve(prob, Tsit5());
 # > Consider which variable or parameter of `IzhNeuron` should be affected by such a spike.
 # > Hint: Look at how a `IzhNeuron` spike affects its own dynamics.
 
-# # Challenge Problems
+# ## Challenge Problems
 # - Implement a Morris-Lecar neuron as a new Blox and add connection rules to interface it with itself and Hodgkin-Huxley neurons from Neuroblox (`HHNeuronExciBlox` and `HHNeuronInhibBlox`). 
 #   - Morris C, Lecar H. Voltage oscillations in the barnacle giant muscle fiber. Biophys J. 1981 Jul;35(1):193-213. doi: 10.1016/S0006-3495(81)84782-0. PMID: 7260316; PMCID: PMC1327511.
 #   - http://www.scholarpedia.org/article/Morris-Lecar_model
