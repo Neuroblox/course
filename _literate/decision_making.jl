@@ -66,6 +66,7 @@ spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate di
 @named n_inh = LIFInhCircuitBlox(; namespace = model_name, N_neurons = N_I, weight = 1.0, exci_scaling_factor, inh_scaling_factor);
 
 # As we can see, each selective population `n_A` and `n_B` receives a separate spike train input `stim_A` and `stim_B` respectively. These inputs model visual processing that is selective for the left and right dot directions. All Bloxs also receive background inputs of the same rate from neurons we do not explicitly model.
+# The Bloxs we use here are subtypes of `CompositeBlox` and contain either `LIFExciNeuron`s or `LIFInhNeuron`s in them.
 
 # ## System construction & Simulation
 g = MetaDiGraph()
@@ -118,6 +119,10 @@ save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
 # \fig{dm_fr}
 
 # We observe the same result qualitatively when plotting the firing rates instead of spikes. Using a single axis we can better see the magnitude of the competition in the difference between the firing rates over time.
+
+# ## Challenge Problems
+# - The circuit makes a decision in real time. Can you calculate and plot a response time distribution? Try changing the dot coherence level and see how it affects the response times.
+# - Which receptor type (NMDA, AMPA or GABA) is the most crucial one for the competition behavior of the circuit? Hint: simulate interventions on the circuit to ablate a receptor type. Look into the equations of `LIFExciNeuron` and `LIFInhNeuron` and affect the receptors' conductance.
 
 # ## References
 # - [1]  Wang XJ. Probabilistic decision making by slow reverberation in cortical circuits. Neuron. 2002 Dec;36(5):955-968. DOI: 10.1016/s0896-6273(02)01092-9. PMID: 12467598. 

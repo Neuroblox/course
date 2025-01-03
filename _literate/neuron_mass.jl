@@ -332,5 +332,5 @@ save(joinpath(@OUTPUT, "stim_hh.svg"), fig); # hide
 # - Write a function that plots the [Peristimulus time histogram](https://en.wikipedia.org/wiki/Peristimulus_time_histogram) of a Blox around a given timepoint. Hint: use the `hist` or `barplot` plotting functions from `Makie` and `detect_spikes(blox, solution; threshold=...)` to find spikes.
 
 # # References
-# - Gerstner W, Kistler WM, Naud R, Paninski L. Neuronal Dynamics: From Single Neurons to Networks and Models of Cognition, Parts I & II. Cambridge University Press; 2014. 
-# - Adam, Elie M., et al. "Deep brain stimulation in the subthalamic nucleus for Parkinson's disease can restore dynamics of striatal networks." Proceedings of the National Academy of Sciences 119.19 (2022): e2120808119.
+# - [1] Gerstner W, Kistler WM, Naud R, Paninski L. Neuronal Dynamics: From Single Neurons to Networks and Models of Cognition, Parts I & II. Cambridge University Press; 2014. 
+# - [2] Adam, Elie M., et al. "Deep brain stimulation in the subthalamic nucleus for Parkinson's disease can restore dynamics of striatal networks." Proceedings of the National Academy of Sciences 119.19 (2022): e2120808119.
