@@ -307,7 +307,7 @@ transition_times = time[transitions_inds]
 transition_values = stimulus[transitions_inds]
 sol = solve(prob, Vern7(), saveat=dt, tstops = transition_times); 
 
-# > **_Note:_** We have used `detect_transitions` to find all points where the stimulation switches on and off. 
+# > **_NOTE_:** We have used `detect_transitions` to find all points where the stimulation switches on and off. 
 # > Such points can lead to discontinuities in the dynamics of our model and thus to imprecise solutions. 
 # > Adding the transition points explicitly as `tstops` when solving will force the chosen solver 
 # > to stop righ before and after each transition and evaluate the equations for greater precision and stability. 

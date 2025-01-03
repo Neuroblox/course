@@ -88,7 +88,7 @@ struct IzhNeuron <: Neuron
     end
 end
 
-# > **_Note:_** In `IzhNeuron` the `jcn` variable does not get a default value, only the [input=true] tag.
+# > **_NOTE_:** In `IzhNeuron` the `jcn` variable does not get a default value, only the [input=true] tag.
 # > This means that other Bloxs will connect to a `IzhNeuron` through `jcn`.
 # >
 # > Neuroblox automatically initializes a `jcn ~ 0` equation and then accumulates connection terms in it.
@@ -130,7 +130,7 @@ end
 connection_equations(lif, izh)
 
 # Notice how the equation has changed compared to above and it is equal to our latest `connection_equations` dispatch.
-# > **_Note:_** When we define a new `connection_equations` dispatch we need to include three positional arguments, the source Blox, the destination Blox and a symbolic weight parameter that is generated internally in Neuroblox and assigned to a specific connection.
+# > **_NOTE_:** When we define a new `connection_equations` dispatch we need to include three positional arguments, the source Blox, the destination Blox and a symbolic weight parameter that is generated internally in Neuroblox and assigned to a specific connection.
 # >
 # > We also include `kwargs...` which reads as an arbitrary number of keyword arguments. This is a placeholder for additional arguments that either Neuroblox uses internally or we want to pass as equation terms. We will see an example of the latter shortly. 
 # >
@@ -170,7 +170,7 @@ sol = solve(prob, Tsit5());
 # These callbacks will be applied at every timepoint during simulation where the callback condition is fulfilled. 
 # This mechanism is particularly useful for neuron models like the Izhikevich and the LIF neurons we saw above that use callbacks to implement spiking. 
 
-# > **_Note:_** The affect equations of a single event can change either only variables or parameters. Currenlty we can not mix variable and parameter changes within the same event. 
+# > **_NOTE_:** The affect equations of a single event can change either only variables or parameters. Currenlty we can not mix variable and parameter changes within the same event. 
 # > See the [ModelingToolkit documentation](https://docs.sciml.ai/ModelingToolkit/stable/basics/Events/#Discrete-events-support) for more details.
 
 import Neuroblox: connection_callbacks
