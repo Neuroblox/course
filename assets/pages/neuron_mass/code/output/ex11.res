@@ -1,1 +1,0 @@
-Neuroblox.PoissonSpikeTrain{@NamedTuple{distibution::Distributions.Normal{Float64}, dt::Int64}}(:spike_train_dist, nothing, 1, (distibution = Distributions.Normal{Float64}(μ=1.0, σ=0.1), dt = 10), (0, 200), 0.01, Random.MersenneTwister(1234))
