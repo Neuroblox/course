@@ -1,0 +1,1 @@
+Neuroblox.PoissonSpikeTrain{Vector{Float64}}(:spike_train_rate, nothing, 1, [0.01], [(0, 200)], 0.01, Random.MersenneTwister(1234))

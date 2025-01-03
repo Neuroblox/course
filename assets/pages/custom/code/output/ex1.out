@@ -1,0 +1,2 @@
+typeof(lif) = Neuroblox.LIFNeuron
+lif isa Neuron = true
