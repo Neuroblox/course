@@ -26,7 +26,7 @@
   color: #111;
   text-decoration: none;
   position: relative;
-  padding: 10px 10px;
+  padding: 20px 20px;
 }
 
 #menu ul li a::after {
@@ -51,7 +51,7 @@
   transform: scaleX(1);
 }
 
-.franklin-content { padding-left: 10%; }
+.franklin-content { padding-left: 30%; }
 .franklin-content { padding-right: 5%; }
 
 @media (max-width: 940px) {

@@ -6,4 +6,4 @@
 
 \toc
 
-\literate{/_literate/neural_mass.jl}
+\literate{/_literate/neuron_mass.jl}
