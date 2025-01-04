@@ -1,4 +1,4 @@
-@def title = "Neuroblox course"
+@def title = "Introduction to Computational Neuroscience with Neuroblox"
 ![Neuroblox logo](/assets/NB_Logo_Full_Transparent@1920px.png)
 
 # Introduction
