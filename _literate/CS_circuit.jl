@@ -14,7 +14,8 @@ using Random
 using CairoMakie 
 
 # First we will manually create a lateral inhibition circuit (*Figure 1*, the "winner-takes-all" circuit) to better understand its components. This circuit is inspired by the structure of the superficial cortical layer.
-# ![Lateral inhibition in the winner-takes-all circuit](/assets/CS_WTA.png)
+#!nb # ![Lateral inhibition in the winner-takes-all circuit](/assets/CS_WTA.png)
+#nb # ![Lateral inhibition in the winner-takes-all circuit](./assets/CS_WTA.png)
 # *Figure 1: Lateral inhibition in the winner-takes-all circuit.*
 
 model_name = :g
@@ -72,7 +73,8 @@ save(joinpath(@OUTPUT, "wta_wta_stack.svg"), fig); # hide
 # Now we are ready to create a single cortical superficial layer block by connecting multiple WTA circuits
 
 # This model is SCORT in [1] and looks like the one in *Figure 2*.
-# ![Cortical circuit with multiple WTA microcircuits](/assets/CS_Cortical.png)
+#!nb # ![Cortical circuit with multiple WTA microcircuits](/assets/CS_Cortical.png)
+#nb # ![Cortical circuit with multiple WTA microcircuits](./assets/CS_Cortical.png)
 # *Figure 2: Cortical circuit with multiple WTA microcircuits.*
 
 N_wta = 10 ## number of WTA circuits
@@ -164,7 +166,8 @@ save(joinpath(@OUTPUT, "cort_power.svg"), fig); # hide
 # > **_Exercise:_** Try changing parameters of `ASC1` to generate different cortical rhythms.
 
 # Finally we will simulate visual processing in our model by adding a `CorticalBlox` representing visual area cortex (VAC) and an `ImageStimulus` connected to it. This extended model is shown in *Figure 3*.
-# ![Extended circuit with Cortex, Brainstem and Image Stimulus components](/assets/CS_extended.png)
+#!nb # ![Extended circuit with Cortex, Brainstem and Image Stimulus components](/assets/CS_extended.png)
+#nb # ![Extended circuit with Cortex, Brainstem and Image Stimulus components](./assets/CS_extended.png)
 # *Figure 3: Extended circuit with Cortex, Brainstem and Image Stimulus components.*
 
 @named VAC = CorticalBlox(namespace=model_name, N_wta=10, N_exci=5,  density=0.01, weight=1) 
