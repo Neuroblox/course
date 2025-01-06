@@ -113,7 +113,7 @@ connection_equations(lif, izh) ## connection from lif to izh
 # We even get a warning saying that the connection rule is not specified so Neuroblox defaults to this basic weighted connection.
 
 # ## Custom Connections
-# Often times genric connection rules are not sufficient and we need ones specialized to our custom Bloxs. There are two elements that allow for great customization variery when it comes to connection rules, connection equations and callbacks.
+# Often times genric connection rules are not sufficient and we need ones specialized to our custom Bloxs. There are two elements that allow for great customization variety when it comes to connection rules, connection equations and callbacks.
 
 # ### Connection equations
 # Let's define a custom equation that connects a `LIFNeuron` to our `IzhNeuron`. The first thing we need to do is to import the `connection_equations` function from Neuroblox so that we can add a new dispatch to it. 
@@ -171,7 +171,7 @@ sol = solve(prob, Tsit5());
 # These callbacks will be applied at every timepoint during simulation where the callback condition is fulfilled. 
 # This mechanism is particularly useful for neuron models like the Izhikevich and the LIF neurons we saw above that use callbacks to implement spiking. 
 
-# > **_NOTE_:** The affect equations of a single event can change either only variables or parameters. Currenlty we can not mix variable and parameter changes within the same event. 
+# > **_NOTE_:** The effect equations of a single event can change either only variables or parameters. Currently we can not mix variable and parameter changes within the same event. 
 # > See the [ModelingToolkit documentation](https://docs.sciml.ai/ModelingToolkit/stable/basics/Events/#Discrete-events-support) for more details.
 
 import Neuroblox: connection_callbacks

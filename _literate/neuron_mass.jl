@@ -10,7 +10,7 @@
 # - drive single neuron and neural mass activity using external sources 
 
 # ## Neurons and neural masses
-# As a first example we will consider a neural mass `WilsonCowan` Blox of Exhitatation-Inhibition (E-I) balance. This is a two-dimensional reduction over a population of excitatory and inhibitory neurons with continuous dynamics.
+# As a first example we will consider a neural mass `WilsonCowan` Blox of Excitation-Inhibition (E-I) balance. This is a two-dimensional reduction over a population of excitatory and inhibitory neurons with continuous dynamics.
 using Neuroblox
 using OrdinaryDiffEq
 using CairoMakie
@@ -64,7 +64,7 @@ fig
 save(joinpath(@OUTPUT, "qif_timeseries.svg"), fig); # hide
 # \fig{qif_timeseries}
 
-# Finally we simulate an HH neuron with stochastic dynamics which was introduced in [this article on deep brain stimulation int he subthalamic nucleus](https://doi.org/10.1073/pnas.2120808119). 
+# Finally we simulate an HH neuron with stochastic dynamics which was introduced in [this article on deep brain stimulation in the subthalamic nucleus](https://doi.org/10.1073/pnas.2120808119). 
 # The model includes a brownian noise term affecting `D(V)` which you can inspect using the `equations` function.
 
 using StochasticDiffEq ## to access stochastic DE solvers
@@ -86,7 +86,7 @@ save(joinpath(@OUTPUT, "hh_power.svg"), fig); # hide
 
 # ## Sources
 
-# External sources in Neuroblox as a particular Blox subtype (`<: AbstractBlox`) which contains a system with output and no input variables. 
+# External sources in Neuroblox are a particular Blox subtype (`<: AbstractBlox`) which contains a system with output and no input variables. 
 # Naturally source Bloxs can only connect **to** other (non-source) Blox and can not receive connections from any Blox.
 # There are two main categories of sources, ones with continuous dynamics for their variables and ones that operate through events (callbacks).
 
@@ -113,7 +113,7 @@ fig
 save(joinpath(@OUTPUT, "wc_input.svg"), fig); # hide
 # \fig{wc_input}
 
-# Notice how the E-I balance has shiften after adding our input. We will work with a more complex circuit for E-I balance on the next session and learn more about its intricacies.
+# Notice how the E-I balance has shifted after adding our input. We will work with a more complex circuit for E-I balance on the next session and learn more about its intricacies.
 
 # We can create custom sources with continuous input the same way we create custom Bloxs and write custom connection rules for them as we have seen in the previous session.
 
