@@ -15,6 +15,10 @@ using Neuroblox
 using OrdinaryDiffEq
 using CairoMakie
 
+## Set the random seed for reproducible results
+using Random
+Random.seed!(1)
+
 @named nm = WilsonCowan()
 ## Retrieve the simplified ODESystem of the Blox
 sys = system(nm)
@@ -198,10 +202,6 @@ save(joinpath(@OUTPUT, "ifn_input.svg"), fig); # hide
 # Neuroblox contains specialized sources that are common to the field of Deep Brain Stimulation (DBS). These sources simulate stimulation patterns by external probes that are continuous in time, yet contain discrete changes (jumps) on their variables. 
 # Even though these sources are often used in DBS protocols, they are implemented as any other source so they can be connected to any other Bloxs given a connection rule. 
 # We will first visualize the sources on their own and then connect them to an HH excitatory neuron.
-
-## Set the random seed for reproducible results
-using Random
-Random.seed!(1)
 
 ## Square pulse stimulus
 @named stim = DBS(
