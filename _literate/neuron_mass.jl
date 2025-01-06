@@ -46,7 +46,7 @@ save(joinpath(@OUTPUT, "wc_timeseries.svg"), fig); # hide
 sys = system(qif; discrete_events = [60] => [qif.I_in ~ 10])
 tspan = (0, 100) # ms
 prob = ODEProblem(sys, [], tspan)
-sol = solve(prob, Tsit5())
+sol = solve(prob, Tsit5());
 
 # Besides the generic `plot` function, Neuroblox includes some plotting recipes specifically for neuron models. 
 # A raster plot with chosen spike threshold
