@@ -36,8 +36,8 @@ jobs:
     #   specific arguments, see the documentation or ?optimize in the REPL.
     - run: julia -e '
             using Pkg; 
-            Pkg.Registry.add();
-            Pkg.Registry.add("https://github.com/Neuroblox/NeurobloxRegistry");
+            pkg"registry add General";
+            pkg"registry add https://github.com/Neuroblox/NeurobloxRegistry";
             Pkg.activate(".");
             Pkg.instantiate();
             using NodeJS; run(`$(npm_cmd()) install highlight.js`);
