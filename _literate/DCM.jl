@@ -222,11 +222,15 @@ end
 # ## Results
 # Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound (ELBO). 
 # Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a (potentially local) optimum:
-freeenergy(state)
+f1 = freeenergy(state)
+save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
+# \fig{freeenergy}
 
 # Plot the estimated posterior of the effective connectivity and compare that to the true parameter values.
 # Bar hight are the posterior mean and error bars are the standard deviation of the posterior.
-ecbarplot(state, setup, A_true)
+f2 = ecbarplot(state, setup, A_true)
+save(joinpath(@OUTPUT, "ecbar.svg"), f2); # hide
+# \fig{ecbar}
 
 # ## Challenge Problems
 # - **Explore susceptibility with respect to noise.** Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy (compare the different free energies of the models and their respective parameter values with ground truth)?
