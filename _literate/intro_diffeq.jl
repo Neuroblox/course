@@ -37,7 +37,7 @@ u0 = [x => 5, y => 2]
 ## Problem to be solved
 prob = ODEProblem(simpsys, u0, tspan)
 ## Solution of the problem using the Tsit5 solver
-sol = solve(prob, Tsit5())
+sol = solve(prob, Tsit5());
 
 # The solution object contains the values of every variable of the system (`x` and `y`) for every simulated timestep. One can easily access the values of a specific variable using its symbolic name
 sol[x] ## or similarly sol[y]
