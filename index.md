@@ -12,6 +12,7 @@ In this course, you will learn the basics of computational neuroscience via hand
 
 We will go over the following units in this course :
 
+* [Getting Started](/pages/getting_started)
 * [Introduction to Julia](/pages/intro_julia/)
 * [Differential Equations in Julia](/pages/intro_diffeq/)
 * [Plotting with Makie](/pages/intro_plot/)
