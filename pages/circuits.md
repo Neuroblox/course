@@ -5,8 +5,8 @@
 We saw how Bloxs and their connection rules are defined and we can connect external sources to single neuron or neural mass Bloxs. Now we are ready to expand our models to resemble more closely the neuronal circuits of the brain.
 
 This session includes two examples of circuit models
-- [a biomimetic corticostriatal model of visual processing](./CS_circuit)
-- [a Pyramidal-Interneuron Gamma Network (PING) of Excitation-Inhibition balance](./PING_circuit). 
+- [a biomimetic corticostriatal model of visual processing](/pages/CS_circuit)
+- [a Pyramidal-Interneuron Gamma Network (PING) of Excitation-Inhibition balance](/pages/PING_circuit). 
 
 Learning goals :
 - build complex models from the systems neuroscience literature.
