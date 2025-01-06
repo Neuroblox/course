@@ -1,5 +1,4 @@
 # This file was generated, do not modify it. # hide
-using Neuroblox
-using OrdinaryDiffEq
-using Random
-using CairoMakie
+macro OUTPUT()# hideall
+    return isdefined(Main, :Franklin) ? Franklin.OUT_PATH[] : "/tmp/"
+end;

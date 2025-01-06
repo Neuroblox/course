@@ -1,5 +1,9 @@
 # This file was generated, do not modify it.
 
+macro OUTPUT()# hideall
+    return isdefined(Main, :Franklin) ? Franklin.OUT_PATH[] : "/tmp/"
+end;
+
 using Neuroblox
 using OrdinaryDiffEq
 using Random

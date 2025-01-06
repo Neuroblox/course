@@ -1,11 +1,17 @@
 <!--This file was generated, do not modify it.-->
+````julia:ex1
+macro OUTPUT()# hideall
+    return isdefined(Main, :Franklin) ? Franklin.OUT_PATH[] : "/tmp/"
+end;
+````
+
 # Biomimetic model of corticostriatal micro-assemblies
 ## Introduction
 In this session we will build a neural assembly that is part of a larger model that performs category learning of images [1]. We will follow a bottom-up approach moving across three levels; from `Neuron` Blox objects to a `CompositeBlox` containing `Neuron` objects to a `CompositeBlox` containing the first `CompositeBlox`.
 
 In a later session we will extend this model and add synaptic plasticity to it to perform category learning, as a simplified version of [1].
 
-````julia:ex1
+````julia:ex2
 using Neuroblox
 using OrdinaryDiffEq
 using Random
@@ -13,10 +19,10 @@ using CairoMakie
 ````
 
 First we will manually create a lateral inhibition circuit (*Figure 1*, the "winner-takes-all" circuit) to better understand its components. This circuit is inspired by the structure of the superficial cortical layer.
-![Winner-takes-all circuit](../assets/CS_WTA.png)
-*Figure 1: Lateral inhibition in the winner-takes-all circuit*
+![Lateral inhibition in the winner-takes-all circuit](/assets/CS_WTA.png)
+*Figure 1: Lateral inhibition in the winner-takes-all circuit.*
 
-````julia:ex2
+````julia:ex3
 model_name = :g
 
 @named inh = HHNeuronInhibBlox(namespace=model_name, G_syn = 4.0) ##feedback inhibitory interneuron neuron
@@ -38,7 +44,7 @@ end
 
 As we can see, the lateral inhibition circuit is made up of 5 excitatory neurons with each one having a reciprocal connection to the same inhibitory interneuron.
 
-````julia:ex3
+````julia:ex4
 @named sys = system_from_graph(g)
 prob = ODEProblem(sys, [], (0.0, 1000), [])
 sol = solve(prob, Vern7())
@@ -53,7 +59,7 @@ save(joinpath(@OUTPUT, "wta_stack.svg"), fig); # hide
 
 The circuit we just built is implemented as a single Blox in Neuroblox. The `WinnerTakeAllBlox` is a subtype of `CompositeBlox`.
 
-````julia:ex4
+````julia:ex5
 N_exci = 5 ## number of excitatory neurons in each WTA circuit
 # For a single-valued input `I_bg`, each neuron in the WTA Blox will receive a uniformly distributed random background current from 0 to `I_bg`.
 @named wta1 = WinnerTakeAllBlox(namespace=model_name, I_bg=5, N_exci=N_exci)
@@ -66,7 +72,7 @@ add_edge!(g, wta1 => wta2, weight=1, density=0.5);
 The `density` keyword argument sets the connection probability from each excitatory neuron of `wta1` to each excitatory neuron of `wta2`.
 Whether a connection is actually made or not depends on a Bernoulli trial with probability of success equal to `density`.
 
-````julia:ex5
+````julia:ex6
 sys = system_from_graph(g, name=model_name)
 prob = ODEProblem(sys, [], (0.0, 1000), [])
 sol = solve(prob, Vern7())
@@ -81,10 +87,10 @@ save(joinpath(@OUTPUT, "wta_wta_stack.svg"), fig); # hide
 Now we are ready to create a single cortical superficial layer block by connecting multiple WTA circuits
 
 This model is SCORT in [1] and looks like the one in *Figure 2*.
-![Cortical circuit](../assets/CS_Cortical.png)
+![Cortical circuit with multiple WTA microcircuits](/assets/CS_Cortical.png)
 *Figure 2: Cortical circuit with multiple WTA microcircuits.*
 
-````julia:ex6
+````julia:ex7
 N_wta = 10 ## number of WTA circuits
 # parameters
 N_exci = 5   ## number of pyramidal neurons in each lateral inhibition (WTA) circuit
@@ -122,7 +128,7 @@ end
 WTA circuits connect to each other with given connection density and the feedforward interneuron connects to each WTA circuit.
 The feed-forward interneuron `n_ff_inh` receives input from the excitatory (pyramidal) cells of the WTA circuits and it is largely responsible for controlling the spiking rhythm of the ensemble of WTAs.
 
-````julia:ex7
+````julia:ex8
 sys = system_from_graph(g, name = model_name)
 prob = ODEProblem(sys, [], (0.0, 1000))
 sol = solve(prob, Vern7())
@@ -140,14 +146,14 @@ save(joinpath(@OUTPUT, "cort_stack.svg"), fig); # hide
 The next step is to expand the cortical model we just created by adding a Blox representing an ascending system (ASC1 in [1]) to it.
 We define the ascending system using a Next Generation Neural Mass model as described in [2]. The neural mass parameters are fixed to generate a 16 Hz modulating frequency in the cortical neurons.
 
-````julia:ex8
+````julia:ex9
 @named ASC1 = NextGenerationEIBlox(;namespace=model_name, Cₑ=2*26, Cᵢ=26, v_synₑₑ=10.0, v_synₑᵢ=-10.0, v_synᵢₑ=10.0, v_synᵢᵢ=-10.0, alpha_invₑₑ=10.0/26, alpha_invₑᵢ=0.8/26, alpha_invᵢₑ=10.0/26, alpha_invᵢᵢ=0.8/26, kₑᵢ=0.6*26, kᵢₑ=0.6*26);
 ````
 
 Similar to `WinnerTakeAllBlox`, the cortical model we created above by connecting multiple WTAs together is implemented as a single Blox in Neuroblox. This is the `CorticalBlox` and it models a superficial layer cortical microcircuit.
 So `CorticalBlox` is a hierarchical Blox which holds a feedforward interneuron and multiple `WinnerTakeAllBlox` which in turn hold multiple excitatory neurons and one feedback interneuron each.
 
-````julia:ex9
+````julia:ex10
 # number if WTA circuits = N_wta=45
 # number of pyramidal neurons in each WTA circuit = N_exci = 5
 @named CB = CorticalBlox(N_wta=10, N_exci=5, density=0.01, weight=1, I_bg_ar=7; namespace=model_name)
@@ -171,7 +177,7 @@ save(joinpath(@OUTPUT, "cort_asc_stack.svg"), fig); # hide
 We can also generate plots of averaged activity in any composite Blox like `CorticalBlox` and `WinnerTakeAllBlox`.
 For instance the meanfield of all cortical block neurons (mean membrane voltage)
 
-````julia:ex10
+````julia:ex11
 fig = meanfield(CB, sol)
 save(joinpath(@OUTPUT, "cort_meanfield.svg"), fig); # hide
 ````
@@ -180,7 +186,7 @@ save(joinpath(@OUTPUT, "cort_meanfield.svg"), fig); # hide
 
 and the powerspectrum of the meanfield (average over membrane potentials)
 
-````julia:ex11
+````julia:ex12
 fig = powerspectrumplot(CB, sol; sampling_rate=0.01)
 save(joinpath(@OUTPUT, "cort_power.svg"), fig); # hide
 ````
@@ -191,10 +197,10 @@ Notice the peak at 16 Hz, representing beta oscillations.
 > **_Exercise:_** Try changing parameters of `ASC1` to generate different cortical rhythms.
 
 Finally we will simulate visual processing in our model by adding a `CorticalBlox` representing visual area cortex (VAC) and an `ImageStimulus` connected to it. This extended model is shown in *Figure 3*.
-![Extended circuit with Cortical, Subcortical and Image Stimulus components](../assets/CS_extended.png)
-*Figure 3: Extended circuit with Cortical, Subcortical and Image Stimulus components.*
+![Extended circuit with Cortex, Brainstem and Image Stimulus components](/assets/CS_extended.png)
+*Figure 3: Extended circuit with Cortex, Brainstem and Image Stimulus components.*
 
-````julia:ex12
+````julia:ex13
 @named VAC = CorticalBlox(namespace=model_name, N_wta=10, N_exci=5,  density=0.01, weight=1)
 @named AC = CorticalBlox(namespace=model_name, N_wta=10, N_exci=5, density=0.01, weight=1)
 # ascending system blox, modulating frequency set to 16 Hz
@@ -227,7 +233,7 @@ save(joinpath(@OUTPUT, "image_stim.svg"), fig); # hide
 
 Above we can see an example image stimulus. Each pixel of the image stimulus is a variable (`stim₊u_i`) that connects to a neuron of the visual cortex `VAC` Blox. Using `connection_rule(stim, VAC)` we can better see how this connection is implemented.
 
-````julia:ex13
+````julia:ex14
 g = MetaDiGraph()
 add_edge!(g, stim => VAC, weight=14)
 add_edge!(g, ASC1 => VAC, weight=44)
