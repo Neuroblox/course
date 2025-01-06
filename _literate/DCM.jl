@@ -95,6 +95,8 @@ ax = Axis(f[1, 1],
 )
 lines!(ax, sol, idxs=idx_m)
 f
+save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
+# \fig{fmriseries}
 
 # We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.
 dfsol = DataFrame(sol[ceil(Int, 101/dt):end]);
@@ -117,6 +119,8 @@ for i = 1:nr
     end
 end
 fig
+save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
+# \fig{csd}
 
 # ## Model Inference
 
