@@ -30,7 +30,7 @@ fig = stackplot([exci1, exci2, exci3, exci4, exci5, inh], sol)
 save(joinpath(@OUTPUT, "wta_stack.svg"), fig); # hide
 
 N_exci = 5 ## number of excitatory neurons in each WTA circuit
-# For a single-valued input `I_bg`, each neuron in the WTA Blox will receive a uniformly distributed random background current from 0 to `I_bg`
+# For a single-valued input `I_bg`, each neuron in the WTA Blox will receive a uniformly distributed random background current from 0 to `I_bg`.
 @named wta1 = WinnerTakeAllBlox(namespace=model_name, I_bg=5, N_exci=N_exci)
 @named wta2 = WinnerTakeAllBlox(namespace=model_name, I_bg=4, N_exci=N_exci)
 

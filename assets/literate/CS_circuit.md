@@ -12,7 +12,9 @@ using Random
 using CairoMakie
 ````
 
-First we will manually create a lateral inhibition circuit (the "winner-takes-all" circuit) to better understand its components. This circuit is inspired by the structure of the superficial cortical layer.
+First we will manually create a lateral inhibition circuit (*Figure 1*, the "winner-takes-all" circuit) to better understand its components. This circuit is inspired by the structure of the superficial cortical layer.
+![Winner-takes-all circuit](../assets/CS_WTA.png)
+*Figure 1: Lateral inhibition in the winner-takes-all circuit*
 
 ````julia:ex2
 model_name = :g
@@ -53,7 +55,7 @@ The circuit we just built is implemented as a single Blox in Neuroblox. The `Win
 
 ````julia:ex4
 N_exci = 5 ## number of excitatory neurons in each WTA circuit
-# For a single-valued input `I_bg`, each neuron in the WTA Blox will receive a uniformly distributed random background current from 0 to `I_bg`
+# For a single-valued input `I_bg`, each neuron in the WTA Blox will receive a uniformly distributed random background current from 0 to `I_bg`.
 @named wta1 = WinnerTakeAllBlox(namespace=model_name, I_bg=5, N_exci=N_exci)
 @named wta2 = WinnerTakeAllBlox(namespace=model_name, I_bg=4, N_exci=N_exci)
 
@@ -78,8 +80,9 @@ save(joinpath(@OUTPUT, "wta_wta_stack.svg"), fig); # hide
 
 Now we are ready to create a single cortical superficial layer block by connecting multiple WTA circuits
 
-This model is SCORT in [1] and looks like this
-![fig4](../assets/neural_assembly_4.png)
+This model is SCORT in [1] and looks like the one in *Figure 2*.
+![Cortical circuit](../assets/CS_Cortical.png)
+*Figure 2: Cortical circuit with multiple WTA microcircuits.*
 
 ````julia:ex6
 N_wta = 10 ## number of WTA circuits
@@ -187,7 +190,9 @@ save(joinpath(@OUTPUT, "cort_power.svg"), fig); # hide
 Notice the peak at 16 Hz, representing beta oscillations.
 > **_Exercise:_** Try changing parameters of `ASC1` to generate different cortical rhythms.
 
-Finally we will simulate visual processing in our model by adding a `CorticalBlox` representing visual area cortex (VAC) and an `ImageStimulus` connected to it.
+Finally we will simulate visual processing in our model by adding a `CorticalBlox` representing visual area cortex (VAC) and an `ImageStimulus` connected to it. This extended model is shown in *Figure 3*.
+![Extended circuit with Cortical, Subcortical and Image Stimulus components](../assets/CS_extended.png)
+*Figure 3: Extended circuit with Cortical, Subcortical and Image Stimulus components.*
 
 ````julia:ex12
 @named VAC = CorticalBlox(namespace=model_name, N_wta=10, N_exci=5,  density=0.01, weight=1)
