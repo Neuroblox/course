@@ -15,8 +15,9 @@
 # \end{equation*}
 # ```
 # For full details of the model, see Eq. 12-14 on p. 7 of the SI Appendix of Börgers et al. [1].
-# Here is a visual representation of the network structure and which neurons receive the driving input:
+# Figure 1 shows a visual representation of the network structure and which neurons receive the driving input:
 # ![PING network structure](../assets/basic_ping_illustration.png)
+# *Figure 1: Structure of the the PING network.* 
 
 # # Model setup
 # This section sets up the model parameters and the network structure. The network consists of 200 neurons: 40 driven excitatory neurons, 120 other excitatory neurons, and 40 inhibitory neurons.
