@@ -1757,11 +1757,9 @@ version = "1.2.0"
 
 [[deps.Neuroblox]]
 deps = ["Accessors", "CSV", "ChainRules", "Combinatorics", "DSP", "DataFrames", "Distributions", "ExponentialUtilities", "ForwardDiff", "GraphDynamics", "Graphs", "Interpolations", "LinearAlgebra", "LogExpFunctions", "MetaGraphs", "ModelingToolkit", "ModelingToolkitStandardLibrary", "MuladdMacro", "OhMyThreads", "OrderedCollections", "Peaks", "Random", "RecursiveArrayTools", "Reexport", "SciMLBase", "SparseArrays", "Statistics", "StatsBase", "StochasticDiffEq", "Symbolics", "ToeplitzMatrices"]
-git-tree-sha1 = "e7a02c2b047a8d75589d7802ea4bc1ce763451a1"
-repo-rev = "v0.5.2"
-repo-url = "https://github.com/Neuroblox/Neuroblox.jl"
+git-tree-sha1 = "3e0b1f2f33068d20192c381d42445e380100b200"
 uuid = "769b91e5-4c60-41ee-bfae-153c84203cb2"
-version = "0.5.2"
+version = "0.5.3"
 weakdeps = ["CairoMakie", "Makie"]
 
     [deps.Neuroblox.extensions]
