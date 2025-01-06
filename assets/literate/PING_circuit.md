@@ -10,11 +10,8 @@ The PING network is a simple model of a cortical network that consists of two po
 We omit the detailed equations of the neurons here, but note they are Hodgkin-Huxley-like equations with a few modifications.
 Excitatory neurons are reduced Traub-Miles cells [2] and inhibitory neurons are Wang-Buzasaki cells [3].
 Both follow Hodgkin-Huxley formalism, i.e., the membrane voltage is governed by the sum of the currents through the sodium, potassium, and leak channels, along with external drive, such that:
-```math
-\begin{equation*}
-C \frac{dV}{dt} = g_{\text{Na}} m^3 h (V_{\text{Na}} - V) + g_\text{K} n^4 (V_\text{K} - V) + g_\text{L} (V_\text{L} - V) + I_{\text{ext}}
-\end{equation*}
-```
+$$ C \frac{dV}{dt} = g_{\text{Na}} m^3 h (V_{\text{Na}} - V) + g_\text{K} n^4 (V_\text{K} - V) + g_\text{L} (V_\text{L} - V) + I_{\text{ext}} $$
+
 For full details of the model, see Eq. 12-14 on p. 7 of the SI Appendix of Börgers et al. [1].
 Figure 1 shows a visual representation of the network structure and which neurons receive the driving input:
 ![PING network structure](/assets/basic_ping_illustration.png)
