@@ -13,6 +13,17 @@ In this session we will define a circuit of three linear neuronal mass models, a
 We will model fMRI data by a balloon model and BOLD signal on top.
 After simulation of this simple model we will use spDCM to infer some of the model parameters from the simulation time series.
 
+![spDCM Workflow](../assets/spectral_DCM_illustration.png)
+*Figure 1: Workflow for Spectral DCM analysis.*
+
+*Figure 1* describes the procedure we will pursue:
+- define the graph and add blocks (sections A, B and C in the Figure)
+- simulate the model, instead we could also use actual data (section D in Figure)
+- compute the cross spectral density
+- setup the DCM
+- estimate parameters
+- plot the results
+
 Learning goals
 - perform the entire workflow of an spDCM analysis.
 - use observer Blox to simulate experimental measurements.
