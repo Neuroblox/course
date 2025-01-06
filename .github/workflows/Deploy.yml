@@ -36,7 +36,7 @@ jobs:
     #   specific arguments, see the documentation or ?optimize in the REPL.
     - run: julia -e '
             using Pkg; 
-            Pkg.Registry.add("General");
+            Pkg.Registry.add();
             Pkg.Registry.add("https://github.com/Neuroblox/NeurobloxRegistry");
             Pkg.activate(".");
             Pkg.instantiate();
