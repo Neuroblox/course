@@ -171,7 +171,7 @@ sol = solve(prob, Tsit5());
 # These callbacks will be applied at every timepoint during simulation where the callback condition is fulfilled. 
 # This mechanism is particularly useful for neuron models like the Izhikevich and the LIF neurons we saw above that use callbacks to implement spiking. 
 
-# > **_NOTE_:** The effect equations of a single event can change either only variables or parameters. Currently we can not mix variable and parameter changes within the same event. 
+# > **_NOTE_:** The affect equations of a single event can change either only variables or parameters. Currently we can not mix variable and parameter changes within the same event. 
 # > See the [ModelingToolkit documentation](https://docs.sciml.ai/ModelingToolkit/stable/basics/Events/#Discrete-events-support) for more details.
 
 import Neuroblox: connection_callbacks
