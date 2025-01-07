@@ -56,11 +56,11 @@ env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
 
 fig = Figure(title="Adjacency matrix", size = (1600, 800))
 
-adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,50))
+adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,10))
 
 run_experiment!(agent, env; t_warmup=200.0, alg=Vern7())
 
-adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,50))
+adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,10))
 fig
 save(joinpath(@OUTPUT, "adj_open.svg"), fig); # hide
 ````
@@ -124,7 +124,7 @@ env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
 
 fig = Figure(title="Adjacency matrix", size = (1600, 800))
 
-adjacency(fig[1,1], agent; title = "Before Learning", colorrange=(0,50))
+adjacency(fig[1,1], agent; title = "Before Learning", colorrange=(0,10))
 
 trace = run_experiment!(agent, env; t_warmup=200.0, alg=Vern7(), verbose=true)
 ````
@@ -136,7 +136,7 @@ trace.trial ## trial indices
 trace.correct ## whether the response was correct or not on each trial
 trace.action; ## what responce was made on each trial, 1 is left and 2 is right
 
-adjacency(fig[1,2], agent; title = "After Learning", colorrange=(0,50))
+adjacency(fig[1,2], agent; title = "After Learning", colorrange=(0,10))
 fig
 save(joinpath(@OUTPUT, "adj_RL.svg"), fig); # hide
 ````

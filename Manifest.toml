@@ -1755,10 +1755,10 @@ uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 version = "1.2.0"
 
 [[deps.Neuroblox]]
-deps = ["Accessors", "CSV", "ChainRules", "Combinatorics", "DSP", "DataFrames", "Distributions", "ExponentialUtilities", "ForwardDiff", "GraphDynamics", "Graphs", "Interpolations", "LinearAlgebra", "LogExpFunctions", "MetaGraphs", "ModelingToolkit", "ModelingToolkitStandardLibrary", "MuladdMacro", "OhMyThreads", "OrderedCollections", "Peaks", "Random", "RecursiveArrayTools", "Reexport", "SciMLBase", "SparseArrays", "Statistics", "StatsBase", "StochasticDiffEq", "Symbolics", "ToeplitzMatrices"]
-git-tree-sha1 = "3e0b1f2f33068d20192c381d42445e380100b200"
+deps = ["Accessors", "CSV", "ChainRules", "Colors", "Combinatorics", "DSP", "DataFrames", "Distributions", "ExponentialUtilities", "ForwardDiff", "GraphDynamics", "Graphs", "Interpolations", "LinearAlgebra", "LogExpFunctions", "MetaGraphs", "ModelingToolkit", "ModelingToolkitStandardLibrary", "MuladdMacro", "OhMyThreads", "OrderedCollections", "Peaks", "Random", "RecursiveArrayTools", "Reexport", "SciMLBase", "SparseArrays", "Statistics", "StatsBase", "StochasticDiffEq", "Symbolics", "ToeplitzMatrices"]
+git-tree-sha1 = "fe931b1c56c8160bd8e830d31d0ad1e1884b7f96"
 uuid = "769b91e5-4c60-41ee-bfae-153c84203cb2"
-version = "0.5.3"
+version = "0.5.4"
 weakdeps = ["CairoMakie", "Makie"]
 
     [deps.Neuroblox.extensions]
