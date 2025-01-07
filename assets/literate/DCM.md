@@ -229,7 +229,7 @@ end
 @named fitmodel = system_from_graph(g, simplify=false)
 ````
 
-With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimizatoin procedure.
+With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
 For instance the the effective connections that are set to zero in the simulation:
 
 ````julia:ex18

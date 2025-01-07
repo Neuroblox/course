@@ -213,7 +213,7 @@ Parameters (16): see parameters(r3₊bm)
   lnκ
   lnτ
   lnϵ</code></pre>
-<p>With the function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimizatoin procedure. For instance the the effective connections that are set to zero in the simulation:</p>
+<p>With the function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure. For instance the the effective connections that are set to zero in the simulation:</p>
 <pre><code class="julia hljs">untune = <span class=hljs-built_in >Dict</span>(A[<span class=hljs-number >3</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >7</span>] =&gt; <span class=hljs-literal >false</span>)
 fitmodel = changetune(fitmodel, untune)                 <span class=hljs-comment ># 3 and 7 are not present in the simulation model</span>
 fitmodel = structural_simplify(fitmodel, split=<span class=hljs-literal >false</span>)   <span class=hljs-comment ># and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don&#x27;t lose time with it ;)</span></code></pre><pre><code class="plaintext hljs">Model fitmodel:
