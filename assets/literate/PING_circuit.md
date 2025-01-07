@@ -22,7 +22,6 @@ This section sets up the model parameters and the network structure. The network
 The network is set up as a directed graph with excitatory neurons driving inhibitory neurons and vice versa, with self-inhibition but not self-excitation present.
 
 ## Import the necessary packages
-Reasons for each non-Neuroblox package are given in the comments after each.
 
 ````julia:ex1
 using Neuroblox
