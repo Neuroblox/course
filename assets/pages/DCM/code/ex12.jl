@@ -8,3 +8,4 @@ for i = 1:nr
     end
 end
 fig
+save(joinpath(@OUTPUT, "csd.svg"), fig); # hide

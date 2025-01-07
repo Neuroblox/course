@@ -3,6 +3,10 @@ using Neuroblox
 using OrdinaryDiffEq
 using CairoMakie
 
+# Set the random seed for reproducible results
+using Random
+Random.seed!(1)
+
 @named nm = WilsonCowan()
 # Retrieve the simplified ODESystem of the Blox
 sys = system(nm)

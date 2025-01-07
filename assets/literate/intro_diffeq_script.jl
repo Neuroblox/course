@@ -30,7 +30,7 @@ u0 = [x => 5, y => 2]
 # Problem to be solved
 prob = ODEProblem(simpsys, u0, tspan)
 # Solution of the problem using the Tsit5 solver
-sol = solve(prob, Tsit5())
+sol = solve(prob, Tsit5());
 
 sol[x] ## or similarly sol[y]
 

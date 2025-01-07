@@ -120,7 +120,7 @@ save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide
 \fig{spikes}
 
 # Challenge Problems
-See the [Differential Equations in Julia](./intro_diffeq/)
+See the [Differential Equations in Julia](/pages/intro_diffeq/)
 
 # References
 - Danisch et al., (2021). Makie.jl: Flexible high-performance data visualization for Julia. Journal of Open Source Software, 6(65), 3349, https://doi.org/10.21105/joss.03349

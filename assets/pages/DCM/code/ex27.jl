@@ -1,2 +1,3 @@
 # This file was generated, do not modify it. # hide
-freeenergy(state)
+f1 = freeenergy(state)
+save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide

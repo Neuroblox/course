@@ -50,6 +50,7 @@ ax = Axis(f[1, 1],
 )
 lines!(ax, sol, idxs=idx_m)
 f
+save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
 
 dfsol = DataFrame(sol[ceil(Int, 101/dt):end]);
 
@@ -70,6 +71,7 @@ for i = 1:nr
     end
 end
 fig
+save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 
 g = MetaDiGraph()
 regions = [];   # list of neural mass blocks to then connect them to each other with an adjacency matrix `A`
@@ -152,6 +154,8 @@ with_stack(5_000_000) do  # 5MB of stack space
     end
 end
 
-freeenergy(state)
+f1 = freeenergy(state)
+save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
 
-ecbarplot(state, setup, A_true)
+f2 = ecbarplot(state, setup, A_true)
+save(joinpath(@OUTPUT, "ecbar.svg"), f2); # hide

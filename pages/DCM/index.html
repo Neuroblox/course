@@ -95,9 +95,7 @@ ax = Axis(f[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>
     ylabel = <span class=hljs-string >&quot;BOLD&quot;</span>,
 )
 lines!(ax, sol, idxs=idx_m)
-f</code></pre><pre><code class="plaintext hljs">Figure()</code></pre>
-<p>We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.</p>
-<pre><code class="julia hljs">dfsol = DataFrame(sol[ceil(<span class=hljs-built_in >Int</span>, <span class=hljs-number >101</span>/dt):<span class=hljs-keyword >end</span>]);</code></pre>
+f</code></pre> <img src="/course/assets/pages/DCM/code/output/fmriseries.svg" alt=""> <p>We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.</p> <pre><code class="julia hljs">dfsol = DataFrame(sol[ceil(<span class=hljs-built_in >Int</span>, <span class=hljs-number >101</span>/dt):<span class=hljs-keyword >end</span>]);</code></pre>
 <h2 id=estimate_and_plot_the_cross-spectral_densities ><a href="#estimate_and_plot_the_cross-spectral_densities" class=header-anchor >Estimate and plot the cross-spectral densities</a></h2>
 <pre><code class="julia hljs">data = <span class=hljs-built_in >Matrix</span>(dfsol[:, idx_m]);</code></pre>
 <p>We compute the cross-spectral density by fitting a linear model of order <code>p</code> and then compute the csd analytically from the parameters of the multivariate autoregressive model</p>
@@ -115,7 +113,8 @@ grid = fig[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>]
         lines!(ax, freq, real.(csd[:, i, j]))
     <span class=hljs-keyword >end</span>
 <span class=hljs-keyword >end</span>
-fig</code></pre><pre><code class="plaintext hljs">Figure()</code></pre>
+fig</code></pre>
+<img src="/course/assets/pages/DCM/code/output/csd.svg" alt="">
 <h2 id=model_inference ><a href="#model_inference" class=header-anchor >Model Inference</a></h2>
 <p>We will now assemble a new model that is used for fitting the previous simulations. This procedure is similar to before with the difference that we will define global parameters and use tags such as &#91;tunable&#61;false/true&#93; to define which parameters we will want to estimate. Note that parameters are tunable by default.</p>
 <pre><code class="julia hljs">g = MetaDiGraph()
@@ -344,9 +343,11 @@ convergence
 </code></pre>
 <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2>
 <p>Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound &#40;ELBO&#41;. Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a &#40;potentially local&#41; optimum:</p>
-<pre><code class="julia hljs">freeenergy(state)</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
+<pre><code class="julia hljs">f1 = freeenergy(state)</code></pre>
+<img src="/course/assets/pages/DCM/code/output/freeenergy.svg" alt="">
 <p>Plot the estimated posterior of the effective connectivity and compare that to the true parameter values. Bar hight are the posterior mean and error bars are the standard deviation of the posterior.</p>
-<pre><code class="julia hljs">ecbarplot(state, setup, A_true)</code></pre><pre><code class="plaintext hljs">FigureAxisPlot()</code></pre>
+<pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)</code></pre>
+<img src="/course/assets/pages/DCM/code/output/ecbar.svg" alt="">
 <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2>
 <ul>
 <li><p><strong>Explore susceptibility with respect to noise.</strong> Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy &#40;compare the different free energies of the models and their respective parameter values with ground truth&#41;?</p>
@@ -367,7 +368,7 @@ convergence
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 06, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 07, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>

@@ -75,7 +75,7 @@ I_bath = -0.7; ## External inhibitory bath for inhibitory neurons - value from p
 # Creating a network in Neuroblox
 Creating and running a network of neurons in Neuroblox consists of three steps: defining the neurons, defining the graph of connections between the neurons, and simulating the system represented by the graph.
 
-### Define the neurons
+## Define the neurons
 The neurons from Börgers et al. [1] are implemented in Neuroblox as `PINGNeuronExci` and `PINGNeuronInhib`. We can specify their initial current drives and create the neurons as follows:
 
 ````julia:ex5
@@ -89,7 +89,7 @@ inhib       = [PINGNeuronInhib(name=Symbol("ID$i"), I_ext=rand(I_driveI) + rand(
 > to see the full details of the blocks. If you really want to dig into the details,
 > type ``@edit PINGNeuronExci()`` to open the source code and see how the equations are written.
 
-### Define the graph of network connections
+## Define the graph of network connections
 This portion illustrates how we go about creating a network of neuronal connections.
 
 ````julia:ex6
@@ -111,7 +111,7 @@ for ni1 ∈ inhib
 end
 ````
 
-### Alternative graph creation
+## Alternative graph creation
 If you are creating a very large network of neurons, it may be more efficient to add all of the nodes first and then all of the edges via an adjacency matrix.
 To illustrate this, here is **an alternative to the graph construction we have just performed above** that will initialize the same graph.
 
@@ -133,7 +133,7 @@ end
 create_adjacency_edges!(g, adj);
 ````
 
-### Simulate the network
+## Simulate the network
 Now that we have the neurons and the graph, we can simulate the network. We use the `system_from_graph` function to create a system of ODEs from the graph and then solve it using the DifferentialEquations.jl package, but for performance scaling reasons we will use the experimental option `graphdynamics=true` which uses a separate compilation backend called [GraphDynamics.jl](https://github.com/Neuroblox/GraphDynamics.jl). The GraphDynamics.jl backend is still experimental, and may not yet support all of the standard Neuroblox features, such as those seen in the Spectral DCM tutorial.
 We choose to solve this system using the ``Tsit5()`` solver. If you're coming from Matlab, this is a more efficient solver analogous to ``ode45``. It's a good first try for systems that aren't really stiff. If you want to try other solvers, we'd recommend trying with ``Vern7()`` (higher precision but still efficient). If you're **really** interested in solver choices, one of the great things about Julia is the [wide variety of solvers available.](https://docs.sciml.ai/DiffEqDocs/stable/solvers/ode_solve/)
 

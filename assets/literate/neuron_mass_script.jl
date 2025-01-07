@@ -4,6 +4,10 @@ using Neuroblox
 using OrdinaryDiffEq
 using CairoMakie
 
+# Set the random seed for reproducible results
+using Random
+Random.seed!(1)
+
 @named nm = WilsonCowan()
 # Retrieve the simplified ODESystem of the Blox
 sys = system(nm)
@@ -26,7 +30,7 @@ save(joinpath(@OUTPUT, "wc_timeseries.svg"), fig); # hide
 sys = system(qif; discrete_events = [60] => [qif.I_in ~ 10])
 tspan = (0, 100) # ms
 prob = ODEProblem(sys, [], tspan)
-sol = solve(prob, Tsit5())
+sol = solve(prob, Tsit5());
 
 fig = rasterplot(qif, sol; threshold=-40);
 fig
@@ -131,10 +135,6 @@ sol = solve(prob, Tsit5())
 fig = rasterplot(ifn, sol);
 fig
 save(joinpath(@OUTPUT, "ifn_input.svg"), fig); # hide
-
-# Set the random seed for reproducible results
-using Random
-Random.seed!(1)
 
 # Square pulse stimulus
 @named stim = DBS(

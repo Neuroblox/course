@@ -1,8 +1,4 @@
 # This file was generated, do not modify it. # hide
-# Set the random seed for reproducible results
-using Random
-Random.seed!(1)
-
 # Square pulse stimulus
 @named stim = DBS(
                 frequency=100.0, ## Hz

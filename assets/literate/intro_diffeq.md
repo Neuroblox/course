@@ -39,7 +39,7 @@ u0 = [x => 5, y => 2]
 # Problem to be solved
 prob = ODEProblem(simpsys, u0, tspan)
 # Solution of the problem using the Tsit5 solver
-sol = solve(prob, Tsit5())
+sol = solve(prob, Tsit5());
 ````
 
 The solution object contains the values of every variable of the system (`x` and `y`) for every simulated timestep. One can easily access the values of a specific variable using its symbolic name
@@ -199,7 +199,7 @@ Notice how the external current is slowly being accumulated in the neuron's pote
 - Pick a neuron model of your choice and perform a sensitivity analysis on the system. How is its spiking behavior change as its parameters change? Summarize the results in one (or several) plots.
 
 ## References
-[1] E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
-[2] Ma, Yingbo, Shashi Gowda, Ranjan Anantharaman, Chris Laughman, Viral Shah, and Chris Rackauckas. "Modelingtoolkit: A composable graph transformation system for equation-based modeling." arXiv preprint arXiv:2103.05244 (2021).
-[3] https://docs.sciml.ai/ModelingToolkit/stable/
+- [1] E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
+- [2] Ma, Yingbo, Shashi Gowda, Ranjan Anantharaman, Chris Laughman, Viral Shah, and Chris Rackauckas. "Modelingtoolkit: A composable graph transformation system for equation-based modeling." arXiv preprint arXiv:2103.05244 (2021).
+- [3] https://docs.sciml.ai/ModelingToolkit/stable/
 

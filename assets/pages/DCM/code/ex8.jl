@@ -7,3 +7,4 @@ ax = Axis(f[1, 1],
 )
 lines!(ax, sol, idxs=idx_m)
 f
+save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
