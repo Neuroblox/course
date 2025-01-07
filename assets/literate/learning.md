@@ -23,7 +23,7 @@ using CSV ## to read data from CSV files
 using DataFrames ## to format the data into DataFrames
 using Downloads ## to download image stimuli files
 
-N_trials = 5 ## number of trials
+N_trials = 10 ## number of trials
 trial_dur = 1000 ## in ms
 
 # download the stimulus images
@@ -42,7 +42,7 @@ model_name = :g
 @named ASC1 = NextGenerationEIBlox(; namespace=model_name, Cₑ=2*26,Cᵢ=1*26, alpha_invₑₑ=10.0/26, alpha_invₑᵢ=0.8/26, alpha_invᵢₑ=10.0/26, alpha_invᵢᵢ=0.8/26, kₑᵢ=0.6*26, kᵢₑ=0.6*26)
 
 # learning rule
-hebbian_cort = HebbianPlasticity(K=5e-5, W_lim=7, t_pre=trial_dur, t_post=trial_dur)
+hebbian_cort = HebbianPlasticity(K=5e-4, W_lim=15, t_pre=trial_dur, t_post=trial_dur)
 
 g = MetaDiGraph()
 
