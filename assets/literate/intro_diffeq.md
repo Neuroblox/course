@@ -1,6 +1,11 @@
 <!--This file was generated, do not modify it.-->
-# Differential Equations in Julia
+# Differential Equations with ModelingToolkit
 Introduction
+In this session we will learn how to define and solve differential equation systems using a symbolic representation with [ModelingToolkit](https://docs.sciml.ai/ModelingToolkit/stable/). First we will work with a popular two-dimensional model called the Lotka-Volterra system.
+
+The Lotka-Volterra equations, while originally developed to model predator-prey dynamics in ecology, serve as an excellent starting point for computational neuroscience. They introduce fundamental concepts of dynamical systems that are crucial in neuroscience. These equations demonstrate how two variables can interact and influence each other over time - similar to how neurons or neural populations interact. Understanding this behavior helps build intuition for more complex systems where neurons form feedback and feedforward connections with one another.
+
+We will then proceed to model our first neuron using the Izhikevich model [1]. Even though the model appears simple, it can exhibit many different spiking patterns (e.g. regular and fast spiking, bursting, chattering) by changing its parameters. Such parameter changes simulate both intrinsic (e.g. neuromodulation, neurotransmitter availability) and extrinsic (e.g. pharmacological interventions) factors. Neurons that change their spiking behavior can affect the stability of entire neuronal networks of which they are part.
 
 Learning goals:
 - Learn about ModelingToolkit, the symbolic way to define differential equation systems.
@@ -65,7 +70,6 @@ We will shortly see more plot types and options.
 
 ### Simulating spikes
 
-Let's now move on to a two-dimensional model of a neuron. This is a popular model, known as the Izhikevich neuron. Even though the model appears simple, it can exhibit many different spiking patterns (e.g. regular and fast spiking, bursting, chattering) by changing its parameters.
 The Izhikevich neuron is a similar system of ODEs like the Lotka-Volterra example above. One notable difference however is the spiking mechanism.
 Spiking in the Izhikevich neuron needs to be implemented "manually". That is we need to detect when the voltage variable crosses a spiking threshold and every time this event happens we need to reset the neuron's voltage to a more polarized value and potentially alter other variables too.
 
