@@ -168,7 +168,7 @@ for (i, idx) in enumerate(CartesianIndices(A_prior))
 end
 ## Avoid simplification of the model in order to be able to exclude some parameters from fitting
 @named fitmodel = system_from_graph(g, simplify=false)
-# With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimizatoin procedure.
+# With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
 # For instance the the effective connections that are set to zero in the simulation:
 untune = Dict(A[3] => false, A[7] => false)
 fitmodel = changetune(fitmodel, untune)                 # 3 and 7 are not present in the simulation model
