@@ -22,7 +22,6 @@
 # The network is set up as a directed graph with excitatory neurons driving inhibitory neurons and vice versa, with self-inhibition but not self-excitation present.
 
 # ## Import the necessary packages
-# Reasons for each non-Neuroblox package are given in the comments after each.
 using Neuroblox 
 using OrdinaryDiffEq 
 using Distributions 
