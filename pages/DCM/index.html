@@ -345,7 +345,7 @@ convergence
 <p>Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound &#40;ELBO&#41;. Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a &#40;potentially local&#41; optimum:</p>
 <pre><code class="julia hljs">f1 = freeenergy(state)</code></pre>
 <img src="/course/assets/pages/DCM/code/output/freeenergy.svg" alt="">
-<p>Plot the estimated posterior of the effective connectivity and compare that to the true parameter values. Bar hight are the posterior mean and error bars are the standard deviation of the posterior.</p>
+<p>Plot the estimated posterior of the effective connectivity and compare that to the true parameter values. Bar height are the posterior mean and error bars are the standard deviation of the posterior.</p>
 <pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)</code></pre>
 <img src="/course/assets/pages/DCM/code/output/ecbar.svg" alt="">
 <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2>
