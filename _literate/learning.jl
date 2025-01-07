@@ -40,25 +40,25 @@ model_name = :g
 @named ASC1 = NextGenerationEIBlox(; namespace=model_name, Cₑ=2*26,Cᵢ=1*26, alpha_invₑₑ=10.0/26, alpha_invₑᵢ=0.8/26, alpha_invᵢₑ=10.0/26, alpha_invᵢᵢ=0.8/26, kₑᵢ=0.6*26, kᵢₑ=0.6*26) 
 
 ## learning rule
-hebbian_cort = HebbianPlasticity(K=5e-5, W_lim=7, t_pre=trial_dur, t_post=trial_dur) 
+hebbian_cort = HebbianPlasticity(K=5e-3, W_lim=20, t_pre=trial_dur, t_post=trial_dur) 
 
 g = MetaDiGraph()
 
 add_edge!(g, stim => VAC, weight=14) 
 add_edge!(g, ASC1 => VAC, weight=44)
 add_edge!(g, ASC1 => AC, weight=44)
-add_edge!(g, VAC => AC, weight=3, density=0.1, learning_rule = hebbian_cort) ## give learning rule as parameter
+add_edge!(g, VAC => AC, weight=3, density=0.2, learning_rule = hebbian_cort) ## pass learning rule as a keyword argument
 
 agent = Agent(g; name=model_name); 
 env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name);
 
 fig = Figure(title="Adjacency matrix", size = (1600, 800))
 
-adjacency(fig[1,1], agent; title="Initial weights")
+adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,50))
 
-run_experiment!(agent, env; t_warmup=200.0, alg=Vern7(), verbose=true)
+run_experiment!(agent, env; t_warmup=200.0, alg=Vern7())
 
-adjacency(fig[1,2], agent; title="Final weights")
+adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,50))
 fig
 save(joinpath(@OUTPUT, "adj_open.svg"), fig); # hide
 # \fig{adj_open}
@@ -117,7 +117,7 @@ env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
 
 fig = Figure(title="Adjacency matrix", size = (1600, 800))
 
-adjacency(fig[1,1], agent; title = "Before Learning")
+adjacency(fig[1,1], agent; title = "Before Learning", colorrange=(0,50))
 
 trace = run_experiment!(agent, env; t_warmup=200.0, alg=Vern7(), verbose=true)
 
@@ -126,7 +126,7 @@ trace.trial ## trial indices
 trace.correct ## whether the response was correct or not on each trial
 trace.action; ## what responce was made on each trial, 1 is left and 2 is right
 
-adjacency(fig[1,2], agent; title = "After Learning")
+adjacency(fig[1,2], agent; title = "After Learning", colorrange=(0,50))
 fig
 save(joinpath(@OUTPUT, "adj_RL.svg"), fig); # hide
 # \fig{adj_RL}
