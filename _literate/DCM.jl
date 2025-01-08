@@ -202,7 +202,7 @@ _, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal
 ## this should be rewritten to abuse the compiler less, but for now, an easy solution is just to run it with more allocated stack space.
 with_stack(f, n) = fetch(schedule(Task(f, n)));
 
-# We are now ready to run the optimization procedure! :)
+# We are now ready to run the optimization procedure!
 # That is we loop over run_sDCM_iteration! which will alter `state` after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters. 
 with_stack(5_000_000) do  # 5MB of stack space
     for iter in 1:max_iter
