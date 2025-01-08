@@ -20,7 +20,7 @@ g = MetaDiGraph()
 <span class=hljs-keyword >end</span></code></pre> <p>As we can see, the lateral inhibition circuit is made up of 5 excitatory neurons with each one having a reciprocal connection to the same inhibitory interneuron.</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> sys = system_from_graph(g)
 prob = ODEProblem(sys, [], (<span class=hljs-number >0.0</span>, <span class=hljs-number >1000</span>), [])
 sol = solve(prob, Vern7())
-fig = stackplot([exci1, exci2, exci3, exci4, exci5, inh], sol)</code></pre> <img src="/course/assets/pages/CS_circuit/code/output/wta_stack.svg" alt=""> <p><code>stackplot</code> stacks the voltage timeseries of each input neuron on top of each other. The y-axis scale is meaningless due to timeseries offsets, yet the plot offers a useful look into spiking patterns in a population.</p> <blockquote> <p><strong><em>Exercise:</em></strong> Try varying the size of the circuit by changing the number of excitatory neurons, while keeping the same structure &#40;all of them connect to the inhibitory neuron and vice versa&#41;.</p> </blockquote> <p>The circuit we just built is implemented as a single Blox in Neuroblox. The <code>WinnerTakeAllBlox</code> is a subtype of <code>CompositeBlox</code>.</p> <pre><code class="julia hljs">N_exci = <span class=hljs-number >5</span> <span class=hljs-comment >## number of excitatory neurons in each WTA circuit</span>
+fig = stackplot([exci1, exci2, exci3, exci4, exci5, inh], sol)</code></pre> <img src="/course/assets/pages/CS_circuit/code/output/wta_stack.svg" alt=""> <p><code>stackplot</code> stacks the voltage timeseries of each input neuron on top of each other. Excitatory neurons appear in blue and inhibitory neurons in red by default. The y-axis scale is meaningless due to timeseries offsets, yet the plot offers a useful look into spiking patterns in a population.</p> <blockquote> <p><strong><em>Exercise:</em></strong> Try varying the size of the circuit by changing the number of excitatory neurons, while keeping the same structure &#40;all of them connect to the inhibitory neuron and vice versa&#41;.</p> </blockquote> <p>The circuit we just built is implemented as a single Blox in Neuroblox. The <code>WinnerTakeAllBlox</code> is a subtype of <code>CompositeBlox</code>.</p> <pre><code class="julia hljs">N_exci = <span class=hljs-number >5</span> <span class=hljs-comment >## number of excitatory neurons in each WTA circuit</span>
 <span class=hljs-comment ># For a single-valued input `I_bg`, each neuron in the WTA Blox will receive a uniformly distributed random background current from 0 to `I_bg`.</span>
 <span class=hljs-meta >@named</span> wta1 = WinnerTakeAllBlox(namespace=model_name, I_bg=<span class=hljs-number >5</span>, N_exci=N_exci)
 <span class=hljs-meta >@named</span> wta2 = WinnerTakeAllBlox(namespace=model_name, I_bg=<span class=hljs-number >4</span>, N_exci=N_exci)
@@ -155,7 +155,7 @@ sol = solve(prob, Vern7());</code></pre>
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 07, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 08, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
