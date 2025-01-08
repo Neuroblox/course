@@ -1,6 +1,6 @@
 # # Plotting with Makie
 # ## Introduction
-# Makie is a plotting ecosystem based in Julia. It comes with multiple backends for rendering and displaying plots. For this course we will be using `CairoMakie` as it has a lot of features for 2D static plots and most computers should support it as it only requires a CPU and no GPU.
+# Makie [1] is a plotting ecosystem based in Julia. It comes with multiple backends for rendering and displaying plots. For this course we will be using `CairoMakie` as it has a lot of features for 2D static plots and most computers should support it as it only requires a CPU and no GPU.
 # Makie has a great [Getting Started page](https://docs.makie.org/stable/tutorials/getting-started). We will make use of this tutorial to introduce some basic plotting functions and labelling options.
 
 # Learning goals:
@@ -112,5 +112,5 @@ save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide
 # See the [Differential Equations in Julia](/pages/intro_diffeq/)
 
 # # References
-# - Danisch et al., (2021). Makie.jl: Flexible high-performance data visualization for Julia. Journal of Open Source Software, 6(65), 3349, https://doi.org/10.21105/joss.03349
-# - https://docs.makie.org/stable/
+# - [1] Danisch et al., (2021). Makie.jl: Flexible high-performance data visualization for Julia. Journal of Open Source Software, 6(65), 3349, https://doi.org/10.21105/joss.03349
+# - [2] https://docs.makie.org/stable/
