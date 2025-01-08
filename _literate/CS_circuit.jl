@@ -45,7 +45,7 @@ fig = stackplot([exci1, exci2, exci3, exci4, exci5, inh], sol)
 save(joinpath(@OUTPUT, "wta_stack.svg"), fig); # hide
 # \fig{wta_stack}
 
-# `stackplot` stacks the voltage timeseries of each input neuron on top of each other. The y-axis scale is meaningless due to timeseries offsets, yet the plot offers a useful look into spiking patterns in a population.
+# `stackplot` stacks the voltage timeseries of each input neuron on top of each other. Excitatory neurons appear in blue and inhibitory neurons in red by default. The y-axis scale is meaningless due to timeseries offsets, yet the plot offers a useful look into spiking patterns in a population.
 # > **_Exercise:_** Try varying the size of the circuit by changing the number of excitatory neurons, while keeping the same structure (all of them connect to the inhibitory neuron and vice versa).
 
 # The circuit we just built is implemented as a single Blox in Neuroblox. The `WinnerTakeAllBlox` is a subtype of `CompositeBlox`.
