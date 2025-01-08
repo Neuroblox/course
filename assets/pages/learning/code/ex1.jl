@@ -38,7 +38,7 @@ add_edge!(g, VAC => AC, weight=3, density=0.1, learning_rule = hebbian_cort) ## 
 agent = Agent(g; name=model_name);
 env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name);
 
-fig = Figure(title="Adjacency matrix", size = (1600, 800))
+fig = Figure(size = (1600, 800))
 
 adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,10))
 

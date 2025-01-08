@@ -1756,9 +1756,9 @@ version = "1.2.0"
 
 [[deps.Neuroblox]]
 deps = ["Accessors", "CSV", "ChainRules", "Colors", "Combinatorics", "DSP", "DataFrames", "Distributions", "ExponentialUtilities", "ForwardDiff", "GraphDynamics", "Graphs", "Interpolations", "LinearAlgebra", "LogExpFunctions", "MetaGraphs", "ModelingToolkit", "ModelingToolkitStandardLibrary", "MuladdMacro", "OhMyThreads", "OrderedCollections", "Peaks", "Random", "RecursiveArrayTools", "Reexport", "SciMLBase", "SparseArrays", "Statistics", "StatsBase", "StochasticDiffEq", "Symbolics", "ToeplitzMatrices"]
-git-tree-sha1 = "fe931b1c56c8160bd8e830d31d0ad1e1884b7f96"
+git-tree-sha1 = "a1728a560cd81b183bd35539739d50ef544f0150"
 uuid = "769b91e5-4c60-41ee-bfae-153c84203cb2"
-version = "0.5.4"
+version = "0.5.5"
 weakdeps = ["CairoMakie", "Makie"]
 
     [deps.Neuroblox.extensions]
