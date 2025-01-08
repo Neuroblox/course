@@ -108,12 +108,13 @@ fig
 save(joinpath(@OUTPUT, "dm_raster.svg"), fig); # hide
 # \fig{dm_raster}
 
-# Notice how the activity of neurons in population B is quickly ramping up and the activity in population A is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.
+# Notice how the neuronal activity in one of the excitatory populations is quickly ramping up, while the activity in the other population is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.
 
 fig = Figure()
-ax = Axis(fig[1,1], title = "Competing Firing Rates")
-frplot!(ax, n_A, sol; color=:black, win_size=50)
-frplot!(ax, n_B, sol; color=:red, win_size=50)
+ax = Axis(fig[1,1])
+frplot!(ax, n_A, sol; color=:black, win_size=50, label="Population A")
+frplot!(ax, n_B, sol; color=:red, win_size=50, label="Population B", title = "Competing Firing Rates")
+axislegend(position=:lt)
 fig
 save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
 # \fig{dm_fr}
