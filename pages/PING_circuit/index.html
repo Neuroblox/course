@@ -71,11 +71,14 @@ adj = zeros(N_total, N_total) <span class=hljs-comment >## Initialize the adjace
 <span class=hljs-keyword >end</span>
 create_adjacency_edges!(g, adj);</code></pre>
 <h2 id=simulate_the_network ><a href="#simulate_the_network" class=header-anchor >Simulate the network</a></h2>
-<p>Now that we have the neurons and the graph, we can simulate the network. We use the <code>system_from_graph</code> function to create a system of ODEs from the graph and then solve it using the DifferentialEquations.jl package, but for performance scaling reasons we will use the experimental option <code>graphdynamics&#61;true</code> which uses a separate compilation backend called <a href="https://github.com/Neuroblox/GraphDynamics.jl">GraphDynamics.jl</a>. The GraphDynamics.jl backend is still experimental, and may not yet support all of the standard Neuroblox features, such as those seen in the Spectral DCM tutorial. We choose to solve this system using the <code>Tsit5&#40;&#41;</code> solver. If you&#39;re coming from Matlab, this is a more efficient solver analogous to <code>ode45</code>. It&#39;s a good first try for systems that aren&#39;t really stiff. If you want to try other solvers, we&#39;d recommend trying with <code>Vern7&#40;&#41;</code> &#40;higher precision but still efficient&#41;. If you&#39;re <strong>really</strong> interested in solver choices, one of the great things about Julia is the <a href="https://docs.sciml.ai/DiffEqDocs/stable/solvers/ode_solve/">wide variety of solvers available.</a></p>
+<p>Now that we have the neurons and the graph, we can simulate the network. We use the <code>system_from_graph</code> function to create a system of ODEs from the graph and then solve it. We choose to solve this system using the <code>Tsit5&#40;&#41;</code> solver. If you&#39;re coming from Matlab, this is a more efficient solver analogous to <code>ode45</code>. It&#39;s a good first try for systems that aren&#39;t really stiff. If you want to try other solvers, we&#39;d recommend trying with <code>Vern7&#40;&#41;</code> &#40;higher precision but still efficient&#41;. If you&#39;re <strong>really</strong> interested in solver choices, one of the great things about Julia is the <a href="https://docs.sciml.ai/DiffEqDocs/stable/solvers/ode_solve/">wide variety of solvers available.</a></p>
 <pre><code class="julia hljs">tspan = (<span class=hljs-number >0.0</span>, <span class=hljs-number >300.0</span>) <span class=hljs-comment >## Time span for the simulation - run for 300ms to match the Börgers et al. [1] Figure 1.</span>
 <span class=hljs-meta >@named</span> sys = system_from_graph(g, graphdynamics=<span class=hljs-literal >true</span>)
 prob = ODEProblem(sys, [], tspan) <span class=hljs-comment >## Create the problem to solve</span>
 sol = solve(prob, Tsit5(), saveat=<span class=hljs-number >0.1</span>); <span class=hljs-comment >## Solve the problem and save at 0.1ms resolution.</span></code></pre>
+<blockquote>
+<p><strong><em>NOTE</em>:</strong> Setting <code>graphdynamics&#61;true</code> will enable an alternative compilation mode for the neural system. Not every model is compatible with GraphDynamics.jl &#91;4&#93; yet, but for ones that are compatible, it is usually significantly faster to compile. This option will make the biggest difference when you care about very large numbers of neurons, or if you are running the same model with small changes to the number of neurons or connectivity graph many times.</p>
+</blockquote>
 <h1 id=plotting_the_results ><a href="#plotting_the_results" class=header-anchor >Plotting the results</a></h1>
 <p>Now that we have a whole simulation, let&#39;s plot the results and see how they line up with the original figures. We&#39;re looking to reproduce the dynamics shown in Figure 1 of Börgers et al. &#91;1&#93;. To create raster plots in Neuroblox for the excitatory and inhibitory populations, it is as simple as:</p>
 <pre><code class="julia hljs">fig = Figure()
@@ -96,6 +99,8 @@ fig</code></pre>
 <li><p>&#91;2&#93; Traub, RD, Miles, R. Neuronal Networks of the Hippocampus. Cambridge University Press, Cambridge, UK, 1991. DOI: <a href="https://www.doi.org/10.1017/CBO9780511895401">10.1017/CBO9780511895401</a></p>
 
 <li><p>&#91;3&#93; Wang, X-J, Buzsáki, G. Gamma oscillation by synaptic inhibition in a hippocampal interneuronal network model. J. Neurosci., 16:6402–6413, 1996. DOI: <a href="https://www.doi.org/10.1523/JNEUROSCI.16-20-06402.1996">10.1523/JNEUROSCI.16-20-06402.1996</a></p>
+
+<li><p>&#91;4&#93; Protter, M. &#40;2024&#41;. GraphDynamics.jl – Efficient dynamics of interacting collections of modular subsystems &#40;v0.2.2&#41;. Zenodo. https://doi.org/10.5281/zenodo.14183153</p>
 
 </ul>
 
