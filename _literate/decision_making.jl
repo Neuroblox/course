@@ -97,7 +97,9 @@ add_edge!(g, n_inh => n_ns; weight = 1);
 sys = system_from_graph(g; name=model_name, graphdynamics = true);
 prob = ODEProblem(sys, [], tspan);
 sol = solve(prob, Euler(); dt = 0.01); 
-    
+
+# > **_NOTE_:** As mention in the PING circuit session too, setting `graphdynamics=true` will enable an alternative compilation mode for the neural system. Not every model is compatible with GraphDynamics.jl [2] yet, but for ones that are compatible, it is usually significantly faster to compile. This option will make the biggest difference when you care about very large numbers of neurons, or if you are running the same model with small changes to the number of neurons or connectivity graph many times.
+
 # ## Results
 
 fig = Figure()
@@ -126,4 +128,5 @@ save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
 # - Which receptor type (NMDA, AMPA or GABA) is the most crucial one for the competition behavior of the circuit? Hint: simulate interventions on the circuit to ablate a receptor type. Look into the equations of `LIFExciNeuron` and `LIFInhNeuron` and affect the receptors' conductance.
 
 # ## References
-# - [1]  Wang XJ. Probabilistic decision making by slow reverberation in cortical circuits. Neuron. 2002 Dec;36(5):955-968. DOI: 10.1016/s0896-6273(02)01092-9. PMID: 12467598. 
+# - [1] Wang XJ. Probabilistic decision making by slow reverberation in cortical circuits. Neuron. 2002 Dec;36(5):955-968. DOI: 10.1016/s0896-6273(02)01092-9. PMID: 12467598. 
+# - [2] Protter, M. (2024). GraphDynamics.jl -- Efficient dynamics of interacting collections of modular subsystems (v0.2.2). Zenodo. https://doi.org/10.5281/zenodo.14183153
