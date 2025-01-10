@@ -35,13 +35,14 @@ N_I = Int(ceil(N * f_inh)) ## total number of inhibitory neurons
 N_E_selective = Int(ceil(f * N_E)) ## number of selective excitatory neurons
 N_E_nonselective = N_E - 2 * N_E_selective ## number of non-selective excitatory neurons
 
-# Use two distinct weight values as per Wang [1]
+# We use two distinct weight values as per Wang [1]
 w₊ = 1.7
 w₋ = 1 - f * (w₊ - 1) / (1 - f)
+````
 
-# Use scaling factors for conductance parameters so that our abbreviated model
-# can exhibit the same competition behavior between the two selective excitatory populations
-# as the larger model in Wang [1] does.
+We use scaling factors for conductance parameters so that our abbreviated model can exhibit the same competition behavior between the two selective excitatory populations as the larger model in Wang [1] does.
+
+````julia:ex2
 exci_scaling_factor = 1600 / N_E
 inh_scaling_factor = 400 / N_I
 
@@ -56,12 +57,10 @@ dt_spike_rate = 50 # update interval for the stimulus spike rate [ms]
 spike_rate_A = (distribution=Normal(μ_A, σ), dt=dt_spike_rate) # spike rate distribution for selective population A
 spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate distribution for selective population B
 
-# background input
-@named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name);
+@named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name); ## background input
 
-# stimulation inputs to selective populations A and B
-@named stim_A = PoissonSpikeTrain(spike_rate_A, tspan; namespace = model_name);
-@named stim_B = PoissonSpikeTrain(spike_rate_B, tspan; namespace = model_name);
+@named stim_A = PoissonSpikeTrain(spike_rate_A, tspan; namespace = model_name); ## stimulation inputs to selective population A
+@named stim_B = PoissonSpikeTrain(spike_rate_B, tspan; namespace = model_name); ## stimulation inputs to selective population B
 
 @named n_A = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor);
 @named n_B = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor) ;
@@ -74,7 +73,7 @@ The Bloxs we use here are subtypes of `CompositeBlox` and contain either `LIFExc
 
 ## System construction & Simulation
 
-````julia:ex2
+````julia:ex3
 g = MetaDiGraph()
 add_edge!(g, background_input => n_A; weight = 1);
 add_edge!(g, background_input => n_B; weight = 1);
@@ -109,7 +108,7 @@ sol = solve(prob, Euler(); dt = 0.01);
 
 ## Results
 
-````julia:ex3
+````julia:ex4
 fig = Figure()
 rasterplot(fig[1,1], n_A, sol; title = "Population A")
 rasterplot(fig[1,2], n_B, sol; title = "Population B")
@@ -122,7 +121,7 @@ save(joinpath(@OUTPUT, "dm_raster.svg"), fig); # hide
 
 Notice how the neuronal activity in one of the excitatory populations is quickly ramping up, while the activity in the other population is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.
 
-````julia:ex4
+````julia:ex5
 fig = Figure()
 ax = Axis(fig[1,1])
 frplot!(ax, n_A, sol; color=:black, win_size=50, label="Population A")

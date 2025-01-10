@@ -1,29 +1,24 @@
 # This file was generated, do not modify it. # hide
-g = MetaDiGraph()
-add_edge!(g, background_input => n_A; weight = 1);
-add_edge!(g, background_input => n_B; weight = 1);
-add_edge!(g, background_input => n_ns; weight = 1);
-add_edge!(g, background_input => n_inh; weight = 1);
+exci_scaling_factor = 1600 / N_E
+inh_scaling_factor = 400 / N_I
 
-add_edge!(g, stim_A => n_A; weight = 1);
-add_edge!(g, stim_B => n_B; weight = 1);
+coherence = 0 # random dot motion coherence [%]
+dt_spike_rate = 50 # update interval for the stimulus spike rate [ms]
+μ_0 = 40e-3 # mean stimulus spike rate [spikes / ms]
+ρ_A = ρ_B = μ_0 / 100
+μ_A = μ_0 + ρ_A * coherence
+μ_B = μ_0 + ρ_B * coherence
+σ = 4e-3 # standard deviation of stimulus spike rate [spikes / ms]
 
-add_edge!(g, n_A => n_B; weight = w₋);
-add_edge!(g, n_A => n_ns; weight = 1);
-add_edge!(g, n_A => n_inh; weight = 1);
+spike_rate_A = (distribution=Normal(μ_A, σ), dt=dt_spike_rate) # spike rate distribution for selective population A
+spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate distribution for selective population B
 
-add_edge!(g, n_B => n_A; weight = w₋);
-add_edge!(g, n_B => n_ns; weight = 1);
-add_edge!(g, n_B => n_inh; weight = 1);
+@named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name); ## background input
 
-add_edge!(g, n_ns => n_A; weight = w₋);
-add_edge!(g, n_ns => n_B; weight = w₋);
-add_edge!(g, n_ns => n_inh; weight = 1);
+@named stim_A = PoissonSpikeTrain(spike_rate_A, tspan; namespace = model_name); ## stimulation inputs to selective population A
+@named stim_B = PoissonSpikeTrain(spike_rate_B, tspan; namespace = model_name); ## stimulation inputs to selective population B
 
-add_edge!(g, n_inh => n_A; weight = 1);
-add_edge!(g, n_inh => n_B; weight = 1);
-add_edge!(g, n_inh => n_ns; weight = 1);
-
-sys = system_from_graph(g; name=model_name, graphdynamics = true);
-prob = ODEProblem(sys, [], tspan);
-sol = solve(prob, Euler(); dt = 0.01);
+@named n_A = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor);
+@named n_B = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor) ;
+@named n_ns = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_nonselective, weight = 1.0, exci_scaling_factor, inh_scaling_factor);
+@named n_inh = LIFInhCircuitBlox(; namespace = model_name, N_neurons = N_I, weight = 1.0, exci_scaling_factor, inh_scaling_factor);

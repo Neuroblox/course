@@ -1,8 +1,7 @@
 # This file was generated, do not modify it. # hide
 fig = Figure()
-ax = Axis(fig[1,1])
-frplot!(ax, n_A, sol; color=:black, win_size=50, label="Population A")
-frplot!(ax, n_B, sol; color=:red, win_size=50, label="Population B", title = "Competing Firing Rates")
-axislegend(position=:lt)
+rasterplot(fig[1,1], n_A, sol; title = "Population A")
+rasterplot(fig[1,2], n_B, sol; title = "Population B")
+rasterplot(fig[2,1], n_inh, sol; color=:red, title = "Inhibitory Population")
 fig
-save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
+save(joinpath(@OUTPUT, "dm_raster.svg"), fig); # hide
