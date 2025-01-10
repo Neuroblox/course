@@ -26,7 +26,7 @@ scatter!(axs[2], seconds, measurements)
 
 fig
 save(joinpath(@OUTPUT, "layout.svg"), fig); # hide
-# \fig{layout}
+#!nb # \fig{layout}
 
 # > Note: Plot functions in Makie also work without defining a `Figure` and an `Axis` object explicitly.
 # > E.g. plotting with `lines(seconds, measurements)` or `scatter(seconds, measurements)` .
@@ -43,7 +43,7 @@ hidexdecorations!(axs[1], grid=false)
 ## Now we can display the figure again with the updated axes
 fig
 save(joinpath(@OUTPUT, "layout_hidex.svg"), fig); # hide
-# \fig{layout_hidex}
+#!nb # \fig{layout_hidex}
 
 # ## Plotting spikes
 
@@ -108,7 +108,7 @@ vlines!(ax, [t_bigger_stimulation]; color=:tomato, linestyle=:dash, linewidth=4,
 axislegend(position = :lt)
 fig
 save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide
-# \fig{spikes}
+#!nb # \fig{spikes}
 
 # # Challenge Problems
 # See the [Differential Equations in Julia](/pages/intro_diffeq/)

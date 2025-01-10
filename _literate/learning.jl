@@ -63,7 +63,7 @@ run_experiment!(agent, env; t_warmup=200.0, alg=Vern7())
 adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,7))
 fig
 save(joinpath(@OUTPUT, "adj_open.svg"), fig); # hide
-# \fig{adj_open}
+#!nb # \fig{adj_open}
 # Notice how the weight values in the upper left corner (connections with `HebbianPlasticity`) have changed after simulation.
 
 # ## Cortico-Striatal Circuit performing Category Learning 
@@ -132,7 +132,7 @@ trace.action; ## what responce was made on each trial, 1 is left and 2 is right
 adjacency(fig[1,2], agent; title = "After Learning", colorrange=(0,0.2))
 fig
 save(joinpath(@OUTPUT, "adj_RL.svg"), fig); # hide
-# \fig{adj_RL}
+#!nb # \fig{adj_RL}
 
 # Notice the changes in weight values after the RL experiment.
 

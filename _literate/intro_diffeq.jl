@@ -54,7 +54,7 @@ fig = plot(sol)
 ## display the figure
 fig
 save(joinpath(@OUTPUT, "mtk1.svg"), fig); # hide
-# \fig{mtk1}
+#!nb # \fig{mtk1}
 
 # We will shortly see more plot types and options.
 
@@ -97,13 +97,13 @@ izh_sol = solve(izh_prob)
 fig = plot(izh_sol)
 fig
 save(joinpath(@OUTPUT, "mtk2.svg"), fig); # hide
-# \fig{mtk2}
+#!nb # \fig{mtk2}
 
 # or if we want to plot just the voltage timeseries with its spiking pattern
 fig = plot(izh_sol; idxs=[v])
 fig
 save(joinpath(@OUTPUT, "mtk3.svg"), fig); # hide
-# \fig{mtk3}
+#!nb # \fig{mtk3}
 
 # ### Changing parameter values and initial conditions
 # After defining and simulating a system we might want to run another simulation by changing either or both of the parameter values and the initial conditions. 
@@ -119,7 +119,7 @@ izh_sol = solve(izh_prob)
 fig = plot(izh_sol; idxs=[v])
 fig
 save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide
-# \fig{mtk4}
+#!nb # \fig{mtk4}
 
 # Notice how the spiking pattern has changed compared to the previous simulation.
 
@@ -157,7 +157,7 @@ izh_sol = solve(izh_prob)
 fig = plot(izh_sol; idxs=[v, I])
 fig
 save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide
-# \fig{mtk5}
+#!nb # \fig{mtk5}
 
 # Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset. 
 

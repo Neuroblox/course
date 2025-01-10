@@ -32,14 +32,14 @@ fig, ax = plot(sol);
 axislegend(ax) ## add legend to the plot
 fig 
 save(joinpath(@OUTPUT, "wc_all.svg"), fig); # hide
-# \fig{wc_all}
+#!nb # \fig{wc_all}
 
 # Using the generic `plot` function we visualize all states of our model. We can retrieve specific variables by using
 E = state_timeseries(nm, sol, "E") ## retrieves state `E` of Blox `nm`
 fig = lines(E); ## simple line plot
 fig 
 save(joinpath(@OUTPUT, "wc_timeseries.svg"), fig); # hide
-# \fig{wc_timeseries}
+#!nb # \fig{wc_timeseries}
 
 # Moving on to neurons, we will use a Quadratic Integrate-and-fire (QIF) neuron model with an added callback that increases the input current after 60 ms.
 
@@ -55,20 +55,20 @@ sol = solve(prob, Tsit5());
 fig = rasterplot(qif, sol; threshold=-40);
 fig 
 save(joinpath(@OUTPUT, "qif_raster.svg"), fig); # hide
-# \fig{qif_raster}
+#!nb # \fig{qif_raster}
 
 # and a firing rate plot, again by setting the spike threshold and the window size for averaging
 fig = frplot(qif, sol; threshold=-40, win_size=20);
 fig 
 save(joinpath(@OUTPUT, "qif_fr.svg"), fig); # hide
-# \fig{qif_fr}
+#!nb # \fig{qif_fr}
 
 # We can easily extract the voltage timeseries of neurons by 
 V = voltage_timeseries(qif, sol) ## equivalent to `state_timeseries(qif, sol, "V")`
 fig = lines(V);
 fig 
 save(joinpath(@OUTPUT, "qif_timeseries.svg"), fig); # hide
-# \fig{qif_timeseries}
+#!nb # \fig{qif_timeseries}
 
 # Finally we simulate an HH neuron with stochastic dynamics which was introduced in [this article on deep brain stimulation in the subthalamic nucleus](https://doi.org/10.1073/pnas.2120808119). 
 # The model includes a brownian noise term affecting `D(V)` which you can inspect using the `equations` function.
@@ -85,7 +85,7 @@ sol = solve(prob, RKMil())
 fig = powerspectrumplot(hh, sol; samplig_rate=0.01);
 fig 
 save(joinpath(@OUTPUT, "hh_power.svg"), fig); # hide
-# \fig{hh_power}
+#!nb # \fig{hh_power}
 
 # We can use all other plots from above with this stochastic HH neuron since it is a subtype of `Neuron`. Given its stochastic nature it might be additionally meaningful to show the powerspectrum of its activity.
 # > **_Exercise:_** Try changing the influence of the stochastic term. What do you notice about the powerspectrum of `HHNeuronExci_STN_Adam_Blox`?
@@ -117,7 +117,7 @@ fig, ax = plot(sol);
 axislegend(ax)
 fig 
 save(joinpath(@OUTPUT, "wc_input.svg"), fig); # hide
-# \fig{wc_input}
+#!nb # \fig{wc_input}
 
 # Notice how the E-I balance has shifted after adding our input. We will work with a more complex circuit for E-I balance on the next session and learn more about its intricacies.
 
@@ -196,7 +196,7 @@ sol = solve(prob, Tsit5())
 fig = rasterplot(ifn, sol);
 fig 
 save(joinpath(@OUTPUT, "ifn_input.svg"), fig); # hide
-# \fig{ifn_input}
+#!nb # \fig{ifn_input}
 
 # Notice how spikes become more and more frequently over time. Can you tell why this is happening?
 
@@ -228,7 +228,7 @@ ax1 = Axis(fig[1,1]; xlabel = "time (ms)", ylabel = "stimulus")
 lines!(ax1, time, stimulus)
 fig
 save(joinpath(@OUTPUT, "stim.svg"), fig); # hide
-# \fig{stim}
+#!nb # \fig{stim}
 
 # We can also generate a smoothed pulse train as 
 
@@ -254,7 +254,7 @@ xlims!(ax2, 4.9, 5.6) ## set the x-axis limits for better visibility of a smooth
 
 fig 
 save(joinpath(@OUTPUT, "stim_comparison.svg"), fig); # hide
-# \fig{stim_comparison}
+#!nb # \fig{stim_comparison}
 
 # It is also possible to create a stimulus protocol that does not follow a simple periodic stimulation schedule as above and contains multiple pulses before a quiet time window:
 frequency = 20.0
@@ -293,7 +293,7 @@ ax1 = Axis(fig[1,1]; xlabel = "time (ms)", ylabel = "stimulus")
 lines!(ax1, time, stimulus)
 fig
 save(joinpath(@OUTPUT, "stim_protocol.svg"), fig); # hide
-# \fig{stim_protocol}
+#!nb # \fig{stim_protocol}
 
 # Now let's finally connect our `ProtocolDBS` source to an HH excitatory neuron and simulate
 
@@ -327,7 +327,7 @@ ax2 = Axis(fig[2,1]; xlabel = "time (ms)", ylabel = "Stimulus (μA/cm²)")
 lines!(ax2, sol.t, stimulus)
 fig
 save(joinpath(@OUTPUT, "stim_hh.svg"), fig); # hide
-# \fig{stim_hh}
+#!nb # \fig{stim_hh}
 
 # ## Challenge Problems
 # - Implement a custom `SpikeSource` of your choice. Hint: the `BernoulliSpikes` implementation above.

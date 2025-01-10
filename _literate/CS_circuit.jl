@@ -46,7 +46,7 @@ prob = ODEProblem(sys, [], (0.0, 1000), [])
 sol = solve(prob, Vern7())
 fig = stackplot([exci1, exci2, exci3, exci4, exci5, inh], sol)
 save(joinpath(@OUTPUT, "wta_stack.svg"), fig); # hide
-# \fig{wta_stack}
+#!nb # \fig{wta_stack}
 
 # `stackplot` stacks the voltage timeseries of each input neuron on top of each other. Excitatory neurons appear in blue and inhibitory neurons in red by default. The y-axis scale is meaningless due to timeseries offsets, yet the plot offers a useful look into spiking patterns in a population.
 # > **_Exercise:_** Try varying the size of the circuit by changing the number of excitatory neurons, while keeping the same structure (all of them connect to the inhibitory neuron and vice versa).
@@ -71,7 +71,7 @@ sol = solve(prob, Vern7())
 neuron_set = get_neurons([wta1, wta2]) ## extract neurons from a composite blocks 
 fig = stackplot(neuron_set, sol)
 save(joinpath(@OUTPUT, "wta_wta_stack.svg"), fig); # hide
-# \fig{wta_wta_stack}
+#!nb # \fig{wta_wta_stack}
 
 # ## Cortical Superficial Layer
 
@@ -126,7 +126,7 @@ wta_neurons = get_neurons(wtas) ## extract neurons from WTA circuits
 neurons = vcat(wta_neurons, n_ff_inh)
 fig = stackplot(neurons, sol)
 save(joinpath(@OUTPUT, "cort_stack.svg"), fig); # hide
-# \fig{cort_stack}
+#!nb # \fig{cort_stack}
 
 # > **_Exercise:_** Try different connection densities and weights and see how it affects the population activity. 
 
@@ -156,18 +156,18 @@ neuron_set = get_neurons(CB) ## extract neurons from a composite block like Cort
 n_neurons = 50 ## set number of neurons to display in the stackplot
 fig = stackplot(neuron_set[1:n_neurons], sol)
 save(joinpath(@OUTPUT, "cort_asc_stack.svg"), fig); # hide
-# \fig{cort_asc_stack}
+#!nb # \fig{cort_asc_stack}
 
 # We can also generate plots of averaged activity in any composite Blox like `CorticalBlox` and `WinnerTakeAllBlox`. 
 # For instance the meanfield of all cortical block neurons (mean membrane voltage)
 fig = meanfield(CB, sol)
 save(joinpath(@OUTPUT, "cort_meanfield.svg"), fig); # hide
-# \fig{cort_meanfield}
+#!nb # \fig{cort_meanfield}
 
 # and the powerspectrum of the meanfield (average over membrane potentials)
 fig = powerspectrumplot(CB, sol; sampling_rate=0.01)
 save(joinpath(@OUTPUT, "cort_power.svg"), fig); # hide
-# \fig{cort_power}
+#!nb # \fig{cort_power}
 
 # Notice the peak at 16 Hz, representing beta oscillations.
 # > **_Exercise:_** Try changing parameters of `ASC1` to generate different cortical rhythms.
@@ -205,7 +205,7 @@ pixels = reshape(pixels, 15, 15)
 ## plot the image that the visual cortex 'sees'
 fig = heatmap(pixels, colormap = :gray1)
 save(joinpath(@OUTPUT, "image_stim.svg"), fig); # hide
-# \fig{image_stim}
+#!nb # \fig{image_stim}
 
 # Above we can see an example image stimulus. Each pixel of the image stimulus is a variable (`stim₊u_i`) that connects to a neuron of the visual cortex `VAC` Blox. Using `connection_rule(stim, VAC)` we can better see how this connection is implemented.
 

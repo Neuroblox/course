@@ -109,7 +109,7 @@ rasterplot(fig[1,2], n_B, sol; title = "Population B")
 rasterplot(fig[2,1], n_inh, sol; color=:red, title = "Inhibitory Population")
 fig
 save(joinpath(@OUTPUT, "dm_raster.svg"), fig); # hide
-# \fig{dm_raster}
+#!nb # \fig{dm_raster}
 
 # Notice how the neuronal activity in one of the excitatory populations is quickly ramping up, while the activity in the other population is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.
 
@@ -120,7 +120,7 @@ frplot!(ax, n_B, sol; color=:red, win_size=50, label="Population B", title = "Co
 axislegend(position=:lt)
 fig
 save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
-# \fig{dm_fr}
+#!nb # \fig{dm_fr}
 
 # We observe the same result qualitatively when plotting the firing rates instead of spikes. Using a single axis we can better see the magnitude of the competition in the difference between the firing rates over time.
 

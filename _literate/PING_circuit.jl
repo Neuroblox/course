@@ -135,7 +135,7 @@ rasterplot(fig[1,1], exci, sol; threshold=20.0, title="Excitatory Neurons")
 rasterplot(fig[2,1], inhib, sol; threshold=20.0, title="Inhibitory Neurons")
 fig
 save(joinpath(@OUTPUT, "ping_raster.svg"), fig); # hide
-# \fig{ping_raster}
+#!nb # \fig{ping_raster}
 
 # The upper panel should show the dynamics in Figure 1.C, with a clear population of excitatory neurons firing together from the external driving current, and the other excitatory neurons exhibiting more stochastic bursts.
 # The lower panel should show the dynamics in Figure 1.A, with the inhibitory neurons firing in a more synchronous manner than the excitatory neurons.
