@@ -59,14 +59,13 @@ for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)          # store neural mass model in list. We need this list below. If you haven't seen the Julia command `push!` before [see here](http://jlhub.com/julia/manual/en/function/push-exclamation).
 
-    ## add Ornstein-Uhlenbeck block as noisy input to the current region
-    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1)
-    add_edge!(g, input => region, weight=1/16)   # Note that 1/16 is taken from SPM12, this stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability.
+    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1) ## add Ornstein-Uhlenbeck as noisy input to the current region
+    add_edge!(g, input => region, weight=1/16)  
 
-    ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
-    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"))
+    measurement = BalloonModel(;name=Symbol("r$(i)₊bm")) ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
     add_edge!(g, region => measurement, weight=1.0)
 end
+# Note that `weight=1/16` in the connection between the OU process and the Neural Mass Blox is taken from SPM12. This stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability.
 # Next we define the between-region connectivity matrix and connect regions; we use the same matrix as is defined in [3]
 A_true = [[-0.5 -2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
 for idx in CartesianIndices(A_true)
@@ -145,8 +144,7 @@ for i = 1:nr
     input = ExternalInput(;name=Symbol("r$(i)₊ei"))
     add_edge!(g, input => region, weight=C)
 
-    ## we assume fMRI signal and model them with a BalloonModel
-    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ)
+    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ) ## assume fMRI signal and model them with a BalloonModel
     add_edge!(g, region => measurement, weight=1.0)
 end
 
