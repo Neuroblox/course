@@ -37,8 +37,7 @@ save(joinpath(@OUTPUT, "layout.svg"), fig); # hide
 # When defining an `Axis` there are multiple options to affect its appearance and alignment, see the [Axis documentation page](https://docs.makie.org/v0.21/reference/blocks/axis) for more details.
 # We can also change an `Axis` after it has been constructed. For instance we could hide the x-axis label and ticks on the top plot above, since it is a duplicate of the x-axis of the bottom plot. We will keep the grid lines though, because it is easier to read the x-axis values this way.
 
-## `grid=false` avoids hiding the x grid lines
-hidexdecorations!(axs[1], grid=false)
+hidexdecorations!(axs[1], grid=false) ## `grid=false` avoids hiding the x grid lines
 
 ## Now we can display the figure again with the updated axes
 fig
@@ -56,8 +55,7 @@ using ModelingToolkit: t_nounits as t, D_nounits as D
 using OrdinaryDiffEq
 
 @variables v(t)=-65 u(t)=-13
-## Parameters for fast spiking.
-@parameters a=0.1 b=0.2 c=-65 d=2 I=10
+@parameters a=0.1 b=0.2 c=-65 d=2 I=10 ## Parameters for fast spiking.
 
 eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
         D(u) ~ a * (b * v - u)]
@@ -88,11 +86,13 @@ t_range = first(tspan):t_window:last(tspan)
 ## initialize an empty vector to hold the spike values. 
 spikes = zeros(length(t_range) - 1)
 
-## loop over the timepoints at which every time window begins
+# To find spikes we need to 
+# - loop over the timepoints at which every time window begins
+# - find the indices of timepoints that fall within the current time window
+# - count the number of spikes within the same window
 for i in eachindex(t_range[1:end-1])
-    ## find the indices of timepoints that fall within the current time window 
     idxs = findall(t -> t_range[i] <= t <= t_range[i+1], timepoints)
-    ## count the number of spikes within the same window
+    
     spikes[i] = count(V_izh[idxs] .> spike_threshold) ## counts the number of True elements in a Boolean vector
 end
 
