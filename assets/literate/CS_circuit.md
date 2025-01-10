@@ -13,6 +13,8 @@ In this session we will build a neural assembly that is part of a larger model t
 
 In a later session we will extend this model and add synaptic plasticity to it to perform category learning, as a simplified version of [1].
 
+## Lateral Inhibition Circuit
+
 ````julia:ex2
 using Neuroblox
 using OrdinaryDiffEq
@@ -59,7 +61,7 @@ save(joinpath(@OUTPUT, "wta_stack.svg"), fig); # hide
 `stackplot` stacks the voltage timeseries of each input neuron on top of each other. Excitatory neurons appear in blue and inhibitory neurons in red by default. The y-axis scale is meaningless due to timeseries offsets, yet the plot offers a useful look into spiking patterns in a population.
 > **_Exercise:_** Try varying the size of the circuit by changing the number of excitatory neurons, while keeping the same structure (all of them connect to the inhibitory neuron and vice versa).
 
-The circuit we just built is implemented as a single Blox in Neuroblox. The `WinnerTakeAllBlox` is a subtype of `CompositeBlox`.
+The circuit we just built is implemented as a single Blox in Neuroblox. The `WinnerTakeAllBlox` is a subtype of `CompositeBlox`. Now we will connect two of these together using the Neuroblox strutures.
 
 ````julia:ex5
 N_exci = 5 ## number of excitatory neurons in each WTA circuit
@@ -85,6 +87,8 @@ save(joinpath(@OUTPUT, "wta_wta_stack.svg"), fig); # hide
 ````
 
 \fig{wta_wta_stack}
+
+## Cortical Superficial Layer
 
 Now we are ready to create a single cortical superficial layer block by connecting multiple WTA circuits
 
@@ -145,6 +149,8 @@ save(joinpath(@OUTPUT, "cort_stack.svg"), fig); # hide
 
 > **_Exercise:_** Try different connection densities and weights and see how it affects the population activity.
 
+## Cortical Superficial Layer with Ascending System
+
 The next step is to expand the cortical model we just created by adding a Blox representing an ascending system (ASC1 in [1]) to it.
 We define the ascending system using a Next Generation Neural Mass model as described in [2]. The neural mass parameters are fixed to generate a 16 Hz modulating frequency in the cortical neurons.
 
@@ -197,6 +203,8 @@ save(joinpath(@OUTPUT, "cort_power.svg"), fig); # hide
 
 Notice the peak at 16 Hz, representing beta oscillations.
 > **_Exercise:_** Try changing parameters of `ASC1` to generate different cortical rhythms.
+
+## Visual Processing in the extended Cortical model
 
 Finally we will simulate visual processing in our model by adding a `CorticalBlox` representing visual area cortex (VAC) and an `ImageStimulus` connected to it. This extended model is shown in *Figure 3*.
 ![Extended circuit with Cortex, Brainstem and Image Stimulus components](/assets/CS_extended.png)
