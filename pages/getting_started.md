@@ -26,7 +26,7 @@ All course sessions exist as webpages on this site and as interactive Jupyter no
 
 Please follow the link below to download a folder containing all Jupyter notebooks for the course and **add the folder in the same directory that you instantiated the `Project.toml` above**.
 
-*Click here and then click  :* 
+*Click here and then download the notebooks folder :* https://drive.google.com/drive/folders/1UdxUgOM9RGN5imHGDwhmu2f9fGz4CCJQ?usp=sharing
 
 To open a notebook, first start a Terminal (or Command Prompt) session in the same directory as above. Then run the following command
 
