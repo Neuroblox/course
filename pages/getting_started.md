@@ -4,9 +4,9 @@ Please follow the [installation instructions](https://julialang.org/downloads/) 
 
 # Installing Neuroblox
 
-To install Neuroblox.jl along with all other Julia packages that we will need for this course please run the following Julia commands
+First create a folder where you will keep all course material, that is notebooks and the Julia environment, holding all necessary packages for the course. To install Neuroblox.jl along with all other Julia packages that we will need for this course, start a Julia session in your course folder, e.g. type `julia` in a Terminal window after installing it from the instructions above, and run the following commands
 
-``` julia 
+```julia 
 using Pkg
 using Downloads
 
