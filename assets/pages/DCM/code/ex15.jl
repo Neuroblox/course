@@ -5,7 +5,6 @@ for i = 1:nr
     input = ExternalInput(;name=Symbol("r$(i)₊ei"))
     add_edge!(g, input => region, weight=C)
 
-    # we assume fMRI signal and model them with a BalloonModel
-    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ)
+    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ) ## assume fMRI signal and model them with a BalloonModel
     add_edge!(g, region => measurement, weight=1.0)
 end
