@@ -18,7 +18,7 @@ image_set = CSV.read(Downloads.download("raw.githubusercontent.com/Neuroblox/Neu
 @named AS = GreedyPolicy(; namespace=model_name, t_decision=2*time_block_dur)
 
 # learning rules
-hebbian_mod = HebbianModulationPlasticity(K=0.05, decay=0.01, α=2.5, θₘ=1, modulator=SNcb, t_pre=trial_dur, t_post=trial_dur, t_mod=time_block_dur)
+hebbian_mod = HebbianModulationPlasticity(K=0.06, decay=0.01, α=2.5, θₘ=1, modulator=SNcb, t_pre=trial_dur, t_post=trial_dur, t_mod=time_block_dur)
 hebbian_cort = HebbianPlasticity(K=5e-4, W_lim=7, t_pre=trial_dur, t_post=trial_dur)
 
 g = MetaDiGraph()

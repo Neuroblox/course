@@ -56,11 +56,11 @@ env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
 
 fig = Figure(size = (1600, 800))
 
-adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,10))
+adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,7))
 
 run_experiment!(agent, env; t_warmup=200.0, alg=Vern7())
 
-adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,10))
+adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,7))
 fig
 save(joinpath(@OUTPUT, "adj_open.svg"), fig); # hide
 ````
@@ -91,7 +91,7 @@ image_set = CSV.read(Downloads.download("raw.githubusercontent.com/Neuroblox/Neu
 @named AS = GreedyPolicy(; namespace=model_name, t_decision=2*time_block_dur)
 
 # learning rules
-hebbian_mod = HebbianModulationPlasticity(K=0.05, decay=0.01, α=2.5, θₘ=1, modulator=SNcb, t_pre=trial_dur, t_post=trial_dur, t_mod=time_block_dur)
+hebbian_mod = HebbianModulationPlasticity(K=0.06, decay=0.01, α=2.5, θₘ=1, modulator=SNcb, t_pre=trial_dur, t_post=trial_dur, t_mod=time_block_dur)
 hebbian_cort = HebbianPlasticity(K=5e-4, W_lim=7, t_pre=trial_dur, t_post=trial_dur)
 
 g = MetaDiGraph()
@@ -125,7 +125,7 @@ env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
 
 fig = Figure(title="Adjacency matrix", size = (1600, 800))
 
-adjacency(fig[1,1], agent; title = "Before Learning", colorrange=(0,10))
+adjacency(fig[1,1], agent; title = "Before Learning", colorrange=(0,0.2))
 
 trace = run_experiment!(agent, env; t_warmup=200.0, alg=Vern7(), verbose=true)
 ````
@@ -137,7 +137,7 @@ trace.trial ## trial indices
 trace.correct ## whether the response was correct or not on each trial
 trace.action; ## what responce was made on each trial, 1 is left and 2 is right
 
-adjacency(fig[1,2], agent; title = "After Learning", colorrange=(0,10))
+adjacency(fig[1,2], agent; title = "After Learning", colorrange=(0,0.2))
 fig
 save(joinpath(@OUTPUT, "adj_RL.svg"), fig); # hide
 ````

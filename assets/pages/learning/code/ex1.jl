@@ -40,10 +40,10 @@ env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
 
 fig = Figure(size = (1600, 800))
 
-adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,10))
+adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,7))
 
 run_experiment!(agent, env; t_warmup=200.0, alg=Vern7())
 
-adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,10))
+adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,7))
 fig
 save(joinpath(@OUTPUT, "adj_open.svg"), fig); # hide
