@@ -1,4 +1,6 @@
 # # Pyramidal-Interneuron Gamma network
+#md # > **_Jupyter Notebook_:** Please work on `PING_circuit.ipynb`.
+
 # # Introduction
 # This tutorial provides a simple example of how to use the Neuroblox package to simulate a [pyramidal-interneuron gamma (PING) network](https://direct.mit.edu/neco/article-abstract/17/3/557/6926/Effects-of-Noisy-Drive-on-Rhythms-in-Networks-of?redirectedFrom=fulltext). 
 # These networks are generally useful in modeling cortical oscillations and are used in a variety of contexts.
@@ -9,21 +11,19 @@
 # We omit the detailed equations of the neurons here, but note they are Hodgkin-Huxley-like equations with a few modifications.
 # Excitatory neurons are reduced Traub-Miles cells [2] and inhibitory neurons are Wang-Buzasaki cells [3].
 # Both follow Hodgkin-Huxley formalism, i.e., the membrane voltage is governed by the sum of the currents through the sodium, potassium, and leak channels, along with external drive, such that:
-# ```math
-# \begin{equation*}
-# C \frac{dV}{dt} = g_{\text{Na}} m^3 h (V_{\text{Na}} - V) + g_\text{K} n^4 (V_\text{K} - V) + g_\text{L} (V_\text{L} - V) + I_{\text{ext}}
-# \end{equation*}
-# ```
+# $$ C \frac{dV}{dt} = g_{\text{Na}} m^3 h (V_{\text{Na}} - V) + g_\text{K} n^4 (V_\text{K} - V) + g_\text{L} (V_\text{L} - V) + I_{\text{ext}} $$
+#
 # For full details of the model, see Eq. 12-14 on p. 7 of the SI Appendix of Börgers et al. [1].
-# Here is a visual representation of the network structure and which neurons receive the driving input:
-# ![PING network structure](../assets/basic_ping_illustration.png)
+# Figure 1 shows a visual representation of the network structure and which neurons receive the driving input:
+#!nb # ![PING network structure](/assets/basic_ping_illustration.png)
+#nb # ![PING network structure](./assets/basic_ping_illustration.png)
+# *Figure 1: Structure of the the PING network.* 
 
 # # Model setup
 # This section sets up the model parameters and the network structure. The network consists of 200 neurons: 40 driven excitatory neurons, 120 other excitatory neurons, and 40 inhibitory neurons.
 # The network is set up as a directed graph with excitatory neurons driving inhibitory neurons and vice versa, with self-inhibition but not self-excitation present.
 
 # ## Import the necessary packages
-# Reasons for each non-Neuroblox package are given in the comments after each.
 using Neuroblox 
 using OrdinaryDiffEq 
 using Distributions 
@@ -65,7 +65,7 @@ I_bath = -0.7; ## External inhibitory bath for inhibitory neurons - value from p
 # # Creating a network in Neuroblox
 # Creating and running a network of neurons in Neuroblox consists of three steps: defining the neurons, defining the graph of connections between the neurons, and simulating the system represented by the graph.
 
-# ### Define the neurons
+# ## Define the neurons
 # The neurons from Börgers et al. [1] are implemented in Neuroblox as `PINGNeuronExci` and `PINGNeuronInhib`. We can specify their initial current drives and create the neurons as follows:
 
 exci_driven = [PINGNeuronExci(name=Symbol("ED$i"), I_ext=rand(I_driveE) + rand(I_base)) for i in 1:NE_driven] ## In-line loop to create the driven excitatory neurons, named ED1, ED2, etc.
@@ -77,27 +77,25 @@ inhib       = [PINGNeuronInhib(name=Symbol("ID$i"), I_ext=rand(I_driveI) + rand(
 # > to see the full details of the blocks. If you really want to dig into the details, 
 # > type ``@edit PINGNeuronExci()`` to open the source code and see how the equations are written.
 
-# ### Define the graph of network connections
+# ## Define the graph of network connections
 # This portion illustrates how we go about creating a network of neuronal connections.
 
 g = MetaDiGraph() ## Initialize the graph
 
-## Add the E -> I and I -> E connections
 for ne ∈ exci
     for ni ∈ inhib
-        add_edge!(g, ne => ni; weight=g_EI/N)
-        add_edge!(g, ni => ne; weight=g_IE/N)
+        add_edge!(g, ne => ni; weight=g_EI/N) ## Add the E -> I connections
+        add_edge!(g, ni => ne; weight=g_IE/N) ## Add the I -> E connections
     end
 end
 
-## Add the I -> I connections
 for ni1 ∈ inhib
     for ni2 ∈ inhib
-        add_edge!(g, ni1 => ni2; weight=g_II/N);
+        add_edge!(g, ni1 => ni2; weight=g_II/N); ## Add the I -> I connections
     end
 end
 
-# ### Alternative graph creation
+# ## Alternative graph creation
 # If you are creating a very large network of neurons, it may be more efficient to add all of the nodes first and then all of the edges via an adjacency matrix. 
 # To illustrate this, here is **an alternative to the graph construction we have just performed above** that will initialize the same graph.
 g = MetaDiGraph() ## Initialize the graph
@@ -116,8 +114,8 @@ for i ∈ 1:NI_driven
 end
 create_adjacency_edges!(g, adj);
 
-# ### Simulate the network
-# Now that we have the neurons and the graph, we can simulate the network. We use the `system_from_graph` function to create a system of ODEs from the graph and then solve it using the DifferentialEquations.jl package, but for performance scaling reasons we will use the experimental option `graphdynamics=true` which uses a separate compilation backend called [GraphDynamics.jl](https://github.com/Neuroblox/GraphDynamics.jl). The GraphDynamics.jl backend is still experimental, and may not yet support all of the standard Neuroblox features, such as those seen in the Spectral DCM tutorial.
+# ## Simulate the network
+# Now that we have the neurons and the graph, we can simulate the network. We use the `system_from_graph` function to create a system of ODEs from the graph and then solve it.
 # We choose to solve this system using the ``Tsit5()`` solver. If you're coming from Matlab, this is a more efficient solver analogous to ``ode45``. It's a good first try for systems that aren't really stiff. If you want to try other solvers, we'd recommend trying with ``Vern7()`` (higher precision but still efficient). If you're **really** interested in solver choices, one of the great things about Julia is the [wide variety of solvers available.](https://docs.sciml.ai/DiffEqDocs/stable/solvers/ode_solve/)
 
 tspan = (0.0, 300.0) ## Time span for the simulation - run for 300ms to match the Börgers et al. [1] Figure 1.
@@ -125,6 +123,7 @@ tspan = (0.0, 300.0) ## Time span for the simulation - run for 300ms to match th
 prob = ODEProblem(sys, [], tspan) ## Create the problem to solve
 sol = solve(prob, Tsit5(), saveat=0.1); ## Solve the problem and save at 0.1ms resolution.
 
+# > **_NOTE_:** Setting `graphdynamics=true` will enable an alternative compilation mode for the neural system. Not every model is compatible with GraphDynamics.jl [4] yet, but for ones that are compatible, it is usually significantly faster to compile. This option will make the biggest difference when you care about very large numbers of neurons, or if you are running the same model with small changes to the number of neurons or connectivity graph many times.
 # # Plotting the results
 # Now that we have a whole simulation, let's plot the results and see how they line up with the original figures. We're looking to reproduce the dynamics shown in Figure 1 of Börgers et al. [1].
 # To create raster plots in Neuroblox for the excitatory and inhibitory populations, it is as simple as:
@@ -134,7 +133,7 @@ rasterplot(fig[1,1], exci, sol; threshold=20.0, title="Excitatory Neurons")
 rasterplot(fig[2,1], inhib, sol; threshold=20.0, title="Inhibitory Neurons")
 fig
 save(joinpath(@OUTPUT, "ping_raster.svg"), fig); # hide
-# \fig{ping_raster}
+#!nb # \fig{ping_raster}
 
 # The upper panel should show the dynamics in Figure 1.C, with a clear population of excitatory neurons firing together from the external driving current, and the other excitatory neurons exhibiting more stochastic bursts.
 # The lower panel should show the dynamics in Figure 1.A, with the inhibitory neurons firing in a more synchronous manner than the excitatory neurons.
@@ -147,6 +146,7 @@ save(joinpath(@OUTPUT, "ping_raster.svg"), fig); # hide
 # > Try increasing the inhibitory bath or decreasing the percentage of excitatory neurons that receive input and see how this affects the synchrony!
 
 # ## References
-# [1] Börgers C, Epstein S, Kopell NJ. Gamma oscillations mediate stimulus competition and attentional selection in a cortical network model. Proc Natl Acad Sci U S A. 2008 Nov 18;105(46):18023-8. DOI: [10.1073/pnas.0809511105](https://www.doi.org/10.1073/pnas.0809511105).
-# [2] Traub, RD, Miles, R. Neuronal Networks of the Hippocampus. Cambridge University Press, Cambridge, UK, 1991. DOI: [10.1017/CBO9780511895401](https://www.doi.org/10.1017/CBO9780511895401)
-# [3] Wang, X-J, Buzsáki, G. Gamma oscillation by synaptic inhibition in a hippocampal interneuronal network model. J. Neurosci., 16:6402–6413, 1996. DOI: [10.1523/JNEUROSCI.16-20-06402.1996](https://www.doi.org/10.1523/JNEUROSCI.16-20-06402.1996)
+# - [1] Börgers C, Epstein S, Kopell NJ. Gamma oscillations mediate stimulus competition and attentional selection in a cortical network model. Proc Natl Acad Sci U S A. 2008 Nov 18;105(46):18023-8. DOI: [10.1073/pnas.0809511105](https://www.doi.org/10.1073/pnas.0809511105).
+# - [2] Traub, RD, Miles, R. Neuronal Networks of the Hippocampus. Cambridge University Press, Cambridge, UK, 1991. DOI: [10.1017/CBO9780511895401](https://www.doi.org/10.1017/CBO9780511895401)
+# - [3] Wang, X-J, Buzsáki, G. Gamma oscillation by synaptic inhibition in a hippocampal interneuronal network model. J. Neurosci., 16:6402–6413, 1996. DOI: [10.1523/JNEUROSCI.16-20-06402.1996](https://www.doi.org/10.1523/JNEUROSCI.16-20-06402.1996)
+# - [4] Protter, M. (2024). GraphDynamics.jl -- Efficient dynamics of interacting collections of modular subsystems (v0.2.2). Zenodo. https://doi.org/10.5281/zenodo.14183153

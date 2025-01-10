@@ -1,4 +1,5 @@
 # # Decision Making in a Circuit Model
+#md # > **_Jupyter Notebook_:** Please work on `decision_making.ipynb`.
 
 # ## Introduction
 # The session covers the classic article by Wang [1] which presented a circuit model for decision making. The model consists of two selective excitatory populations, one for each possible choice, a non-selective excitatory population and an inhibitory population which facilitates the competition between the two selective ones.
@@ -32,13 +33,11 @@ N_I = Int(ceil(N * f_inh)) ## total number of inhibitory neurons
 N_E_selective = Int(ceil(f * N_E)) ## number of selective excitatory neurons
 N_E_nonselective = N_E - 2 * N_E_selective ## number of non-selective excitatory neurons
 
-## Use two distinct weight values as per Wang [1]
+## We use two distinct weight values as per Wang [1]
 w₊ = 1.7 
 w₋ = 1 - f * (w₊ - 1) / (1 - f)
 
-## Use scaling factors for conductance parameters so that our abbreviated model 
-## can exhibit the same competition behavior between the two selective excitatory populations
-## as the larger model in Wang [1] does.
+# We use scaling factors for conductance parameters so that our abbreviated model can exhibit the same competition behavior between the two selective excitatory populations as the larger model in Wang [1] does.
 exci_scaling_factor = 1600 / N_E
 inh_scaling_factor = 400 / N_I
 
@@ -53,12 +52,10 @@ dt_spike_rate = 50 # update interval for the stimulus spike rate [ms]
 spike_rate_A = (distribution=Normal(μ_A, σ), dt=dt_spike_rate) # spike rate distribution for selective population A
 spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate distribution for selective population B
 
-## background input
-@named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name);
+@named background_input = PoissonSpikeTrain(spike_rate, tspan; namespace = model_name); ## background input
 
-## stimulation inputs to selective populations A and B
-@named stim_A = PoissonSpikeTrain(spike_rate_A, tspan; namespace = model_name);
-@named stim_B = PoissonSpikeTrain(spike_rate_B, tspan; namespace = model_name);
+@named stim_A = PoissonSpikeTrain(spike_rate_A, tspan; namespace = model_name); ## stimulation inputs to selective population A
+@named stim_B = PoissonSpikeTrain(spike_rate_B, tspan; namespace = model_name); ## stimulation inputs to selective population B
 
 @named n_A = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor);
 @named n_B = LIFExciCircuitBlox(; namespace = model_name, N_neurons = N_E_selective, weight = w₊, exci_scaling_factor, inh_scaling_factor) ;
@@ -97,7 +94,9 @@ add_edge!(g, n_inh => n_ns; weight = 1);
 sys = system_from_graph(g; name=model_name, graphdynamics = true);
 prob = ODEProblem(sys, [], tspan);
 sol = solve(prob, Euler(); dt = 0.01); 
-    
+
+# > **_NOTE_:** As mention in the PING circuit session too, setting `graphdynamics=true` will enable an alternative compilation mode for the neural system. Not every model is compatible with GraphDynamics.jl [2] yet, but for ones that are compatible, it is usually significantly faster to compile. This option will make the biggest difference when you care about very large numbers of neurons, or if you are running the same model with small changes to the number of neurons or connectivity graph many times.
+
 # ## Results
 
 fig = Figure()
@@ -106,17 +105,18 @@ rasterplot(fig[1,2], n_B, sol; title = "Population B")
 rasterplot(fig[2,1], n_inh, sol; color=:red, title = "Inhibitory Population")
 fig
 save(joinpath(@OUTPUT, "dm_raster.svg"), fig); # hide
-# \fig{dm_raster}
+#!nb # \fig{dm_raster}
 
-# Notice how the activity of neurons in population B is quickly ramping up and the activity in population A is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.
+# Notice how the neuronal activity in one of the excitatory populations is quickly ramping up, while the activity in the other population is decreasing at the same time. The inhibitory population exhibits a contant tonic activity that facilitates the competition between A and B via the precise spike times.
 
 fig = Figure()
-ax = Axis(fig[1,1], title = "Competing Firing Rates")
-frplot!(ax, n_A, sol; color=:black, win_size=50)
-frplot!(ax, n_B, sol; color=:red, win_size=50)
+ax = Axis(fig[1,1])
+frplot!(ax, n_A, sol; color=:black, win_size=50, label="Population A")
+frplot!(ax, n_B, sol; color=:red, win_size=50, label="Population B", title = "Competing Firing Rates")
+axislegend(position=:lt)
 fig
 save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
-# \fig{dm_fr}
+#!nb # \fig{dm_fr}
 
 # We observe the same result qualitatively when plotting the firing rates instead of spikes. Using a single axis we can better see the magnitude of the competition in the difference between the firing rates over time.
 
@@ -125,4 +125,5 @@ save(joinpath(@OUTPUT, "dm_fr.svg"), fig); # hide
 # - Which receptor type (NMDA, AMPA or GABA) is the most crucial one for the competition behavior of the circuit? Hint: simulate interventions on the circuit to ablate a receptor type. Look into the equations of `LIFExciNeuron` and `LIFInhNeuron` and affect the receptors' conductance.
 
 # ## References
-# - [1]  Wang XJ. Probabilistic decision making by slow reverberation in cortical circuits. Neuron. 2002 Dec;36(5):955-968. DOI: 10.1016/s0896-6273(02)01092-9. PMID: 12467598. 
+# - [1] Wang XJ. Probabilistic decision making by slow reverberation in cortical circuits. Neuron. 2002 Dec;36(5):955-968. DOI: 10.1016/s0896-6273(02)01092-9. PMID: 12467598. 
+# - [2] Protter, M. (2024). GraphDynamics.jl -- Efficient dynamics of interacting collections of modular subsystems (v0.2.2). Zenodo. https://doi.org/10.5281/zenodo.14183153

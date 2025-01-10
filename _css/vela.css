@@ -3,10 +3,11 @@ small alterations for Franklin
 */
 h1.page.title,
 hr {
-  position relative
-  padding-left: 12.5%;
-  padding-right: 12.5%;
-  line-height: 1.35em;
+    position: center;
+    text-align: center;
+    padding-left: 5%;
+    padding-right: 5%;
+    line-height: 1.35em;
 }
 
 @media (min-width: 940px) {

@@ -1,5 +1,12 @@
-# # Differential Equations in Julia
+# # Differential Equations with ModelingToolkit
+#md # > **_Jupyter Notebook_:** Please work on `intro_diffeq.ipynb`.
+
 # Introduction
+# In this session we will learn how to define and solve differential equation systems using a symbolic representation with [ModelingToolkit](https://docs.sciml.ai/ModelingToolkit/stable/). First we will work with a popular two-dimensional model called the Lotka-Volterra system.
+
+# The Lotka-Volterra equations, while originally developed to model predator-prey dynamics in ecology, serve as an excellent starting point for computational neuroscience. They introduce fundamental concepts of dynamical systems that are crucial in neuroscience. These equations demonstrate how two variables can interact and influence each other over time - similar to how neurons or neural populations interact. Understanding this behavior helps build intuition for more complex systems where neurons form feedback and feedforward connections with one another.
+
+# We will then proceed to model our first neuron using the Izhikevich model [1]. Even though the model appears simple, it can exhibit many different spiking patterns (e.g. regular and fast spiking, bursting, chattering) by changing its parameters. Such parameter changes simulate both intrinsic (e.g. neuromodulation, neurotransmitter availability) and extrinsic (e.g. pharmacological interventions) factors. Neurons that change their spiking behavior can affect the stability of entire neuronal networks of which they are part.
 
 # Learning goals:
 # - Learn about ModelingToolkit, the symbolic way to define differential equation systems.
@@ -37,7 +44,7 @@ u0 = [x => 5, y => 2]
 ## Problem to be solved
 prob = ODEProblem(simpsys, u0, tspan)
 ## Solution of the problem using the Tsit5 solver
-sol = solve(prob, Tsit5())
+sol = solve(prob, Tsit5());
 
 # The solution object contains the values of every variable of the system (`x` and `y`) for every simulated timestep. One can easily access the values of a specific variable using its symbolic name
 sol[x] ## or similarly sol[y]
@@ -47,7 +54,7 @@ fig = plot(sol)
 ## display the figure
 fig
 save(joinpath(@OUTPUT, "mtk1.svg"), fig); # hide
-# \fig{mtk1}
+#!nb # \fig{mtk1}
 
 # We will shortly see more plot types and options.
 
@@ -55,7 +62,6 @@ save(joinpath(@OUTPUT, "mtk1.svg"), fig); # hide
 
 # ### Simulating spikes
 
-# Let's now move on to a two-dimensional model of a neuron. This is a popular model, known as the Izhikevich neuron. Even though the model appears simple, it can exhibit many different spiking patterns (e.g. regular and fast spiking, bursting, chattering) by changing its parameters.
 # The Izhikevich neuron is a similar system of ODEs like the Lotka-Volterra example above. One notable difference however is the spiking mechanism.
 # Spiking in the Izhikevich neuron needs to be implemented "manually". That is we need to detect when the voltage variable crosses a spiking threshold and every time this event happens we need to reset the neuron's voltage to a more polarized value and potentially alter other variables too.
 
@@ -91,13 +97,13 @@ izh_sol = solve(izh_prob)
 fig = plot(izh_sol)
 fig
 save(joinpath(@OUTPUT, "mtk2.svg"), fig); # hide
-# \fig{mtk2}
+#!nb # \fig{mtk2}
 
 # or if we want to plot just the voltage timeseries with its spiking pattern
 fig = plot(izh_sol; idxs=[v])
 fig
 save(joinpath(@OUTPUT, "mtk3.svg"), fig); # hide
-# \fig{mtk3}
+#!nb # \fig{mtk3}
 
 # ### Changing parameter values and initial conditions
 # After defining and simulating a system we might want to run another simulation by changing either or both of the parameter values and the initial conditions. 
@@ -113,7 +119,7 @@ izh_sol = solve(izh_prob)
 fig = plot(izh_sol; idxs=[v])
 fig
 save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide
-# \fig{mtk4}
+#!nb # \fig{mtk4}
 
 # Notice how the spiking pattern has changed compared to the previous simulation.
 
@@ -121,8 +127,7 @@ save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide
 # Until now we have been simulating the Izhikevich neuron by injecting it with a constant external DC current `I=10`. We'll now see how we can expand the `I` input to a dynamic current, which is more realistic (currents do not remain constant in the brain for too long). 
 # Since `I` will change dynamically in time, it will be a time-dependent variable of the system and not a constant parameter.
 @variables v(t)=-65 u(t)=-13 I(t)
-## The following parameter values correspond to regular spiking.
-@parameters a=0.02 b=0.2 c=-65 d=8
+@parameters a=0.02 b=0.2 c=-65 d=8 ## These parameter values correspond to regular spiking.
 
 eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
         D(u) ~ a * (b * v - u),
@@ -130,11 +135,10 @@ eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
 
 event = (v > 30.0) => [u ~ u + d, v ~ c]
 
-## Notice how `I` was moved from the parameter list to the variable list in the following call.
 @named izh_system = ODESystem(eqs, t, [v, u, I], [a, b, c, d]; discrete_events = event)
 izh_simple = structural_simplify(izh_system)
 
-# Let's display the equations of the original and the simplified system to see the effect of `structural_simplify`. 
+# Notice how `I` was moved from the parameter list to the variable list above. Let's display the equations of the original and the simplified system to see the effect of `structural_simplify`. 
 equations(izh_system)
 # The original system contains the algebraic equation for the external current `I`.
 equations(izh_simple)
@@ -151,7 +155,7 @@ izh_sol = solve(izh_prob)
 fig = plot(izh_sol; idxs=[v, I])
 fig
 save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide
-# \fig{mtk5}
+#!nb # \fig{mtk5}
 
 # Notice how the external current is slowly being accumulated in the neuron's potential `v` until the eventual spike and reset. 
 
@@ -160,6 +164,6 @@ save(joinpath(@OUTPUT, "mtk5.svg"), fig); # hide
 # - Pick a neuron model of your choice and perform a sensitivity analysis on the system. How is its spiking behavior change as its parameters change? Summarize the results in one (or several) plots.
 
 # ## References
-# [1] E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
-# [2] Ma, Yingbo, Shashi Gowda, Ranjan Anantharaman, Chris Laughman, Viral Shah, and Chris Rackauckas. "Modelingtoolkit: A composable graph transformation system for equation-based modeling." arXiv preprint arXiv:2103.05244 (2021).
-# [3] https://docs.sciml.ai/ModelingToolkit/stable/
+# - [1] E. M. Izhikevich, "Simple model of spiking neurons," in IEEE Transactions on Neural Networks, vol. 14, no. 6, pp. 1569-1572, Nov. 2003, doi: 10.1109/TNN.2003.820440
+# - [2] Ma, Yingbo, Shashi Gowda, Ranjan Anantharaman, Chris Laughman, Viral Shah, and Chris Rackauckas. "Modelingtoolkit: A composable graph transformation system for equation-based modeling." arXiv preprint arXiv:2103.05244 (2021).
+# - [3] https://docs.sciml.ai/ModelingToolkit/stable/

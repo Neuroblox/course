@@ -1,4 +1,6 @@
 # # Solving Inverse Problems with Spectral Dynamic Causal Modeling
+#md # > **_Jupyter Notebook_:** Please work on `DCM.ipynb`.
+
 # ## Introduction
 # Neuroblox provides you with a comprehensive environment for simulations as we have explored previously, but its functionality doesn't stop there.
 # We will now pivot and turn our attention to a different kind of problem: 
@@ -12,6 +14,18 @@
 # We will model fMRI data by a balloon model and BOLD signal on top.
 # After simulation of this simple model we will use spDCM to infer some of the model parameters from the simulation time series.
 # 
+#!nb # ![spDCM Workflow](/assets/spectral_DCM_illustration.png)
+#nb # ![spDCM Workflow](./assets/spectral_DCM_illustration.png)
+# *Figure 1: Workflow for Spectral DCM analysis.*  
+#
+# *Figure 1* describes the procedure we will pursue:
+# - define the graph and add blocks (sections A, B and C in the Figure)
+# - simulate the model, instead we could also use actual data (section D in Figure)
+# - compute the cross spectral density 
+# - setup the DCM
+# - estimate parameters
+# - plot the results
+
 # Learning goals
 # - perform the entire workflow of an spDCM analysis.
 # - use observer Blox to simulate experimental measurements. 
@@ -45,14 +59,13 @@ for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)          # store neural mass model in list. We need this list below. If you haven't seen the Julia command `push!` before [see here](http://jlhub.com/julia/manual/en/function/push-exclamation).
 
-    ## add Ornstein-Uhlenbeck block as noisy input to the current region
-    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1)
-    add_edge!(g, input => region, weight=1/16)   # Note that 1/16 is taken from SPM12, this stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability.
+    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1) ## add Ornstein-Uhlenbeck as noisy input to the current region
+    add_edge!(g, input => region, weight=1/16)  
 
-    ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
-    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"))
+    measurement = BalloonModel(;name=Symbol("r$(i)₊bm")) ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
     add_edge!(g, region => measurement, weight=1.0)
 end
+# Note that `weight=1/16` in the connection between the OU process and the Neural Mass Blox is taken from SPM12. This stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability.
 # Next we define the between-region connectivity matrix and connect regions; we use the same matrix as is defined in [3]
 A_true = [[-0.5 -2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
 for idx in CartesianIndices(A_true)
@@ -83,6 +96,8 @@ ax = Axis(f[1, 1],
 )
 lines!(ax, sol, idxs=idx_m)
 f
+save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
+#!nb # \fig{fmriseries}
 
 # We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.
 dfsol = DataFrame(sol[ceil(Int, 101/dt):end]);
@@ -105,6 +120,8 @@ for i = 1:nr
     end
 end
 fig
+save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
+#!nb # \fig{csd}
 
 # ## Model Inference
 
@@ -127,8 +144,7 @@ for i = 1:nr
     input = ExternalInput(;name=Symbol("r$(i)₊ei"))
     add_edge!(g, input => region, weight=C)
 
-    ## we assume fMRI signal and model them with a BalloonModel
-    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ)
+    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ) ## assume fMRI signal and model them with a BalloonModel
     add_edge!(g, region => measurement, weight=1.0)
 end
 
@@ -152,7 +168,7 @@ for (i, idx) in enumerate(CartesianIndices(A_prior))
 end
 ## Avoid simplification of the model in order to be able to exclude some parameters from fitting
 @named fitmodel = system_from_graph(g, simplify=false)
-# With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimizatoin procedure.
+# With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
 # For instance the the effective connections that are set to zero in the simulation:
 untune = Dict(A[3] => false, A[7] => false)
 fitmodel = changetune(fitmodel, untune)                 # 3 and 7 are not present in the simulation model
@@ -186,7 +202,7 @@ _, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal
 ## this should be rewritten to abuse the compiler less, but for now, an easy solution is just to run it with more allocated stack space.
 with_stack(f, n) = fetch(schedule(Task(f, n)));
 
-# We are now ready to run the optimization procedure! :)
+# We are now ready to run the optimization procedure!
 # That is we loop over run_sDCM_iteration! which will alter `state` after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters. 
 with_stack(5_000_000) do  # 5MB of stack space
     for iter in 1:max_iter
@@ -206,15 +222,19 @@ end
 # ## Results
 # Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound (ELBO). 
 # Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a (potentially local) optimum:
-freeenergy(state)
+f1 = freeenergy(state)
+save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
+#!nb # \fig{freeenergy}
 
 # Plot the estimated posterior of the effective connectivity and compare that to the true parameter values.
-# Bar hight are the posterior mean and error bars are the standard deviation of the posterior.
-ecbarplot(state, setup, A_true)
+# Bar height are the posterior mean and error bars are the standard deviation of the posterior.
+f2 = ecbarplot(state, setup, A_true)
+save(joinpath(@OUTPUT, "ecbar.svg"), f2); # hide
+#!nb # \fig{ecbar}
 
 # ## Challenge Problems
-# - Explore susceptibility with respect to noise. Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy (compare the different free energies of the models and their respective parameter values with ground truth)?
-# - Averaging over patients. Now repeat the simulation and inference again with 10 different seeds (you can just remove the number in Random.seed() to use current time stamps as seeds) and store the results of each run, such that you get several models based on the same ground truth but with different instances of the noise. Can you extract the average value of the effective connectivity from the ensemble?
+# - **Explore susceptibility with respect to noise.** Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy (compare the different free energies of the models and their respective parameter values with ground truth)?
+# - **Averaging over patients.** Now repeat the simulation and inference again with 10 different seeds (you can just remove the number in Random.seed() to use current time stamps as seeds) and store the results of each run, such that you get several models based on the same ground truth but with different instances of the noise. Can you extract the average value of the effective connectivity from the ensemble?
 # - Changing neuronal dynamics model. Now change the model and test the whole procedure with a different underlying neuronal mass model, for instance the Jansen-Rit model. Note that there are no default priors for the Jansen-Rit model, you will have to provide priors for the extra parameters or remove them from the optimization procedure by setting their tunable to false.
 
 # ## References

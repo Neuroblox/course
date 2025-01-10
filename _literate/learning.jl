@@ -1,4 +1,6 @@
 # # Synaptic Plasticity and Reinforcement Learning
+#md # > **_Jupyter Notebook_:** Please work on `learning.ipynb`.
+
 # ## Introduction
 # In Neuroblox, we can add plasticity rules to our circuit models. The symbolic weights that are defined for every connection are the ones that are updated according to these plasticity rules after every simulation run.
 # Weight updates are automatically handled after each simulation when doing reinforcement learning in Neuroblox. This is the topic that we will cover here. 
@@ -21,7 +23,7 @@ using CSV ## to read data from CSV files
 using DataFrames ## to format the data into DataFrames
 using Downloads ## to download image stimuli files
 
-N_trials = 5 ## number of trials
+N_trials = 10 ## number of trials
 trial_dur = 1000 ## in ms
 
 ## download the stimulus images 
@@ -40,28 +42,29 @@ model_name = :g
 @named ASC1 = NextGenerationEIBlox(; namespace=model_name, Cₑ=2*26,Cᵢ=1*26, alpha_invₑₑ=10.0/26, alpha_invₑᵢ=0.8/26, alpha_invᵢₑ=10.0/26, alpha_invᵢᵢ=0.8/26, kₑᵢ=0.6*26, kᵢₑ=0.6*26) 
 
 ## learning rule
-hebbian_cort = HebbianPlasticity(K=5e-5, W_lim=7, t_pre=trial_dur, t_post=trial_dur) 
+hebbian_cort = HebbianPlasticity(K=5e-4, W_lim=15, t_pre=trial_dur, t_post=trial_dur) 
 
 g = MetaDiGraph()
 
 add_edge!(g, stim => VAC, weight=14) 
 add_edge!(g, ASC1 => VAC, weight=44)
 add_edge!(g, ASC1 => AC, weight=44)
-add_edge!(g, VAC => AC, weight=3, density=0.1, learning_rule = hebbian_cort) ## give learning rule as parameter
+add_edge!(g, VAC => AC, weight=3, density=0.1, learning_rule = hebbian_cort) ## pass learning rule as a keyword argument
 
 agent = Agent(g; name=model_name); 
 env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name);
 
-fig = Figure(title="Adjacency matrix", size = (1600, 800))
+fig = Figure(size = (1600, 800))
 
-adjacency(fig[1,1], agent; title="Initial weights")
+adjacency(fig[1,1], agent; title="Initial weights", colorrange=(0,7))
 
-run_experiment!(agent, env; t_warmup=200.0, alg=Vern7(), verbose=true)
+run_experiment!(agent, env; t_warmup=200.0, alg=Vern7())
 
-adjacency(fig[1,2], agent; title="Final weights")
+adjacency(fig[1,2], agent; title="Final weights", colorrange=(0,7))
 fig
 save(joinpath(@OUTPUT, "adj_open.svg"), fig); # hide
-# \fig{adj_open}
+#!nb # \fig{adj_open}
+# Notice how the weight values in the upper left corner (connections with `HebbianPlasticity`) have changed after simulation.
 
 # ## Cortico-Striatal Circuit performing Category Learning 
 # This is one simplified biological instantiation of an RL system. It is carrying out a simple RL behavior but not faithfully simulating physiology. The experiment we are simulating here is the category learning experiment [Antzoulatos2014] which was successfully modeled through a detailed corticostriatal model [2].
@@ -85,7 +88,7 @@ image_set = CSV.read(Downloads.download("raw.githubusercontent.com/Neuroblox/Neu
 @named AS = GreedyPolicy(; namespace=model_name, t_decision=2*time_block_dur) 
 
 ## learning rules
-hebbian_mod = HebbianModulationPlasticity(K=0.05, decay=0.01, α=2.5, θₘ=1, modulator=SNcb, t_pre=trial_dur, t_post=trial_dur, t_mod=time_block_dur)
+hebbian_mod = HebbianModulationPlasticity(K=0.06, decay=0.01, α=2.5, θₘ=1, modulator=SNcb, t_pre=trial_dur, t_post=trial_dur, t_mod=time_block_dur)
 hebbian_cort = HebbianPlasticity(K=5e-4, W_lim=7, t_pre=trial_dur, t_post=trial_dur) 
 
 g = MetaDiGraph()
@@ -117,7 +120,7 @@ env = ClassificationEnvironment(stim, N_trials; name=:env, namespace=model_name)
 
 fig = Figure(title="Adjacency matrix", size = (1600, 800))
 
-adjacency(fig[1,1], agent; title = "Before Learning")
+adjacency(fig[1,1], agent; title = "Before Learning", colorrange=(0,0.2))
 
 trace = run_experiment!(agent, env; t_warmup=200.0, alg=Vern7(), verbose=true)
 
@@ -126,10 +129,10 @@ trace.trial ## trial indices
 trace.correct ## whether the response was correct or not on each trial
 trace.action; ## what responce was made on each trial, 1 is left and 2 is right
 
-adjacency(fig[1,2], agent; title = "After Learning")
+adjacency(fig[1,2], agent; title = "After Learning", colorrange=(0,0.2))
 fig
 save(joinpath(@OUTPUT, "adj_RL.svg"), fig); # hide
-# \fig{adj_RL}
+#!nb # \fig{adj_RL}
 
 # Notice the changes in weight values after the RL experiment.
 

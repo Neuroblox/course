@@ -5,8 +5,8 @@
 We saw how Bloxs and their connection rules are defined and we can connect external sources to single neuron or neural mass Bloxs. Now we are ready to expand our models to resemble more closely the neuronal circuits of the brain.
 
 This session includes two examples of circuit models
-- [a biomimetic corticostriatal model of visual processing](./CS_circuit)
-- [a Pyramidal-Interneuron Gamma Network (PING) of Excitation-Inhibition balance](./PING_circuit). 
+- [a biomimetic corticostriatal model of visual processing](/pages/CS_circuit)
+- [a Pyramidal-Interneuron Gamma Network (PING) of Excitation-Inhibition balance](/pages/PING_circuit). 
 
 Learning goals :
 - build complex models from the systems neuroscience literature.
@@ -24,8 +24,8 @@ Let's consider two `WinnerTakesAllBlox` objects which are `<: CompositeBlox` and
 
 ```julia
 model_name = :g
-wta1 = WinnerTakesAllBlox(namespace = model_name)
-wta2 = WinnerTakesAllBlox(namespace = model_name)
+@named wta1 = WinnerTakeAllBlox(namespace = model_name)
+@named wta2 = WinnerTakeAllBlox(namespace = model_name)
 ```
 
 then `wta1₊exci1₊V` and `wta2₊exci2₊V` are the voltage variables (membrane potentials) of  the first excitatory neuron (`HHNeuronExciBlox`) in `wta1` and `wta2` respectively. Each `₊` character adds another namespace if read from right to left. 

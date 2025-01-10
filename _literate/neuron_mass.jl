@@ -1,4 +1,6 @@
 # # Neurons, Neural Masses and Sources
+#md # > **_Jupyter Notebook_:** Please work on `neuron_mass.ipynb`.
+
 # ## Introduction
 # The main distinction between the neuron, neural mass and source Blox we will encounter on this session is the mechanism by which they communicate with other Bloxs.
 # All neural mass Bloxs, some sources, and neurons of the Hodgkin-Huxley (HH) family have continuous output variables which are included as terms in the postsynaptic Blox's differential equations.
@@ -10,10 +12,14 @@
 # - drive single neuron and neural mass activity using external sources 
 
 # ## Neurons and neural masses
-# As a first example we will consider a neural mass `WilsonCowan` Blox of Exhitatation-Inhibition (E-I) balance. This is a two-dimensional reduction over a population of excitatory and inhibitory neurons with continuous dynamics.
+# As a first example we will consider a neural mass `WilsonCowan` Blox of Excitation-Inhibition (E-I) balance. This is a two-dimensional reduction over a population of excitatory and inhibitory neurons with continuous dynamics.
 using Neuroblox
 using OrdinaryDiffEq
 using CairoMakie
+
+## Set the random seed for reproducible results
+using Random
+Random.seed!(1)
 
 @named nm = WilsonCowan()
 ## Retrieve the simplified ODESystem of the Blox
@@ -26,14 +32,14 @@ fig, ax = plot(sol);
 axislegend(ax) ## add legend to the plot
 fig 
 save(joinpath(@OUTPUT, "wc_all.svg"), fig); # hide
-# \fig{wc_all}
+#!nb # \fig{wc_all}
 
 # Using the generic `plot` function we visualize all states of our model. We can retrieve specific variables by using
 E = state_timeseries(nm, sol, "E") ## retrieves state `E` of Blox `nm`
 fig = lines(E); ## simple line plot
 fig 
 save(joinpath(@OUTPUT, "wc_timeseries.svg"), fig); # hide
-# \fig{wc_timeseries}
+#!nb # \fig{wc_timeseries}
 
 # Moving on to neurons, we will use a Quadratic Integrate-and-fire (QIF) neuron model with an added callback that increases the input current after 60 ms.
 
@@ -42,29 +48,29 @@ save(joinpath(@OUTPUT, "wc_timeseries.svg"), fig); # hide
 sys = system(qif; discrete_events = [60] => [qif.I_in ~ 10])
 tspan = (0, 100) # ms
 prob = ODEProblem(sys, [], tspan)
-sol = solve(prob, Tsit5())
+sol = solve(prob, Tsit5());
 
 # Besides the generic `plot` function, Neuroblox includes some plotting recipes specifically for neuron models. 
 # A raster plot with chosen spike threshold
 fig = rasterplot(qif, sol; threshold=-40);
 fig 
 save(joinpath(@OUTPUT, "qif_raster.svg"), fig); # hide
-# \fig{qif_raster}
+#!nb # \fig{qif_raster}
 
 # and a firing rate plot, again by setting the spike threshold and the window size for averaging
 fig = frplot(qif, sol; threshold=-40, win_size=20);
 fig 
 save(joinpath(@OUTPUT, "qif_fr.svg"), fig); # hide
-# \fig{qif_fr}
+#!nb # \fig{qif_fr}
 
 # We can easily extract the voltage timeseries of neurons by 
 V = voltage_timeseries(qif, sol) ## equivalent to `state_timeseries(qif, sol, "V")`
 fig = lines(V);
 fig 
 save(joinpath(@OUTPUT, "qif_timeseries.svg"), fig); # hide
-# \fig{qif_timeseries}
+#!nb # \fig{qif_timeseries}
 
-# Finally we simulate an HH neuron with stochastic dynamics which was introduced in [this article on deep brain stimulation int he subthalamic nucleus](https://doi.org/10.1073/pnas.2120808119). 
+# Finally we simulate an HH neuron with stochastic dynamics which was introduced in [this article on deep brain stimulation in the subthalamic nucleus](https://doi.org/10.1073/pnas.2120808119). 
 # The model includes a brownian noise term affecting `D(V)` which you can inspect using the `equations` function.
 
 using StochasticDiffEq ## to access stochastic DE solvers
@@ -79,14 +85,14 @@ sol = solve(prob, RKMil())
 fig = powerspectrumplot(hh, sol; samplig_rate=0.01);
 fig 
 save(joinpath(@OUTPUT, "hh_power.svg"), fig); # hide
-# \fig{hh_power}
+#!nb # \fig{hh_power}
 
 # We can use all other plots from above with this stochastic HH neuron since it is a subtype of `Neuron`. Given its stochastic nature it might be additionally meaningful to show the powerspectrum of its activity.
 # > **_Exercise:_** Try changing the influence of the stochastic term. What do you notice about the powerspectrum of `HHNeuronExci_STN_Adam_Blox`?
 
 # ## Sources
 
-# External sources in Neuroblox as a particular Blox subtype (`<: AbstractBlox`) which contains a system with output and no input variables. 
+# External sources in Neuroblox are a particular Blox subtype (`<: AbstractBlox`) which contains a system with output and no input variables. 
 # Naturally source Bloxs can only connect **to** other (non-source) Blox and can not receive connections from any Blox.
 # There are two main categories of sources, ones with continuous dynamics for their variables and ones that operate through events (callbacks).
 
@@ -111,9 +117,9 @@ fig, ax = plot(sol);
 axislegend(ax)
 fig 
 save(joinpath(@OUTPUT, "wc_input.svg"), fig); # hide
-# \fig{wc_input}
+#!nb # \fig{wc_input}
 
-# Notice how the E-I balance has shiften after adding our input. We will work with a more complex circuit for E-I balance on the next session and learn more about its intricacies.
+# Notice how the E-I balance has shifted after adding our input. We will work with a more complex circuit for E-I balance on the next session and learn more about its intricacies.
 
 # We can create custom sources with continuous input the same way we create custom Bloxs and write custom connection rules for them as we have seen in the previous session.
 
@@ -190,7 +196,7 @@ sol = solve(prob, Tsit5())
 fig = rasterplot(ifn, sol);
 fig 
 save(joinpath(@OUTPUT, "ifn_input.svg"), fig); # hide
-# \fig{ifn_input}
+#!nb # \fig{ifn_input}
 
 # Notice how spikes become more and more frequently over time. Can you tell why this is happening?
 
@@ -198,10 +204,6 @@ save(joinpath(@OUTPUT, "ifn_input.svg"), fig); # hide
 # Neuroblox contains specialized sources that are common to the field of Deep Brain Stimulation (DBS). These sources simulate stimulation patterns by external probes that are continuous in time, yet contain discrete changes (jumps) on their variables. 
 # Even though these sources are often used in DBS protocols, they are implemented as any other source so they can be connected to any other Bloxs given a connection rule. 
 # We will first visualize the sources on their own and then connect them to an HH excitatory neuron.
-
-## Set the random seed for reproducible results
-using Random
-Random.seed!(1)
 
 ## Square pulse stimulus
 @named stim = DBS(
@@ -226,7 +228,7 @@ ax1 = Axis(fig[1,1]; xlabel = "time (ms)", ylabel = "stimulus")
 lines!(ax1, time, stimulus)
 fig
 save(joinpath(@OUTPUT, "stim.svg"), fig); # hide
-# \fig{stim}
+#!nb # \fig{stim}
 
 # We can also generate a smoothed pulse train as 
 
@@ -252,7 +254,7 @@ xlims!(ax2, 4.9, 5.6) ## set the x-axis limits for better visibility of a smooth
 
 fig 
 save(joinpath(@OUTPUT, "stim_comparison.svg"), fig); # hide
-# \fig{stim_comparison}
+#!nb # \fig{stim_comparison}
 
 # It is also possible to create a stimulus protocol that does not follow a simple periodic stimulation schedule as above and contains multiple pulses before a quiet time window:
 frequency = 20.0
@@ -291,7 +293,7 @@ ax1 = Axis(fig[1,1]; xlabel = "time (ms)", ylabel = "stimulus")
 lines!(ax1, time, stimulus)
 fig
 save(joinpath(@OUTPUT, "stim_protocol.svg"), fig); # hide
-# \fig{stim_protocol}
+#!nb # \fig{stim_protocol}
 
 # Now let's finally connect our `ProtocolDBS` source to an HH excitatory neuron and simulate
 
@@ -325,7 +327,7 @@ ax2 = Axis(fig[2,1]; xlabel = "time (ms)", ylabel = "Stimulus (μA/cm²)")
 lines!(ax2, sol.t, stimulus)
 fig
 save(joinpath(@OUTPUT, "stim_hh.svg"), fig); # hide
-# \fig{stim_hh}
+#!nb # \fig{stim_hh}
 
 # ## Challenge Problems
 # - Implement a custom `SpikeSource` of your choice. Hint: the `BernoulliSpikes` implementation above.

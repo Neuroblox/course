@@ -1,4 +1,6 @@
 # # Blox and Connections in Neuroblox
+#md # > **_Jupyter Notebook_:** Please work on `blox_connections.ipynb`.
+
 # ## Introduction
 # Neuroblox comes with a library of many components already, which we call Blox. Such Blox are neuron models, neural masses, circuits of these, input sources, observers etc. Additionally there are connection rules that dictate how types of components connect with one another. Over the rest of this course we will encounter multiple examples of models made by Neuroblox components and connected by rules already implemented in the package.
 
@@ -71,12 +73,8 @@ struct IzhNeuron <: Neuron
     system
     namespace
     
-    ## We keep all function arguments as keyword arguments 
-    ## so that we can set them more conveniently as `arg = value`.
     function IzhNeuron(; name, namespace=nothing, a=0.02, b=0.2, V_reset=-50, d=2, threshold=30)
         sts = @variables V(t)=-65 [output=true] u(t)=-13 jcn [input=true]
-        ## Spike threshold `θ=30` is now included as a parameter.
-        ## Default values for all parameters are the keyword arguments from above. This way we can set them easily during construction.
         params = @parameters a=a b=b V_reset=V_reset d=d θ=threshold
 
         eqs = [D(V) ~ 0.04 * V ^ 2 + 5 * V + 140 - u + jcn + 5,
@@ -89,6 +87,7 @@ struct IzhNeuron <: Neuron
     end
 end
 
+## In the `IzhNeuron` constructor function we keep all arguments as keyword arguments so that we can set them more conveniently as `arg = value`. Spike threshold `θ=30` is now included as a parameter. Default values for all parameters are the keyword arguments from above. This way we can set them easily during construction.
 # > **_NOTE_:** In `IzhNeuron` the `jcn` variable does not get a default value, only the [input=true] tag.
 # > This means that other Bloxs will connect to a `IzhNeuron` through `jcn`.
 # >
@@ -113,7 +112,7 @@ connection_equations(lif, izh) ## connection from lif to izh
 # We even get a warning saying that the connection rule is not specified so Neuroblox defaults to this basic weighted connection.
 
 # ## Custom Connections
-# Often times genric connection rules are not sufficient and we need ones specialized to our custom Bloxs. There are two elements that allow for great customization variery when it comes to connection rules, connection equations and callbacks.
+# Often times genric connection rules are not sufficient and we need ones specialized to our custom Bloxs. There are two elements that allow for great customization variety when it comes to connection rules, connection equations and callbacks.
 
 # ### Connection equations
 # Let's define a custom equation that connects a `LIFNeuron` to our `IzhNeuron`. The first thing we need to do is to import the `connection_equations` function from Neuroblox so that we can add a new dispatch to it. 
@@ -171,7 +170,7 @@ sol = solve(prob, Tsit5());
 # These callbacks will be applied at every timepoint during simulation where the callback condition is fulfilled. 
 # This mechanism is particularly useful for neuron models like the Izhikevich and the LIF neurons we saw above that use callbacks to implement spiking. 
 
-# > **_NOTE_:** The affect equations of a single event can change either only variables or parameters. Currenlty we can not mix variable and parameter changes within the same event. 
+# > **_NOTE_:** The affect equations of a single event can change either only variables or parameters. Currently we can not mix variable and parameter changes within the same event. 
 # > See the [ModelingToolkit documentation](https://docs.sciml.ai/ModelingToolkit/stable/basics/Events/#Discrete-events-support) for more details.
 
 import Neuroblox: connection_callbacks
