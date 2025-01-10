@@ -44,6 +44,12 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://neuroblox.github.io/course/pages/blox_connections/index.html</loc>
+    <lastmod>2025-01-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://neuroblox.github.io/course/menu1/index.html</loc>
     <lastmod>2025-01-10</lastmod>
     <changefreq>monthly</changefreq>
@@ -69,12 +75,6 @@
 </url>
 <url>
     <loc>https://neuroblox.github.io/course/menu3/index.html</loc>
-    <lastmod>2025-01-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://neuroblox.github.io/course/pages/custom/index.html</loc>
     <lastmod>2025-01-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
