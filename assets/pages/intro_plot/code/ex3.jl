@@ -4,8 +4,7 @@ using ModelingToolkit: t_nounits as t, D_nounits as D
 using OrdinaryDiffEq
 
 @variables v(t)=-65 u(t)=-13
-# Parameters for fast spiking.
-@parameters a=0.1 b=0.2 c=-65 d=2 I=10
+@parameters a=0.1 b=0.2 c=-65 d=2 I=10 ## Parameters for fast spiking.
 
 eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
         D(u) ~ a * (b * v - u)]
@@ -35,24 +34,3 @@ t_window = 20
 t_range = first(tspan):t_window:last(tspan)
 # initialize an empty vector to hold the spike values.
 spikes = zeros(length(t_range) - 1)
-
-# loop over the timepoints at which every time window begins
-for i in eachindex(t_range[1:end-1])
-    # find the indices of timepoints that fall within the current time window
-    idxs = findall(t -> t_range[i] <= t <= t_range[i+1], timepoints)
-    # count the number of spikes within the same window
-    spikes[i] = count(V_izh[idxs] .> spike_threshold) ## counts the number of True elements in a Boolean vector
-end
-
-fig = Figure()
-ax = Axis(fig[1,1], xlabel="Time (sec)", ylabel="Spikes")
-
-# plot spikes for each time window
-barplot!(ax, t_range[1:end-1], spikes, label="Spikes")
-# plot a vertical line to note when the change in current `I` occurred
-vlines!(ax, [t_bigger_stimulation]; color=:tomato, linestyle=:dash, linewidth=4, label="Stimulation: I = I+10")
-
-# display the legend
-axislegend(position = :lt)
-fig
-save(joinpath(@OUTPUT, "spikes.svg"), fig); # hide

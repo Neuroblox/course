@@ -11,8 +11,7 @@ axs = [Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</sp
 lines!(axs[<span class=hljs-number >1</span>], seconds, measurements)
 scatter!(axs[<span class=hljs-number >2</span>], seconds, measurements)
 
-fig</code></pre> <img src="/course/assets/pages/intro_plot/code/output/layout.svg" alt=""> <blockquote> <p>Note: Plot functions in Makie also work without defining a <code>Figure</code> and an <code>Axis</code> object explicitly. E.g. plotting with <code>lines&#40;seconds, measurements&#41;</code> or <code>scatter&#40;seconds, measurements&#41;</code> . However in this case we won&#39;t have all the customization options for the plot axes readily available.</p> </blockquote> <p>Plotting layouts in Makie is quite intuitive. We can treat the <code>Figure</code> object as a matrix of &#40;sub&#41;plot positions. In the example above we organized the two plots on a single column on positions <code>fig&#91;1,1&#93;</code> and <code>fig&#91;2,1&#93;</code> &#40;remember that Julia is an 1-index language&#33;&#41;. We then input these grid positions of the figure to the respective <code>Axis</code> object to define the 2D axes which will contain each plot. When defining an <code>Axis</code> there are multiple options to affect its appearance and alignment, see the <a href="https://docs.makie.org/v0.21/reference/blocks/axis">Axis documentation page</a> for more details. We can also change an <code>Axis</code> after it has been constructed. For instance we could hide the x-axis label and ticks on the top plot above, since it is a duplicate of the x-axis of the bottom plot. We will keep the grid lines though, because it is easier to read the x-axis values this way.</p> <pre><code class="julia hljs"><span class=hljs-comment ># `grid=false` avoids hiding the x grid lines</span>
-hidexdecorations!(axs[<span class=hljs-number >1</span>], grid=<span class=hljs-literal >false</span>)
+fig</code></pre> <img src="/course/assets/pages/intro_plot/code/output/layout.svg" alt=""> <blockquote> <p>Note: Plot functions in Makie also work without defining a <code>Figure</code> and an <code>Axis</code> object explicitly. E.g. plotting with <code>lines&#40;seconds, measurements&#41;</code> or <code>scatter&#40;seconds, measurements&#41;</code> . However in this case we won&#39;t have all the customization options for the plot axes readily available.</p> </blockquote> <p>Plotting layouts in Makie is quite intuitive. We can treat the <code>Figure</code> object as a matrix of &#40;sub&#41;plot positions. In the example above we organized the two plots on a single column on positions <code>fig&#91;1,1&#93;</code> and <code>fig&#91;2,1&#93;</code> &#40;remember that Julia is an 1-index language&#33;&#41;. We then input these grid positions of the figure to the respective <code>Axis</code> object to define the 2D axes which will contain each plot. When defining an <code>Axis</code> there are multiple options to affect its appearance and alignment, see the <a href="https://docs.makie.org/v0.21/reference/blocks/axis">Axis documentation page</a> for more details. We can also change an <code>Axis</code> after it has been constructed. For instance we could hide the x-axis label and ticks on the top plot above, since it is a duplicate of the x-axis of the bottom plot. We will keep the grid lines though, because it is easier to read the x-axis values this way.</p> <pre><code class="julia hljs">hidexdecorations!(axs[<span class=hljs-number >1</span>], grid=<span class=hljs-literal >false</span>) <span class=hljs-comment >## `grid=false` avoids hiding the x grid lines</span>
 
 <span class=hljs-comment ># Now we can display the figure again with the updated axes</span>
 fig</code></pre> <img src="/course/assets/pages/intro_plot/code/output/layout_hidex.svg" alt=""> <h2 id=plotting_spikes ><a href="#plotting_spikes" class=header-anchor >Plotting spikes</a></h2> <p>We will now combine the Makie and the Differential Equations ecosystems to start plotting more meaningful results after simulating neuronal models. We will use the Izhikevich model from the last section in its fast-spiking regime. Besides the spiking event, we will add a second event that increases the external current flowing into the neuron at a specific time during simulation. We will count and plot the spikes that the neuron emits within time windows of a given width both before and after the change in external current.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> ModelingToolkit
@@ -20,8 +19,7 @@ fig</code></pre> <img src="/course/assets/pages/intro_plot/code/output/layout_hi
 <span class=hljs-keyword >using</span> OrdinaryDiffEq
 
 <span class=hljs-meta >@variables</span> v(t)=-<span class=hljs-number >65</span> u(t)=-<span class=hljs-number >13</span>
-<span class=hljs-comment ># Parameters for fast spiking.</span>
-<span class=hljs-meta >@parameters</span> a=<span class=hljs-number >0.1</span> b=<span class=hljs-number >0.2</span> c=-<span class=hljs-number >65</span> d=<span class=hljs-number >2</span> I=<span class=hljs-number >10</span>
+<span class=hljs-meta >@parameters</span> a=<span class=hljs-number >0.1</span> b=<span class=hljs-number >0.2</span> c=-<span class=hljs-number >65</span> d=<span class=hljs-number >2</span> I=<span class=hljs-number >10</span> <span class=hljs-comment >## Parameters for fast spiking.</span>
 
 eqs = [D(v) ~ <span class=hljs-number >0.04</span> * v ^ <span class=hljs-number >2</span> + <span class=hljs-number >5</span> * v + <span class=hljs-number >140</span> - u + I,
         D(u) ~ a * (b * v - u)]
@@ -50,13 +48,29 @@ t_window = <span class=hljs-number >20</span>
 <span class=hljs-comment ># split time into bins of size `t_window`</span>
 t_range = first(tspan):t_window:last(tspan)
 <span class=hljs-comment ># initialize an empty vector to hold the spike values.</span>
-spikes = zeros(length(t_range) - <span class=hljs-number >1</span>)
-
-<span class=hljs-comment ># loop over the timepoints at which every time window begins</span>
-<span class=hljs-keyword >for</span> i <span class=hljs-keyword >in</span> eachindex(t_range[<span class=hljs-number >1</span>:<span class=hljs-keyword >end</span>-<span class=hljs-number >1</span>])
-    <span class=hljs-comment ># find the indices of timepoints that fall within the current time window</span>
+spikes = zeros(length(t_range) - <span class=hljs-number >1</span>)</code></pre><pre><code class="plaintext hljs">20-element Vector{Float64}:
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0</code></pre> <p>To find spikes we need to</p> <ul> <li><p>loop over the timepoints at which every time window begins</p> <li><p>find the indices of timepoints that fall within the current time window</p> <li><p>count the number of spikes within the same window</p> </ul> <pre><code class="julia hljs"><span class=hljs-keyword >for</span> i <span class=hljs-keyword >in</span> eachindex(t_range[<span class=hljs-number >1</span>:<span class=hljs-keyword >end</span>-<span class=hljs-number >1</span>])
     idxs = findall(t -&gt; t_range[i] &lt;= t &lt;= t_range[i+<span class=hljs-number >1</span>], timepoints)
-    <span class=hljs-comment ># count the number of spikes within the same window</span>
+
     spikes[i] = count(V_izh[idxs] .&gt; spike_threshold) <span class=hljs-comment >## counts the number of True elements in a Boolean vector</span>
 <span class=hljs-keyword >end</span>
 

@@ -154,8 +154,7 @@ Since `I` will change dynamically in time, it will be a time-dependent variable 
 
 ````julia:ex9
 @variables v(t)=-65 u(t)=-13 I(t)
-# The following parameter values correspond to regular spiking.
-@parameters a=0.02 b=0.2 c=-65 d=8
+@parameters a=0.02 b=0.2 c=-65 d=8 ## These parameter values correspond to regular spiking.
 
 eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
         D(u) ~ a * (b * v - u),
@@ -163,12 +162,11 @@ eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
 
 event = (v > 30.0) => [u ~ u + d, v ~ c]
 
-# Notice how `I` was moved from the parameter list to the variable list in the following call.
 @named izh_system = ODESystem(eqs, t, [v, u, I], [a, b, c, d]; discrete_events = event)
 izh_simple = structural_simplify(izh_system)
 ````
 
-Let's display the equations of the original and the simplified system to see the effect of `structural_simplify`.
+Notice how `I` was moved from the parameter list to the variable list above. Let's display the equations of the original and the simplified system to see the effect of `structural_simplify`.
 
 ````julia:ex10
 equations(izh_system)
