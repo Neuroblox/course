@@ -127,8 +127,7 @@ save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide
 # Until now we have been simulating the Izhikevich neuron by injecting it with a constant external DC current `I=10`. We'll now see how we can expand the `I` input to a dynamic current, which is more realistic (currents do not remain constant in the brain for too long). 
 # Since `I` will change dynamically in time, it will be a time-dependent variable of the system and not a constant parameter.
 @variables v(t)=-65 u(t)=-13 I(t)
-## The following parameter values correspond to regular spiking.
-@parameters a=0.02 b=0.2 c=-65 d=8
+@parameters a=0.02 b=0.2 c=-65 d=8 ## These parameter values correspond to regular spiking.
 
 eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
         D(u) ~ a * (b * v - u),
@@ -136,11 +135,10 @@ eqs = [D(v) ~ 0.04 * v ^ 2 + 5 * v + 140 - u + I,
 
 event = (v > 30.0) => [u ~ u + d, v ~ c]
 
-## Notice how `I` was moved from the parameter list to the variable list in the following call.
 @named izh_system = ODESystem(eqs, t, [v, u, I], [a, b, c, d]; discrete_events = event)
 izh_simple = structural_simplify(izh_system)
 
-# Let's display the equations of the original and the simplified system to see the effect of `structural_simplify`. 
+# Notice how `I` was moved from the parameter list to the variable list above. Let's display the equations of the original and the simplified system to see the effect of `structural_simplify`. 
 equations(izh_system)
 # The original system contains the algebraic equation for the external current `I`.
 equations(izh_simple)
