@@ -1,4 +1,5 @@
 # # Decision Making in a Circuit Model
+#md # > **_Jupyter Notebook_:** Please work on `decision_making.ipynb`.
 
 # ## Introduction
 # The session covers the classic article by Wang [1] which presented a circuit model for decision making. The model consists of two selective excitatory populations, one for each possible choice, a non-selective excitatory population and an inhibitory population which facilitates the competition between the two selective ones.

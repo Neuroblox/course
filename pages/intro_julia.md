@@ -3,7 +3,7 @@
 ## Notebooks
 
 We will work on two Jupyter notebooks 
-- `julia_introduction.ipnyb` : getting started with Julia, please start here.
+- `julia_intro.ipnyb` : getting started with Julia, please start here.
 - `julia_types_and_multiple_dispatch.ipnyb` : custom types and multiple dispatch.
 
 These notebooks were contributed by George Datseris as part of the Zero-to-Hero Julia workshop and are kindly available as an open repository. For more details on that workshop please check : 

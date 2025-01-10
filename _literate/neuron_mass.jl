@@ -1,4 +1,6 @@
 # # Neurons, Neural Masses and Sources
+#md # > **_Jupyter Notebook_:** Please work on `neuron_mass.ipynb`.
+
 # ## Introduction
 # The main distinction between the neuron, neural mass and source Blox we will encounter on this session is the mechanism by which they communicate with other Bloxs.
 # All neural mass Bloxs, some sources, and neurons of the Hodgkin-Huxley (HH) family have continuous output variables which are included as terms in the postsynaptic Blox's differential equations.
