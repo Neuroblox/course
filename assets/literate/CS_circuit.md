@@ -6,6 +6,8 @@ end;
 ````
 
 # Biomimetic model of corticostriatal micro-assemblies
+> **_Jupyter Notebook_:** Please work on `CS_circuit.ipynb`.
+
 ## Introduction
 In this session we will build a neural assembly that is part of a larger model that performs category learning of images [1]. We will follow a bottom-up approach moving across three levels; from `Neuron` Blox objects to a `CompositeBlox` containing `Neuron` objects to a `CompositeBlox` containing the first `CompositeBlox`.
 

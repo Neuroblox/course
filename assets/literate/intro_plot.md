@@ -1,5 +1,7 @@
 <!--This file was generated, do not modify it.-->
 # Plotting with Makie
+> **_Jupyter Notebook_:** Please work on `intro_plot.ipynb`.
+
 ## Introduction
 Makie [1] is a plotting ecosystem based in Julia. It comes with multiple backends for rendering and displaying plots. For this course we will be using `CairoMakie` as it has a lot of features for 2D static plots and most computers should support it as it only requires a CPU and no GPU.
 Makie has a great [Getting Started page](https://docs.makie.org/stable/tutorials/getting-started). We will make use of this tutorial to introduce some basic plotting functions and labelling options.

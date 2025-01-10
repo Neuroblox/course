@@ -1,5 +1,7 @@
 <!--This file was generated, do not modify it.-->
 # Pyramidal-Interneuron Gamma network
+> **_Jupyter Notebook_:** Please work on `PING_circuit.ipynb`.
+
 # Introduction
 This tutorial provides a simple example of how to use the Neuroblox package to simulate a [pyramidal-interneuron gamma (PING) network](https://direct.mit.edu/neco/article-abstract/17/3/557/6926/Effects-of-Noisy-Drive-on-Rhythms-in-Networks-of?redirectedFrom=fulltext).
 These networks are generally useful in modeling cortical oscillations and are used in a variety of contexts.

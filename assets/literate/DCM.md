@@ -1,5 +1,7 @@
 <!--This file was generated, do not modify it.-->
 # Solving Inverse Problems with Spectral Dynamic Causal Modeling
+> **_Jupyter Notebook_:** Please work on `DCM.ipynb`.
+
 ## Introduction
 Neuroblox provides you with a comprehensive environment for simulations as we have explored previously, but its functionality doesn't stop there.
 We will now pivot and turn our attention to a different kind of problem:
