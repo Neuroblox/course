@@ -39,18 +39,16 @@ inhib       = [PINGNeuronInhib(name=<span class=hljs-built_in >Symbol</span>(<sp
 <p>This portion illustrates how we go about creating a network of neuronal connections.</p>
 <pre><code class="julia hljs">g = MetaDiGraph() <span class=hljs-comment >## Initialize the graph</span>
 
-<span class=hljs-comment ># Add the E -&gt; I and I -&gt; E connections</span>
 <span class=hljs-keyword >for</span> ne ∈ exci
     <span class=hljs-keyword >for</span> ni ∈ inhib
-        add_edge!(g, ne =&gt; ni; weight=g_EI/N)
-        add_edge!(g, ni =&gt; ne; weight=g_IE/N)
+        add_edge!(g, ne =&gt; ni; weight=g_EI/N) <span class=hljs-comment >## Add the E -&gt; I connections</span>
+        add_edge!(g, ni =&gt; ne; weight=g_IE/N) <span class=hljs-comment >## Add the I -&gt; E connections</span>
     <span class=hljs-keyword >end</span>
 <span class=hljs-keyword >end</span>
 
-<span class=hljs-comment ># Add the I -&gt; I connections</span>
 <span class=hljs-keyword >for</span> ni1 ∈ inhib
     <span class=hljs-keyword >for</span> ni2 ∈ inhib
-        add_edge!(g, ni1 =&gt; ni2; weight=g_II/N);
+        add_edge!(g, ni1 =&gt; ni2; weight=g_II/N); <span class=hljs-comment >## Add the I -&gt; I connections</span>
     <span class=hljs-keyword >end</span>
 <span class=hljs-keyword >end</span></code></pre>
 <h2 id=alternative_graph_creation ><a href="#alternative_graph_creation" class=header-anchor >Alternative graph creation</a></h2>
