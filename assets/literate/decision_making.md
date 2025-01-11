@@ -72,6 +72,7 @@ As we can see, each selective population `n_A` and `n_B` receives a separate spi
 The Bloxs we use here are subtypes of `CompositeBlox` and contain either `LIFExciNeuron`s or `LIFInhNeuron`s in them.
 
 ## System construction & Simulation
+We construct the graph with all connections and weights according to [1]. Please note that the `system_from_graph` call and the subsequent `ODEProblem` construction will take some minutes (probably 4-5, depending on your machine) as the system size is larger compared to other examples. The `graphdynamics=true` flag that we set in `system_from_graph` though will greatly enhance performance here.
 
 ````julia:ex3
 g = MetaDiGraph()
