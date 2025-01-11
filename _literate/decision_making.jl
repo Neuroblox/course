@@ -66,6 +66,7 @@ spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate di
 # The Bloxs we use here are subtypes of `CompositeBlox` and contain either `LIFExciNeuron`s or `LIFInhNeuron`s in them.
 
 # ## System construction & Simulation
+# We construct the graph with all connections and weights according to [1]. Please note that the `system_from_graph` call and the subsequent `ODEProblem` construction will take some minutes (probably 4-5, depending on your machine) as the system size is larger compared to other examples. The `graphdynamics=true` flag that we set in `system_from_graph` though will greatly enhance performance here.
 g = MetaDiGraph()
 add_edge!(g, background_input => n_A; weight = 1);
 add_edge!(g, background_input => n_B; weight = 1);
