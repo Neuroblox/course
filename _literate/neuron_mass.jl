@@ -102,7 +102,7 @@ save(joinpath(@OUTPUT, "hh_power.svg"), fig); # hide
 
 @named inp = ConstantInput(; I=3)
 
-connection_rule(inp, nm)
+connection_rule(inp, nm, weight=1)
 
 # This source simply adds a fixed current to the input variable (`nm₊jcn`) of the downstream (destination) Blox. 
 
