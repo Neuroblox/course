@@ -88,7 +88,7 @@ end
 finally we compose the simulation model
 
 ````julia:ex5
-@named simmodel = system_from_graph(g, split=false)
+@named simmodel = system_from_graph(g, split=false);
 ````
 
 ## Run the simulation and plot the results
@@ -226,7 +226,7 @@ for (i, idx) in enumerate(CartesianIndices(A_prior))
     end
 end
 # Avoid simplification of the model in order to be able to exclude some parameters from fitting
-@named fitmodel = system_from_graph(g, simplify=false)
+@named fitmodel = system_from_graph(g, simplify=false);
 ````
 
 With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.

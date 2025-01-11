@@ -31,7 +31,7 @@ for idx in CartesianIndices(A_true)
     add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[1], idx[2]])
 end
 
-@named simmodel = system_from_graph(g, split=false)
+@named simmodel = system_from_graph(g, split=false);
 
 tspan = (0.0, 512.0)
 prob = SDEProblem(simmodel, [], tspan)
@@ -104,7 +104,7 @@ for (i, idx) in enumerate(CartesianIndices(A_prior))
     end
 end
 # Avoid simplification of the model in order to be able to exclude some parameters from fitting
-@named fitmodel = system_from_graph(g, simplify=false)
+@named fitmodel = system_from_graph(g, simplify=false);
 
 untune = Dict(A[3] => false, A[7] => false)
 fitmodel = changetune(fitmodel, untune)                 # 3 and 7 are not present in the simulation model

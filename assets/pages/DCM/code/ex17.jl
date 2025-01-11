@@ -13,4 +13,4 @@ for (i, idx) in enumerate(CartesianIndices(A_prior))
     end
 end
 # Avoid simplification of the model in order to be able to exclude some parameters from fitting
-@named fitmodel = system_from_graph(g, simplify=false)
+@named fitmodel = system_from_graph(g, simplify=false);
