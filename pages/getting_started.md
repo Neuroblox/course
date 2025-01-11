@@ -34,4 +34,7 @@ To open a notebook, first start a Terminal (or Command Prompt) session in the sa
 julia --project="." -e "using IJulia; notebook();"
 ```
 
+> **_NOTE_:**
+> The first time that you run this command `IJulia` will ask you if you want it to install `Jupyter`, please confirm this to proceed.  
+
 This will start a local Jupyter server on your browser. On this new Jupyter tab that will open, navigate to your directory in the `/notebooks/` folder and choose a notebook to open. All notebook files have the `.ipynb` extension.
