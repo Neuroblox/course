@@ -1,13 +1,23 @@
 # This file was generated, do not modify it. # hide
-@named nn = HHNeuronExciBlox(I_bg=0.4)
+@named stim_smooth = DBS(
+                frequency=100.0,
+                amplitude=200.0,
+                pulse_width=0.5,
+                offset=0.0,
+                start_time=5.0,
+                smooth=1e-3
+);
 
-g = MetaDiGraph()
-add_edge!(g, dbs => nn, weight = 10.0)
+smooth_stimulus = stim_smooth.stimulus.(time)
 
-@named sys = system_from_graph(g)
-prob = ODEProblem(sys, [], tspan)
+fig = Figure();
+ax1 = Axis(fig[1,1]; xlabel = "time (ms)", ylabel = "stimulus")
+lines!(ax1, time, stimulus) ## plot the un-smoothed stimulus from above
+xlims!(ax1, 4.9, 5.6) ## set the x-axis limits for better visibility of a smoothed pulse
 
-transitions_inds = detect_transitions(time, stimulus; atol=0.001)
-transition_times = time[transitions_inds]
-transition_values = stimulus[transitions_inds]
-sol = solve(prob, Vern7(), saveat=dt, tstops = transition_times);
+ax2 = Axis(fig[2,1]; xlabel = "time (ms)", ylabel = "stimulus")
+lines!(ax2, time, smooth_stimulus) ## plot the smoothed stimulus
+xlims!(ax2, 4.9, 5.6) ## set the x-axis limits for better visibility of a smoothed pulse
+
+fig
+save(joinpath(@OUTPUT, "stim_comparison.svg"), fig); # hide

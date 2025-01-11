@@ -195,12 +195,14 @@ struct BernoulliSpikes <: SpikeSource
         new(name, namespace, tspan, probability_spike, dt)
     end
 end
+````
 
+We import `generate_spike_times` and write our own dispatch that generates and returns a vector of spike times.
+
+````julia:ex13
 import Neuroblox: generate_spike_times, connection_spike_affects
 
 function generate_spike_times(source::BernoulliSpikes)
-    # Write a function that generates and returns a vector of spike times.
-
     t_range = source.tspan[1]:source.dt:source.tspan[2]
     t_spikes = Float64[]
     for t in t_range
@@ -210,11 +212,12 @@ function generate_spike_times(source::BernoulliSpikes)
     end
     return t_spikes
 end
+````
 
+We also import `connection_spike_affects` and dispatch it by pairing our new source with any neuron that we want to affect. In this function we write all equations that should be evaluated each time `source` spikes. The `w` input is necessary and it is the symbolic connection weight, same as in `connection_equations`.
+
+````julia:ex14
 function connection_spike_affects(source::BernoulliSpikes, ifn::IFNeuron, w)
-    # Write all equations that should be evaluated each time `source` spikes.
-    # `w` is the symbolic connection weight, same as in `connection_equations`.
-
     eqs = [ifn.I_in ~ ifn.I_in + w]
     return eqs
 end
@@ -244,7 +247,7 @@ Neuroblox contains specialized sources that are common to the field of Deep Brai
 Even though these sources are often used in DBS protocols, they are implemented as any other source so they can be connected to any other Bloxs given a connection rule.
 We will first visualize the sources on their own and then connect them to an HH excitatory neuron.
 
-````julia:ex13
+````julia:ex15
 # Square pulse stimulus
 @named stim = DBS(
                 frequency=100.0, ## Hz
@@ -274,7 +277,7 @@ save(joinpath(@OUTPUT, "stim.svg"), fig); # hide
 
 We can also generate a smoothed pulse train as
 
-````julia:ex14
+````julia:ex16
 @named stim_smooth = DBS(
                 frequency=100.0,
                 amplitude=200.0,
@@ -303,7 +306,7 @@ save(joinpath(@OUTPUT, "stim_comparison.svg"), fig); # hide
 
 It is also possible to create a stimulus protocol that does not follow a simple periodic stimulation schedule as above and contains multiple pulses before a quiet time window:
 
-````julia:ex15
+````julia:ex17
 frequency = 20.0
 amplitude = 1.0
 pulse_width = 20.0
@@ -346,7 +349,7 @@ save(joinpath(@OUTPUT, "stim_protocol.svg"), fig); # hide
 
 Now let's finally connect our `ProtocolDBS` source to an HH excitatory neuron and simulate
 
-````julia:ex16
+````julia:ex18
 @named nn = HHNeuronExciBlox(I_bg=0.4)
 
 g = MetaDiGraph()
@@ -366,7 +369,7 @@ sol = solve(prob, Vern7(), saveat=dt, tstops = transition_times);
 > Adding the transition points explicitly as `tstops` when solving will force the chosen solver
 > to stop righ before and after each transition and evaluate the equations for greater precision and stability.
 
-````julia:ex17
+````julia:ex19
 # Retrive the timeseries of the voltage variable (`nn₊V`) from the solution
 v = voltage_timeseries(nn, sol)
 

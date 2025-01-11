@@ -1,23 +1,20 @@
 # This file was generated, do not modify it. # hide
-@named stim_smooth = DBS(
-                frequency=100.0,
-                amplitude=200.0,
-                pulse_width=0.5,
-                offset=0.0,
-                start_time=5.0,
-                smooth=1e-3
-);
+function connection_spike_affects(source::BernoulliSpikes, ifn::IFNeuron, w)
+    eqs = [ifn.I_in ~ ifn.I_in + w]
+    return eqs
+end
 
-smooth_stimulus = stim_smooth.stimulus.(time)
+tspan = (0, 500)
+@named s = BernoulliSpikes(0.05, tspan, 5)
+@named ifn = IFNeuron()
 
-fig = Figure();
-ax1 = Axis(fig[1,1]; xlabel = "time (ms)", ylabel = "stimulus")
-lines!(ax1, time, stimulus) ## plot the un-smoothed stimulus from above
-xlims!(ax1, 4.9, 5.6) ## set the x-axis limits for better visibility of a smoothed pulse
+g = MetaDiGraph()
+add_edge!(g, s => ifn, weight=1)
+@named sys = system_from_graph(g)
 
-ax2 = Axis(fig[2,1]; xlabel = "time (ms)", ylabel = "stimulus")
-lines!(ax2, time, smooth_stimulus) ## plot the smoothed stimulus
-xlims!(ax2, 4.9, 5.6) ## set the x-axis limits for better visibility of a smoothed pulse
+prob = ODEProblem(sys, [], tspan)
+sol = solve(prob, Tsit5())
 
+fig = rasterplot(ifn, sol);
 fig
-save(joinpath(@OUTPUT, "stim_comparison.svg"), fig); # hide
+save(joinpath(@OUTPUT, "ifn_input.svg"), fig); # hide

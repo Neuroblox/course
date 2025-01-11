@@ -1,1 +1,1 @@
-nothing
+generate_spike_times (generic function with 3 methods)

@@ -79,13 +79,11 @@ spike_rate = (distibution = Normal(<span class=hljs-number >1</span>, <span clas
     <span class=hljs-keyword >function</span> BernoulliSpikes(probability_spike, tspan, dt; name, namespace=<span class=hljs-literal >nothing</span>)
         new(name, namespace, tspan, probability_spike, dt)
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span>
-
-<span class=hljs-keyword >import</span> Neuroblox: generate_spike_times, connection_spike_affects
+<span class=hljs-keyword >end</span></code></pre>
+<p>We import <code>generate_spike_times</code> and write our own dispatch that generates and returns a vector of spike times.</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >import</span> Neuroblox: generate_spike_times, connection_spike_affects
 
 <span class=hljs-keyword >function</span> generate_spike_times(source::BernoulliSpikes)
-    <span class=hljs-comment ># Write a function that generates and returns a vector of spike times.</span>
-
     t_range = source.tspan[<span class=hljs-number >1</span>]:source.dt:source.tspan[<span class=hljs-number >2</span>]
     t_spikes = <span class=hljs-built_in >Float64</span>[]
     <span class=hljs-keyword >for</span> t <span class=hljs-keyword >in</span> t_range
@@ -94,12 +92,9 @@ spike_rate = (distibution = Normal(<span class=hljs-number >1</span>, <span clas
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >return</span> t_spikes
-<span class=hljs-keyword >end</span>
-
-<span class=hljs-keyword >function</span> connection_spike_affects(source::BernoulliSpikes, ifn::IFNeuron, w)
-    <span class=hljs-comment ># Write all equations that should be evaluated each time `source` spikes.</span>
-    <span class=hljs-comment ># `w` is the symbolic connection weight, same as in `connection_equations`.</span>
-
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">generate_spike_times (generic function with 3 methods)</code></pre>
+<p>We also import <code>connection_spike_affects</code> and dispatch it by pairing our new source with any neuron that we want to affect. In this function we write all equations that should be evaluated each time <code>source</code> spikes. The <code>w</code> input is necessary and it is the symbolic connection weight, same as in <code>connection_equations</code>.</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >function</span> connection_spike_affects(source::BernoulliSpikes, ifn::IFNeuron, w)
     eqs = [ifn.I_in ~ ifn.I_in + w]
     <span class=hljs-keyword >return</span> eqs
 <span class=hljs-keyword >end</span>
@@ -250,7 +245,7 @@ fig</code></pre>
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 10, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 11, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
