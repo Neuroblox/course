@@ -159,11 +159,10 @@ struct BernoulliSpikes <: SpikeSource
     end
 end
 
+# We import `generate_spike_times` and write our own dispatch that generates and returns a vector of spike times. 
 import Neuroblox: generate_spike_times, connection_spike_affects
 
 function generate_spike_times(source::BernoulliSpikes)
-    ## Write a function that generates and returns a vector of spike times.
-
     t_range = source.tspan[1]:source.dt:source.tspan[2]
     t_spikes = Float64[]
     for t in t_range
@@ -174,10 +173,8 @@ function generate_spike_times(source::BernoulliSpikes)
     return t_spikes
 end
 
+# We also import `connection_spike_affects` and dispatch it by pairing our new source with any neuron that we want to affect. In this function we write all equations that should be evaluated each time `source` spikes. The `w` input is necessary and it is the symbolic connection weight, same as in `connection_equations`.
 function connection_spike_affects(source::BernoulliSpikes, ifn::IFNeuron, w)
-    ## Write all equations that should be evaluated each time `source` spikes.
-    ## `w` is the symbolic connection weight, same as in `connection_equations`.
-
     eqs = [ifn.I_in ~ ifn.I_in + w]
     return eqs
 end
