@@ -17,12 +17,12 @@ equations(lif)
 
 @named ifn = IFNeuron() ## create an Integrate-and-Fire neuron, simpler than the `LIFNeuron`
 
-connection_equations(lif, ifn)
+connection_equations(lif, ifn, weight=1, connection_rule="basic")
 
-connection_rule(lif, ifn)
+connection_rule(lif, ifn, weight=1, connection_rule="psp")
 
 g = MetaDiGraph()
-add_edge!(g, lif => ifn)
+add_edge!(g, lif => ifn, weight=1) ## add connection with specific weight value
 
 @named sys = system_from_graph(g)
 prob = ODEProblem(sys, [], (0, 200.0))
@@ -50,8 +50,8 @@ end
 
 @named izh = IzhNeuron()
 
-connection_equations(izh, lif) ## connection from izh to lif
-connection_equations(lif, izh) ## connection from lif to izh
+connection_equations(izh, lif, weight=1, connection_rule="basic") ## connection from izh to lif
+connection_equations(lif, izh, weight=1, connection_rule="basic") ## connection from lif to izh
 
 import Neuroblox: connection_equations
 
@@ -61,7 +61,7 @@ function connection_equations(source::LIFNeuron, destination::IzhNeuron, weight;
     return equation
 end
 
-connection_equations(lif, izh)
+connection_equations(lif, izh, weight=1, connection_rule="basic")
 
 g = MetaDiGraph()
 # Also set the weight value this time

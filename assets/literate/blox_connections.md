@@ -50,16 +50,16 @@ The first one will print only the connection equations
 ````julia:ex2
 @named ifn = IFNeuron() ## create an Integrate-and-Fire neuron, simpler than the `LIFNeuron`
 
-connection_equations(lif, ifn)
+connection_equations(lif, ifn, weight=1, connection_rule="basic")
 ````
 
 While the second function prints out all fields that take part in the connection rule
 
 ````julia:ex3
-connection_rule(lif, ifn)
+connection_rule(lif, ifn, weight=1, connection_rule="psp")
 ````
 
-The output of both functions now seems very similar. However `connection_rule` will be more useful later on when we start using more complex Bloxs and connection rules.
+The `weight` and `connection_rule` are keyword arguments that can be ommitted. If we ommit them then we will get a message informing us about the default values that they take. The `connection_rule` argument applies to connections between `Neuron` types; `"basic"` is a simple weighted connection and `"psp"` applies a postsynaptic potential type of connection. The output of both `connection_equations` and `connection_rule` functions now seems very similar. However `connection_rule` will be more useful later on when we start using more complex Bloxs and connection rules that do more than just adding an equation and a symbolic weight.
 
 ## Simulating connected Bloxs
 We are now ready to define a couple of Bloxs, connect them and simulate the final model.
@@ -68,7 +68,7 @@ Let's build a simple circuit by using the two neurons we created above; `lif` co
 
 ````julia:ex4
 g = MetaDiGraph()
-add_edge!(g, lif => ifn)
+add_edge!(g, lif => ifn, weight=1) ## add connection with specific weight value
 
 @named sys = system_from_graph(g)
 prob = ODEProblem(sys, [], (0, 200.0))
@@ -126,8 +126,8 @@ One benefit of assigning `IzhNeuron <: Neuron` is now apparent. Without defining
 We can see what this equation looks like by running
 
 ````julia:ex7
-connection_equations(izh, lif) ## connection from izh to lif
-connection_equations(lif, izh) ## connection from lif to izh
+connection_equations(izh, lif, weight=1, connection_rule="basic") ## connection from izh to lif
+connection_equations(lif, izh, weight=1, connection_rule="basic") ## connection from lif to izh
 ````
 
 We even get a warning saying that the connection rule is not specified so Neuroblox defaults to this basic weighted connection.
@@ -152,7 +152,7 @@ Internally Neuroblox will call the function dispatch with the most specific comb
 Now that we have defined a specialized equation, we can connect the same two Bloxs in a new way.
 
 ````julia:ex9
-connection_equations(lif, izh)
+connection_equations(lif, izh, weight=1, connection_rule="basic")
 ````
 
 Notice how the equation has changed compared to above and it is equal to our latest `connection_equations` dispatch.
