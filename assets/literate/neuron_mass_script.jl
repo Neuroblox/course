@@ -60,7 +60,7 @@ save(joinpath(@OUTPUT, "hh_power.svg"), fig); # hide
 
 @named inp = ConstantInput(; I=3)
 
-connection_rule(inp, nm)
+connection_rule(inp, nm, weight=1)
 
 g = MetaDiGraph()
 add_edge!(g, inp => nm, weight = 1)

@@ -129,7 +129,7 @@ We will drive the `WilsonCowan` Blox above with a `ConstantInput` source. The co
 ````julia:ex8
 @named inp = ConstantInput(; I=3)
 
-connection_rule(inp, nm)
+connection_rule(inp, nm, weight=1)
 ````
 
 This source simply adds a fixed current to the input variable (`nm₊jcn`) of the downstream (destination) Blox.
