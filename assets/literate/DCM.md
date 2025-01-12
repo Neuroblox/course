@@ -287,27 +287,21 @@ Prepare the DCM. This function will setup the computation of the Dynamic Causal 
 
 ````julia:ex25
 (state, setup) = setup_sDCM(dfsol[:, String.(Symbol.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
-
-# HACK: on machines with very small amounts of RAM, Julia can run out of stack space while compiling the code called in this loop
-# this should be rewritten to abuse the compiler less, but for now, an easy solution is just to run it with more allocated stack space.
-with_stack(f, n) = fetch(schedule(Task(f, n)));
 ````
 
 We are now ready to run the optimization procedure!
 That is we loop over run_sDCM_iteration! which will alter `state` after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.
 
 ````julia:ex26
-with_stack(5_000_000) do  # 5MB of stack space
-    for iter in 1:max_iter
-        state.iter = iter
-        run_sDCM_iteration!(state, setup)
-        print("iteration: ", iter, " - F:", state.F[end] - state.F[2], " - dF predicted:", state.dF[end], "\n")
-        if iter >= 4
-            criterion = state.dF[end-3:end] .< setup.tolerance
-            if all(criterion)
-                print("convergence\n")
-                break
-            end
+for iter in 1:max_iter
+    state.iter = iter
+    run_sDCM_iteration!(state, setup)
+    print("iteration: ", iter, " - F:", state.F[end] - state.F[2], " - dF predicted:", state.dF[end], "\n")
+    if iter >= 4
+        criterion = state.dF[end-3:end] .< setup.tolerance
+        if all(criterion)
+            print("convergence\n")
+            break
         end
     end
 end

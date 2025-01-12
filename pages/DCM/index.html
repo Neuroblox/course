@@ -186,23 +186,17 @@ priors = (μθ_pr = pmean,
 <p>earlier we used the function <code>get_idx_tagged_vars</code> to get the indices of tagged variables. Here we don&#39;t want to get the indices but rather the symbolic variable names themselves. and in particular we need to get the measurement variables in the same ordering as the model equations are defined.</p>
 <pre><code class="julia hljs">_, s_bold = get_eqidx_tagged_vars(fitmodel, <span class=hljs-string >&quot;measurement&quot;</span>);    <span class=hljs-comment ># get bold signal variables</span></code></pre>
 <p>Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that wer are using fMRI time series as opposed to LFPs.</p>
-<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol[:, <span class=hljs-built_in >String</span>.(<span class=hljs-built_in >Symbol</span>.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);
-
-<span class=hljs-comment ># HACK: on machines with very small amounts of RAM, Julia can run out of stack space while compiling the code called in this loop</span>
-<span class=hljs-comment ># this should be rewritten to abuse the compiler less, but for now, an easy solution is just to run it with more allocated stack space.</span>
-with_stack(f, n) = fetch(schedule(<span class=hljs-built_in >Task</span>(f, n)));</code></pre>
+<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol[:, <span class=hljs-built_in >String</span>.(<span class=hljs-built_in >Symbol</span>.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre>
 <p>We are now ready to run the optimization procedure&#33; That is we loop over run<em>sDCM</em>iteration&#33; which will alter <code>state</code> after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.</p>
-<pre><code class="julia hljs">with_stack(<span class=hljs-number >5_000_000</span>) <span class=hljs-keyword >do</span>  <span class=hljs-comment ># 5MB of stack space</span>
-    <span class=hljs-keyword >for</span> iter <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:max_iter
-        state.iter = iter
-        run_sDCM_iteration!(state, setup)
-        print(<span class=hljs-string >&quot;iteration: &quot;</span>, iter, <span class=hljs-string >&quot; - F:&quot;</span>, state.F[<span class=hljs-keyword >end</span>] - state.F[<span class=hljs-number >2</span>], <span class=hljs-string >&quot; - dF predicted:&quot;</span>, state.dF[<span class=hljs-keyword >end</span>], <span class=hljs-string >&quot;\n&quot;</span>)
-        <span class=hljs-keyword >if</span> iter &gt;= <span class=hljs-number >4</span>
-            criterion = state.dF[<span class=hljs-keyword >end</span>-<span class=hljs-number >3</span>:<span class=hljs-keyword >end</span>] .&lt; setup.tolerance
-            <span class=hljs-keyword >if</span> all(criterion)
-                print(<span class=hljs-string >&quot;convergence\n&quot;</span>)
-                <span class=hljs-keyword >break</span>
-            <span class=hljs-keyword >end</span>
+<pre><code class="julia hljs"><span class=hljs-keyword >for</span> iter <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:max_iter
+    state.iter = iter
+    run_sDCM_iteration!(state, setup)
+    print(<span class=hljs-string >&quot;iteration: &quot;</span>, iter, <span class=hljs-string >&quot; - F:&quot;</span>, state.F[<span class=hljs-keyword >end</span>] - state.F[<span class=hljs-number >2</span>], <span class=hljs-string >&quot; - dF predicted:&quot;</span>, state.dF[<span class=hljs-keyword >end</span>], <span class=hljs-string >&quot;\n&quot;</span>)
+    <span class=hljs-keyword >if</span> iter &gt;= <span class=hljs-number >4</span>
+        criterion = state.dF[<span class=hljs-keyword >end</span>-<span class=hljs-number >3</span>:<span class=hljs-keyword >end</span>] .&lt; setup.tolerance
+        <span class=hljs-keyword >if</span> all(criterion)
+            print(<span class=hljs-string >&quot;convergence\n&quot;</span>)
+            <span class=hljs-keyword >break</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
 <span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:0.0 - dF predicted:1147.1054551103696
@@ -259,7 +253,7 @@ convergence
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 11, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 12, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
