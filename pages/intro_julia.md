@@ -7,8 +7,8 @@ We will work on two Jupyter notebooks
 - `julia_types_and_multiple_dispatch.ipnyb` : custom types and multiple dispatch.
 
 These notebooks were contributed by George Datseris as part of the Zero-to-Hero Julia workshop and are kindly available as an open repository. For more details on that workshop please check : 
-- workshop recording : https://www.youtube.com/watch?v=Fi7Pf2NveH0 
-- GitHub repository with all resources : https://github.com/Datseris/Zero2Hero-JuliaWorkshop
+- [workshop recording](https://www.youtube.com/watch?v=Fi7Pf2NveH0) 
+- [GitHub repository with all resources](https://github.com/Datseris/Zero2Hero-JuliaWorkshop)
 
 
 ## Further resources :
