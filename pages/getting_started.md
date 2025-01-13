@@ -30,7 +30,7 @@ Please follow the link below to download a folder containing all Jupyter noteboo
 To open a notebook, first start a Terminal (or Command Prompt) session in the same directory as above. Then run the following command
 
 ```
-julia --project="." -e "using IJulia; notebook();"
+julia --project="." -e "using IJulia; notebook(dir=pwd());"
 ```
 
 > **_NOTE_:**
