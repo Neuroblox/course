@@ -31,11 +31,11 @@ for idx in CartesianIndices(A_true)
     add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[1], idx[2]])
 end
 
-@named simmodel = system_from_graph(g, split=false);
+@named simmodel = system_from_graph(g);
 
 tspan = (0.0, 512.0)
 prob = SDEProblem(simmodel, [], tspan)
-dt = 2   # 2 seconds (units are milliseconds) as measurement interval for fMRI
+dt = 2   # 2 seconds (units are seconds) as measurement interval for fMRI
 sol = solve(prob, ImplicitRKMil(), saveat=dt);
 
 idx_m = get_idx_tagged_vars(simmodel, "measurement")    # get index of bold signal
@@ -74,8 +74,8 @@ save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 g = MetaDiGraph()
 regions = [];   # list of neural mass blocks to then connect them to each other with an adjacency matrix `A`
 
-@parameters lnκ=0.0 [tunable=false] lnϵ=0.0 [tunable=false] lnτ=0.0 [tunable=false]   # lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale
-@parameters C=1/16 [tunable=false]   # note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.
+@parameters lnκ=0.0 [tunable=false] lnϵ=0.0 [tunable=false] lnτ=0.0 [tunable=false];   # lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale
+@parameters C=1/16 [tunable=false];   # note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.
 
 for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
@@ -107,11 +107,11 @@ end
 @named fitmodel = system_from_graph(g, simplify=false);
 
 untune = Dict(A[3] => false, A[7] => false)
-fitmodel = changetune(fitmodel, untune)                 # 3 and 7 are not present in the simulation model
+fitmodel = changetune(fitmodel, untune)                 # A[3] and A[7] were set to 0 in the simulation
 fitmodel = structural_simplify(fitmodel, split=false)   # and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don't lose time with it ;)
 
 max_iter = 128; # maximum number of iterations
-# attribute initial conditions to states
+# attribute initial conditions or default values to dynamic states of our model
 sts, _ = get_dynamic_states(fitmodel);
 
 perturbedfp = Dict(sts .=> abs.(0.001*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
@@ -135,7 +135,7 @@ _, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal
 for iter in 1:max_iter
     state.iter = iter
     run_sDCM_iteration!(state, setup)
-    print("iteration: ", iter, " - F:", state.F[end] - state.F[2], " - dF predicted:", state.dF[end], "\n")
+    print("iteration: ", iter, " - F:", state.F[end], " - dF predicted:", state.dF[end], "\n")
     if iter >= 4
         criterion = state.dF[end-3:end] .< setup.tolerance
         if all(criterion)

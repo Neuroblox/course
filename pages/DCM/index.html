@@ -21,12 +21,12 @@ regions = [];      <span class=hljs-comment ># list of neural mass blocks to the
 <span class=hljs-keyword >end</span></code></pre> <p>Note that <code>weight&#61;1/16</code> in the connection between the OU process and the Neural Mass Blox is taken from SPM12. This stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability. Next we define the between-region connectivity matrix and connect regions; we use the same matrix as is defined in &#91;3&#93;</p> <pre><code class="julia hljs">A_true = [[-<span class=hljs-number >0.5</span> -<span class=hljs-number >2</span> <span class=hljs-number >0</span>]; [<span class=hljs-number >0.4</span> -<span class=hljs-number >0.5</span> -<span class=hljs-number >0.3</span>]; [<span class=hljs-number >0</span> <span class=hljs-number >0.2</span> -<span class=hljs-number >0.5</span>]]
 <span class=hljs-keyword >for</span> idx <span class=hljs-keyword >in</span> <span class=hljs-built_in >CartesianIndices</span>(A_true)
     add_edge!(g, regions[idx[<span class=hljs-number >1</span>]] =&gt; regions[idx[<span class=hljs-number >2</span>]], weight=A_true[idx[<span class=hljs-number >1</span>], idx[<span class=hljs-number >2</span>]])
-<span class=hljs-keyword >end</span></code></pre> <p>finally we compose the simulation model</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> simmodel = system_from_graph(g, split=<span class=hljs-literal >false</span>);</code></pre>
+<span class=hljs-keyword >end</span></code></pre> <p>finally we compose the simulation model</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> simmodel = system_from_graph(g);</code></pre>
 <h2 id=run_the_simulation_and_plot_the_results ><a href="#run_the_simulation_and_plot_the_results" class=header-anchor >Run the simulation and plot the results</a></h2>
 <p>setup simulation of the model, time in seconds</p>
 <pre><code class="julia hljs">tspan = (<span class=hljs-number >0.0</span>, <span class=hljs-number >512.0</span>)
 prob = SDEProblem(simmodel, [], tspan)
-dt = <span class=hljs-number >2</span>   <span class=hljs-comment ># 2 seconds (units are milliseconds) as measurement interval for fMRI</span>
+dt = <span class=hljs-number >2</span>   <span class=hljs-comment ># 2 seconds (units are seconds) as measurement interval for fMRI</span>
 sol = solve(prob, ImplicitRKMil(), saveat=dt);</code></pre>
 <p>we now want to extract all the variables in our model which carry the tag &quot;measurement&quot;. For this purpose we can use the Neuroblox function <code>get_idx_tagged_vars</code> the observable quantity in our model is the BOLD signal, the variable of the Blox <code>BalloonModel</code> that represents the BOLD signal is tagged with &quot;measurement&quot; tag. other tags that are defined are &quot;input&quot; which denotes variables representing a stimulus, like for instance an <code>OUBlox</code>.</p>
 <pre><code class="julia hljs">idx_m = get_idx_tagged_vars(simmodel, <span class=hljs-string >&quot;measurement&quot;</span>)    <span class=hljs-comment ># get index of bold signal</span></code></pre><pre><code class="plaintext hljs">3-element Vector{Int64}:
@@ -69,9 +69,8 @@ fig</code></pre>
 <pre><code class="julia hljs">g = MetaDiGraph()
 regions = [];   <span class=hljs-comment ># list of neural mass blocks to then connect them to each other with an adjacency matrix `A`</span></code></pre>
 <p>Note that parameters are typically defined within a Blox and thus not immediately visible to the user. Since we want some parameters to be shared across several regions we define them outside of the regions. For this purpose use the ModelingToolkit macro <code>@parameters</code> which is used to define symbolic parameters for models. Note that we can set the tunable flag right away thereby defining whether we will include this parameter in the optimization procedure or rather keep it fixed to its predefined value.</p>
-<pre><code class="julia hljs"><span class=hljs-meta >@parameters</span> lnκ=<span class=hljs-number >0.0</span> [tunable=<span class=hljs-literal >false</span>] lnϵ=<span class=hljs-number >0.0</span> [tunable=<span class=hljs-literal >false</span>] lnτ=<span class=hljs-number >0.0</span> [tunable=<span class=hljs-literal >false</span>]   <span class=hljs-comment ># lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale</span>
-<span class=hljs-meta >@parameters</span> C=<span class=hljs-number >1</span>/<span class=hljs-number >16</span> [tunable=<span class=hljs-literal >false</span>]   <span class=hljs-comment ># note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.</span></code></pre><pre><code class="plaintext hljs">1-element Vector{Symbolics.Num}:
- C</code></pre>
+<pre><code class="julia hljs"><span class=hljs-meta >@parameters</span> lnκ=<span class=hljs-number >0.0</span> [tunable=<span class=hljs-literal >false</span>] lnϵ=<span class=hljs-number >0.0</span> [tunable=<span class=hljs-literal >false</span>] lnτ=<span class=hljs-number >0.0</span> [tunable=<span class=hljs-literal >false</span>];   <span class=hljs-comment ># lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale</span>
+<span class=hljs-meta >@parameters</span> C=<span class=hljs-number >1</span>/<span class=hljs-number >16</span> [tunable=<span class=hljs-literal >false</span>];   <span class=hljs-comment ># note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.</span></code></pre>
 <p>We now define a similar model as above for the simulation but instead of using an actual stimulus Blox we here add ExternalInput which represents a simple linear external input that is not specified any further. We simply say that our model gets some input with a proportional factor <span class=katex ><span class=katex-mathml ><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi></mrow><annotation encoding="application/x-tex">C</annotation></semantics></math></span><span class=katex-html  aria-hidden=true ><span class=base ><span class=strut  style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span>. This is mostly only to make sure that our results are consistent with those produced by SPM</p>
 <pre><code class="julia hljs"><span class=hljs-keyword >for</span> i = <span class=hljs-number >1</span>:nr
     region = LinearNeuralMass(;name=<span class=hljs-built_in >Symbol</span>(<span class=hljs-string >&quot;r<span class=hljs-subst >$(i)</span>₊lm&quot;</span>))
@@ -104,9 +103,9 @@ A_prior -= diagm(diag(A_prior))    <span class=hljs-comment ># remove the diagon
 <span class=hljs-keyword >end</span>
 <span class=hljs-comment ># Avoid simplification of the model in order to be able to exclude some parameters from fitting</span>
 <span class=hljs-meta >@named</span> fitmodel = system_from_graph(g, simplify=<span class=hljs-literal >false</span>);</code></pre>
-<p>With the function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure. For instance the the effective connections that are set to zero in the simulation:</p>
+<p>With the Neuroblox function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure. Assume we want to exclude the connections that were set to zero in the simulation:</p>
 <pre><code class="julia hljs">untune = <span class=hljs-built_in >Dict</span>(A[<span class=hljs-number >3</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >7</span>] =&gt; <span class=hljs-literal >false</span>)
-fitmodel = changetune(fitmodel, untune)                 <span class=hljs-comment ># 3 and 7 are not present in the simulation model</span>
+fitmodel = changetune(fitmodel, untune)                 <span class=hljs-comment ># A[3] and A[7] were set to 0 in the simulation</span>
 fitmodel = structural_simplify(fitmodel, split=<span class=hljs-literal >false</span>)   <span class=hljs-comment ># and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don&#x27;t lose time with it ;)</span></code></pre><pre><code class="plaintext hljs">Model fitmodel:
 Equations (21):
   21 standard: see equations(fitmodel)
@@ -152,7 +151,7 @@ Parameters (16): see parameters(fitmodel)
 Observed (6): see observed(fitmodel)</code></pre>
 <h2 id=setup_spectral_dcm ><a href="#setup_spectral_dcm" class=header-anchor >Setup spectral DCM</a></h2>
 <pre><code class="julia hljs">max_iter = <span class=hljs-number >128</span>; <span class=hljs-comment ># maximum number of iterations</span>
-<span class=hljs-comment ># attribute initial conditions to states</span>
+<span class=hljs-comment ># attribute initial conditions or default values to dynamic states of our model</span>
 sts, _ = get_dynamic_states(fitmodel);</code></pre>
 <p>the following step is needed if the model&#39;s Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 &#40;which is the default expansion&#41;. We simply add small random values to avoid this degeneracy:</p>
 <pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >0.001</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">Dict{SymbolicUtils.BasicSymbolic{Real}, Float64} with 15 entries:
@@ -183,15 +182,15 @@ priors = (μθ_pr = pmean,
                   );</code></pre>
 <p>To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:</p>
 <pre><code class="julia hljs">csdsetup = (mar_order = p, freq = freq, dt = dt);</code></pre>
-<p>earlier we used the function <code>get_idx_tagged_vars</code> to get the indices of tagged variables. Here we don&#39;t want to get the indices but rather the symbolic variable names themselves. and in particular we need to get the measurement variables in the same ordering as the model equations are defined.</p>
+<p>earlier we used the function <code>get_idx_tagged_vars</code> to get the indices of tagged variables. Here we don&#39;t want to get the indices but rather the symbolic variable names themselves in order to get the correct columns of the dataframe of the simulation that correspond to the BOLD signal or measurement:</p>
 <pre><code class="julia hljs">_, s_bold = get_eqidx_tagged_vars(fitmodel, <span class=hljs-string >&quot;measurement&quot;</span>);    <span class=hljs-comment ># get bold signal variables</span></code></pre>
-<p>Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that wer are using fMRI time series as opposed to LFPs.</p>
+<p>Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series &#40;as opposed to LFPs, which is the other modality that is currently available in Neuroblox&#41;.</p>
 <pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol[:, <span class=hljs-built_in >String</span>.(<span class=hljs-built_in >Symbol</span>.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre>
 <p>We are now ready to run the optimization procedure&#33; That is we loop over run<em>sDCM</em>iteration&#33; which will alter <code>state</code> after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.</p>
 <pre><code class="julia hljs"><span class=hljs-keyword >for</span> iter <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:max_iter
     state.iter = iter
     run_sDCM_iteration!(state, setup)
-    print(<span class=hljs-string >&quot;iteration: &quot;</span>, iter, <span class=hljs-string >&quot; - F:&quot;</span>, state.F[<span class=hljs-keyword >end</span>] - state.F[<span class=hljs-number >2</span>], <span class=hljs-string >&quot; - dF predicted:&quot;</span>, state.dF[<span class=hljs-keyword >end</span>], <span class=hljs-string >&quot;\n&quot;</span>)
+    print(<span class=hljs-string >&quot;iteration: &quot;</span>, iter, <span class=hljs-string >&quot; - F:&quot;</span>, state.F[<span class=hljs-keyword >end</span>], <span class=hljs-string >&quot; - dF predicted:&quot;</span>, state.dF[<span class=hljs-keyword >end</span>], <span class=hljs-string >&quot;\n&quot;</span>)
     <span class=hljs-keyword >if</span> iter &gt;= <span class=hljs-number >4</span>
         criterion = state.dF[<span class=hljs-keyword >end</span>-<span class=hljs-number >3</span>:<span class=hljs-keyword >end</span>] .&lt; setup.tolerance
         <span class=hljs-keyword >if</span> all(criterion)
@@ -199,33 +198,34 @@ priors = (μθ_pr = pmean,
             <span class=hljs-keyword >break</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:0.0 - dF predicted:1147.1054551103696
-iteration: 2 - F:718.0093510944293 - dF predicted:569.299236898208
-iteration: 3 - F:1212.0890668666557 - dF predicted:523.7480518200163
-iteration: 4 - F:1661.7384106660927 - dF predicted:478.73443066512357
-iteration: 5 - F:2079.0215116278723 - dF predicted:453.5261059681964
-iteration: 6 - F:2467.61340881909 - dF predicted:365.41805040344536
-iteration: 7 - F:2761.006165403611 - dF predicted:210.3956027762734
-iteration: 8 - F:2921.4041942815306 - dF predicted:100.11497057081677
-iteration: 9 - F:3001.306058688854 - dF predicted:53.12301661772222
-iteration: 10 - F:3043.128347345615 - dF predicted:24.01009773005822
-iteration: 11 - F:3061.03826801537 - dF predicted:8.90674999075749
-iteration: 12 - F:3067.9725278678598 - dF predicted:3.9341757821794645
-iteration: 13 - F:3071.2158454588116 - dF predicted:2.267115887541819
-iteration: 14 - F:3073.1217359964458 - dF predicted:1.4525817629732556
-iteration: 15 - F:3074.3302523542498 - dF predicted:0.9021357068992089
-iteration: 16 - F:3075.0701667933245 - dF predicted:0.5499039418576805
-iteration: 17 - F:3075.522247650467 - dF predicted:0.3274667143936829
-iteration: 18 - F:3075.776926859192 - dF predicted:0.19301397542487178
-iteration: 19 - F:3075.9322828650593 - dF predicted:0.11838171904597196
-iteration: 20 - F:3075.9936004914603 - dF predicted:0.10613156150926072
-iteration: 21 - F:3076.035589119687 - dF predicted:0.23456566248347616
-iteration: 22 - F:3076.035589119687 - dF predicted:0.0011664583343338065
-iteration: 23 - F:3076.035589119687 - dF predicted:0.00016958743689815048
-iteration: 24 - F:3076.035618930205 - dF predicted:0.00025378090229427044
-iteration: 25 - F:3076.035618930205 - dF predicted:3.4906311202532494e-5
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:-3565.211717284932 - dF predicted:1147.1054551103696
+iteration: 2 - F:-2847.2023661905027 - dF predicted:569.299236898208
+iteration: 3 - F:-2353.1226504182764 - dF predicted:523.7480518200163
+iteration: 4 - F:-1903.4733066188394 - dF predicted:478.73443066512357
+iteration: 5 - F:-1486.1902056570598 - dF predicted:453.5261059681964
+iteration: 6 - F:-1097.598308465842 - dF predicted:365.41805040344536
+iteration: 7 - F:-804.2055518813215 - dF predicted:210.3956027762734
+iteration: 8 - F:-643.8075230034013 - dF predicted:100.11497057081677
+iteration: 9 - F:-563.9056585960781 - dF predicted:53.12301661772222
+iteration: 10 - F:-522.083369939317 - dF predicted:24.01009773005822
+iteration: 11 - F:-504.17344926956247 - dF predicted:8.90674999075749
+iteration: 12 - F:-497.23918941707234 - dF predicted:3.9341757821794645
+iteration: 13 - F:-493.9958718261205 - dF predicted:2.267115887541819
+iteration: 14 - F:-492.08998128848657 - dF predicted:1.4525817629732556
+iteration: 15 - F:-490.8814649306822 - dF predicted:0.9021357068992089
+iteration: 16 - F:-490.1415504916074 - dF predicted:0.5499039418576805
+iteration: 17 - F:-489.6894696344654 - dF predicted:0.3274667143936829
+iteration: 18 - F:-489.4347904257404 - dF predicted:0.19301397542487178
+iteration: 19 - F:-489.27943441987304 - dF predicted:0.11838171904597196
+iteration: 20 - F:-489.218116793472 - dF predicted:0.10613156150926072
+iteration: 21 - F:-489.1761281652454 - dF predicted:0.23456566248347616
+iteration: 22 - F:-489.1761281652454 - dF predicted:0.0011664583343338065
+iteration: 23 - F:-489.1761281652454 - dF predicted:0.00016958743689815048
+iteration: 24 - F:-489.1760983547268 - dF predicted:0.00025378090229427044
+iteration: 25 - F:-489.1760983547268 - dF predicted:3.4906311202532494e-5
 convergence
 </code></pre>
+<p>Note that the output <code>F</code> is the free energy at each iteration step and <code>dF</code> is the predicted change of free energy at each step which approximates the actual free energy change and is used as stopping criterion by requiring that it does not excede the <code>tolerance</code> level for 4 consecutive times.</p>
 <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2>
 <p>Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound &#40;ELBO&#41;. Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a &#40;potentially local&#41; optimum:</p>
 <pre><code class="julia hljs">f1 = freeenergy(state)</code></pre>
@@ -253,7 +253,7 @@ convergence
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 12, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 13, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
