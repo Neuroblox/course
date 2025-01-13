@@ -11,12 +11,11 @@ using Pkg
 using Downloads
 
 Downloads.download("raw.githubusercontent.com/Neuroblox/course/refs/heads/main/Project.toml", joinpath(@__DIR__, "Project.toml"))
+pkg"registry add General" # add the Generl Registry, necessary to work with NeurobloxRegistry if this is the first time opening Julia
 pkg"registry add https://github.com/Neuroblox/NeurobloxRegistry"; # add the Neuroblox Registry to the Julia registries to have access to Neuroblox.jl
 Pkg.activate(@__DIR__) # activate a Julia environment at your current directory
 Pkg.instantiate() # download all packages listed in the Project.toml we downloaded above
 ```
-> **_NOTE_:**
-> If this is your first time using Julia, you *may* also need to add the General registry **before** `Pkg.instantiate()`, which can be done with `pkg"registry add General"`
 
 `Project.toml` is a file containing a list of packages, sometimes with specified versions or version bounds. When we `Pkg.instantiate()` an environment at a directory that includes a `Project.toml` then all listed packages are installed at their most suitable versions.
 
