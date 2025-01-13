@@ -73,14 +73,14 @@ for idx in CartesianIndices(A_true)
 end
 
 # finally we compose the simulation model
-@named simmodel = system_from_graph(g, split=false);
+@named simmodel = system_from_graph(g);
 
 # ## Run the simulation and plot the results
 
 # setup simulation of the model, time in seconds
 tspan = (0.0, 512.0)
 prob = SDEProblem(simmodel, [], tspan)
-dt = 2   # 2 seconds (units are milliseconds) as measurement interval for fMRI
+dt = 2   # 2 seconds (units are seconds) as measurement interval for fMRI
 sol = solve(prob, ImplicitRKMil(), saveat=dt);
 
 # we now want to extract all the variables in our model which carry the tag "measurement". For this purpose we can use the Neuroblox function `get_idx_tagged_vars`
@@ -134,8 +134,8 @@ regions = [];   # list of neural mass blocks to then connect them to each other 
 # Since we want some parameters to be shared across several regions we define them outside of the regions.
 # For this purpose use the ModelingToolkit macro `@parameters` which is used to define symbolic parameters for models.
 # Note that we can set the tunable flag right away thereby defining whether we will include this parameter in the optimization procedure or rather keep it fixed to its predefined value.
-@parameters lnκ=0.0 [tunable=false] lnϵ=0.0 [tunable=false] lnτ=0.0 [tunable=false]   # lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale
-@parameters C=1/16 [tunable=false]   # note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.
+@parameters lnκ=0.0 [tunable=false] lnϵ=0.0 [tunable=false] lnτ=0.0 [tunable=false];   # lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale
+@parameters C=1/16 [tunable=false];   # note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.
 # We now define a similar model as above for the simulation but instead of using an actual stimulus Blox we here add ExternalInput which represents a simple linear external input that is not specified any further.
 # We simply say that our model gets some input with a proportional factor $C$. This is mostly only to make sure that our results are consistent with those produced by SPM
 for i = 1:nr
@@ -168,15 +168,15 @@ for (i, idx) in enumerate(CartesianIndices(A_prior))
 end
 ## Avoid simplification of the model in order to be able to exclude some parameters from fitting
 @named fitmodel = system_from_graph(g, simplify=false);
-# With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
-# For instance the the effective connections that are set to zero in the simulation:
+# With the Neuroblox function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
+# Assume we want to exclude the connections that were set to zero in the simulation:
 untune = Dict(A[3] => false, A[7] => false)
-fitmodel = changetune(fitmodel, untune)                 # 3 and 7 are not present in the simulation model
+fitmodel = changetune(fitmodel, untune)                 # A[3] and A[7] were set to 0 in the simulation
 fitmodel = structural_simplify(fitmodel, split=false)   # and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don't lose time with it ;)
 
 # ## Setup spectral DCM
 max_iter = 128; # maximum number of iterations
-## attribute initial conditions to states
+## attribute initial conditions or default values to dynamic states of our model
 sts, _ = get_dynamic_states(fitmodel);
 # the following step is needed if the model's Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 (which is the default expansion). We simply add small random values to avoid this degeneracy:
 perturbedfp = Dict(sts .=> abs.(0.001*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
@@ -192,10 +192,9 @@ hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precisi
                   );
 # To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:
 csdsetup = (mar_order = p, freq = freq, dt = dt);
-# earlier we used the function `get_idx_tagged_vars` to get the indices of tagged variables. Here we don't want to get the indices but rather the symbolic variable names themselves.
-# and in particular we need to get the measurement variables in the same ordering as the model equations are defined.
+# earlier we used the function `get_idx_tagged_vars` to get the indices of tagged variables. Here we don't want to get the indices but rather the symbolic variable names themselves in order to get the correct columns of the dataframe of the simulation that correspond to the BOLD signal or measurement:
 _, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal variables
-# Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that wer are using fMRI time series as opposed to LFPs.
+# Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series (as opposed to LFPs, which is the other modality that is currently available in Neuroblox).
 (state, setup) = setup_sDCM(dfsol[:, String.(Symbol.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
 
 # We are now ready to run the optimization procedure!
@@ -203,7 +202,7 @@ _, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal
 for iter in 1:max_iter
     state.iter = iter
     run_sDCM_iteration!(state, setup)
-    print("iteration: ", iter, " - F:", state.F[end] - state.F[2], " - dF predicted:", state.dF[end], "\n")
+    print("iteration: ", iter, " - F:", state.F[end], " - dF predicted:", state.dF[end], "\n")
     if iter >= 4
         criterion = state.dF[end-3:end] .< setup.tolerance
         if all(criterion)
@@ -212,6 +211,7 @@ for iter in 1:max_iter
         end
     end
 end
+# Note that the output `F` is the free energy at each iteration step and `dF` is the predicted change of free energy at each step which approximates the actual free energy change and is used as stopping criterion by requiring that it does not excede the `tolerance` level for 4 consecutive times.
 
 # ## Results
 # Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound (ELBO). 
