@@ -116,7 +116,7 @@ for i in 1:N_wta
 end
 
 # WTA circuits connect to each other with given connection density and the feedforward interneuron connects to each WTA circuit.
-# The feed-forward interneuron `n_ff_inh` receives input from the excitatory (pyramidal) cells of the WTA circuits and it is largely responsible for controlling the spiking rhythm of the ensemble of WTAs.
+# The feedforward interneuron `n_ff_inh` of a `CorticalBlox` connects to all excitatory (pyramidal) cells of the WTA circuits within the `CorticalBlox` and receives input from excitatory neurons of other `CorticalBlox` that connect to the current `CorticalBlox`. This interneuron is largely responsible for controlling the spiking rhythm of the ensemble of WTAs.
   
 sys = system_from_graph(g, name = model_name)
 prob = ODEProblem(sys, [], (0.0, 1000))
