@@ -155,21 +155,21 @@ Observed (6): see observed(fitmodel)</code></pre>
 sts, _ = get_dynamic_states(fitmodel);</code></pre>
 <p>the following step is needed if the model&#39;s Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 &#40;which is the default expansion&#41;. We simply add small random values to avoid this degeneracy:</p>
 <pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >0.001</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">Dict{SymbolicUtils.BasicSymbolic{Real}, Float64} with 15 entries:
-  r1₊bm₊s(t) =&gt; 0.000138322
-  r1₊bm₊lnu(t) =&gt; 0.000896385
-  r2₊bm₊s(t) =&gt; 0.000397204
-  r2₊bm₊lnu(t) =&gt; 0.000747008
-  r3₊bm₊s(t) =&gt; 0.000388604
-  r3₊bm₊lnu(t) =&gt; 0.000169086
-  r1₊lm₊x(t) =&gt; 4.49163e-6
-  r2₊lm₊x(t) =&gt; 0.000928402
-  r1₊bm₊lnν(t) =&gt; 0.000541726
-  r2₊bm₊lnν(t) =&gt; 0.000646358
   r3₊lm₊x(t) =&gt; 0.000489568
-  r1₊bm₊lnq(t) =&gt; 0.000808084
+  r3₊bm₊lnq(t) =&gt; 0.000198145
   r2₊bm₊lnq(t) =&gt; 0.000210419
+  r1₊bm₊lnν(t) =&gt; 0.000541726
+  r2₊bm₊s(t) =&gt; 0.000397204
+  r3₊bm₊lnu(t) =&gt; 0.000169086
+  r2₊bm₊lnν(t) =&gt; 0.000646358
+  r1₊bm₊s(t) =&gt; 0.000138322
   r3₊bm₊lnν(t) =&gt; 0.000570881
-  r3₊bm₊lnq(t) =&gt; 0.000198145</code></pre>
+  r1₊lm₊x(t) =&gt; 4.49163e-6
+  r1₊bm₊lnu(t) =&gt; 0.000896385
+  r3₊bm₊s(t) =&gt; 0.000388604
+  r2₊lm₊x(t) =&gt; 0.000928402
+  r2₊bm₊lnu(t) =&gt; 0.000747008
+  r1₊bm₊lnq(t) =&gt; 0.000808084</code></pre>
 <p>For convenience we can use the default prior function to use standardized prior values as given in SPM:</p>
 <pre><code class="julia hljs">pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
@@ -198,31 +198,31 @@ priors = (μθ_pr = pmean,
             <span class=hljs-keyword >break</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:-3565.211717284932 - dF predicted:1147.1054551103696
-iteration: 2 - F:-2847.2023661905027 - dF predicted:569.299236898208
-iteration: 3 - F:-2353.1226504182764 - dF predicted:523.7480518200163
-iteration: 4 - F:-1903.4733066188394 - dF predicted:478.73443066512357
-iteration: 5 - F:-1486.1902056570598 - dF predicted:453.5261059681964
-iteration: 6 - F:-1097.598308465842 - dF predicted:365.41805040344536
-iteration: 7 - F:-804.2055518813215 - dF predicted:210.3956027762734
-iteration: 8 - F:-643.8075230034013 - dF predicted:100.11497057081677
-iteration: 9 - F:-563.9056585960781 - dF predicted:53.12301661772222
-iteration: 10 - F:-522.083369939317 - dF predicted:24.01009773005822
-iteration: 11 - F:-504.17344926956247 - dF predicted:8.90674999075749
-iteration: 12 - F:-497.23918941707234 - dF predicted:3.9341757821794645
-iteration: 13 - F:-493.9958718261205 - dF predicted:2.267115887541819
-iteration: 14 - F:-492.08998128848657 - dF predicted:1.4525817629732556
-iteration: 15 - F:-490.8814649306822 - dF predicted:0.9021357068992089
-iteration: 16 - F:-490.1415504916074 - dF predicted:0.5499039418576805
-iteration: 17 - F:-489.6894696344654 - dF predicted:0.3274667143936829
-iteration: 18 - F:-489.4347904257404 - dF predicted:0.19301397542487178
-iteration: 19 - F:-489.27943441987304 - dF predicted:0.11838171904597196
-iteration: 20 - F:-489.218116793472 - dF predicted:0.10613156150926072
-iteration: 21 - F:-489.1761281652454 - dF predicted:0.23456566248347616
-iteration: 22 - F:-489.1761281652454 - dF predicted:0.0011664583343338065
-iteration: 23 - F:-489.1761281652454 - dF predicted:0.00016958743689815048
-iteration: 24 - F:-489.1760983547268 - dF predicted:0.00025378090229427044
-iteration: 25 - F:-489.1760983547268 - dF predicted:3.4906311202532494e-5
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:-3568.7760918985473 - dF predicted:1151.645766454626
+iteration: 2 - F:-2848.2213182820224 - dF predicted:570.6511079776099
+iteration: 3 - F:-2353.1242235135683 - dF predicted:524.3646402335777
+iteration: 4 - F:-1903.0539222090856 - dF predicted:478.7683995366398
+iteration: 5 - F:-1485.7828414862329 - dF predicted:453.24897986787704
+iteration: 6 - F:-1097.437817610763 - dF predicted:365.0822004373764
+iteration: 7 - F:-804.3167412039838 - dF predicted:210.2013606453641
+iteration: 8 - F:-644.0670887998349 - dF predicted:100.06125194194902
+iteration: 9 - F:-564.1829538619753 - dF predicted:53.19735621850561
+iteration: 10 - F:-522.2850500695243 - dF predicted:24.073777898263447
+iteration: 11 - F:-504.33225663624694 - dF predicted:8.902065051716994
+iteration: 12 - F:-497.4118392749408 - dF predicted:3.901165216297128
+iteration: 13 - F:-494.19989921140956 - dF predicted:2.2364255974822576
+iteration: 14 - F:-492.321101184751 - dF predicted:1.429503973813221
+iteration: 15 - F:-491.1320145742268 - dF predicted:0.8876270589104192
+iteration: 16 - F:-490.4043700125305 - dF predicted:0.5419600356351018
+iteration: 17 - F:-489.95846375941073 - dF predicted:0.32462393588823557
+iteration: 18 - F:-489.7081937123439 - dF predicted:0.1953923146434604
+iteration: 19 - F:-489.5533654142472 - dF predicted:0.135656721526179
+iteration: 20 - F:-489.50792749644734 - dF predicted:0.18761426800246586
+iteration: 21 - F:-489.498524195646 - dF predicted:0.6009586126933194
+iteration: 22 - F:-489.498524195646 - dF predicted:0.002476062697706699
+iteration: 23 - F:-489.4966992190876 - dF predicted:0.0037885150812212915
+iteration: 24 - F:-489.493464681141 - dF predicted:0.005932986591946685
+iteration: 25 - F:-489.48824801595504 - dF predicted:0.009058419422460832
 convergence
 </code></pre>
 <p>Note that the output <code>F</code> is the free energy at each iteration step and <code>dF</code> is the predicted change of free energy at each step which approximates the actual free energy change and is used as stopping criterion by requiring that it does not excede the <code>tolerance</code> level for 4 consecutive times.</p>
@@ -253,7 +253,7 @@ convergence
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 15, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: January 16, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>

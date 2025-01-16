@@ -32,7 +32,7 @@ dt_spike_rate = 50 # update interval for the stimulus spike rate [ms]
 μ_0 = 40e-3 # mean stimulus spike rate [spikes / ms]
 ρ_A = ρ_B = μ_0 / 100
 μ_A = μ_0 + ρ_A * coherence
-μ_B = μ_0 + ρ_B * coherence
+μ_B = μ_0 - ρ_B * coherence
 σ = 4e-3 # standard deviation of stimulus spike rate [spikes / ms]
 
 spike_rate_A = (distribution=Normal(μ_A, σ), dt=dt_spike_rate) # spike rate distribution for selective population A
