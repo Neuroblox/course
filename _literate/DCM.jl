@@ -58,8 +58,8 @@ regions = [];      # list of neural mass blocks to then connect them to each oth
 for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)          # store neural mass model in list. We need this list below. If you haven't seen the Julia command `push!` before [see here](http://jlhub.com/julia/manual/en/function/push-exclamation).
-
-    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1) ## add Ornstein-Uhlenbeck as noisy input to the current region
+# TODO: replace this with an autoregression blox since it really seems that the OUBlox messes up the results:
+    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1, τ=0.5) ## add Ornstein-Uhlenbeck as noisy input to the current region
     add_edge!(g, input => region, weight=1/16)  
 
     measurement = BalloonModel(;name=Symbol("r$(i)₊bm")) ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
