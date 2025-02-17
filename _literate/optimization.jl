@@ -42,11 +42,11 @@ prob = ODEProblem(
 )
 
 ## generate fictive data, aka the ground truth
-data = solve(prob, Tsit5())
+data = solve(prob, Tsit5());
 
 # We add some observation noise to our fictive data to make it look more realistic. At each timepoint each state receives noise that is sampled from a Normal distribution around 0 with a standard deviation of 0.1 .
 noise_distribution = Normal(0, 0.1)
-data .+= rand(noise_distribution, size(data))
+data .+= rand(noise_distribution, size(data));
 
 # ## Initial Guess for Parameters
 # For most optimization methods we need to provide an initial guess for the parameters to be fitted. Let's add a guess and visualize the result of using these parameters in our model compared to the ground truth data.
