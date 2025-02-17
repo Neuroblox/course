@@ -27,4 +27,4 @@ prob = ODEProblem(
 )
 
 # generate fictive data, aka the ground truth
-data = solve(prob, Tsit5())
+data = solve(prob, Tsit5());

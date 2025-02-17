@@ -28,10 +28,10 @@ prob = ODEProblem(
 )
 
 # generate fictive data, aka the ground truth
-data = solve(prob, Tsit5())
+data = solve(prob, Tsit5());
 
 noise_distribution = Normal(0, 0.1)
-data .+= rand(noise_distribution, size(data))
+data .+= rand(noise_distribution, size(data));
 
 # define a setter function to easily change parameter values during each optimization iteration
 setter! = setp(sys, [nm.kₑₑ, nm.kᵢᵢ, nm.kₑᵢ, nm.kᵢₑ])
