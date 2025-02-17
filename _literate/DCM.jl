@@ -1,4 +1,4 @@
-# # Solving Inverse Problems with Spectral Dynamic Causal Modeling
+# # Parameter Fitting using Spectral Dynamic Causal Modeling
 #md # > **_Jupyter Notebook_:** Please work on `DCM.ipynb`.
 
 # ## Introduction
