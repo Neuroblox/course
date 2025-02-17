@@ -1,6 +1,6 @@
 @def title = "Introduction to Computational Neuroscience with Neuroblox"
 ~~~
-<img src="/assets/NB_Logo_Full_Transparent@1920px.png" alt="drawing" width="300"/>
+<img src="/assets/NB_Logo_Full_Transparent@1920px.png" alt="drawing" width="200"/>
 ~~~
 
 # Introduction
