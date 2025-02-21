@@ -1,2 +1,5 @@
 # This file was generated, do not modify it. # hide
-idx_m = get_idx_tagged_vars(simmodel, "measurement")    # get index of bold signal
+tspan = (0, 1022)
+dt = 2   # 2 seconds as measurement interval for fMRI
+prob = SDEProblem(simmodel, [], tspan)
+sol = solve(prob, ImplicitRKMil(), saveat=dt);

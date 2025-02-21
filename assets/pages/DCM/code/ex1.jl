@@ -7,3 +7,4 @@ using OrderedCollections
 using CairoMakie
 using ModelingToolkit
 using Random
+using StatsBase

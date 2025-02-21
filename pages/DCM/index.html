@@ -1,11 +1,14 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/katex/katex.min.css"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/NB_favicon.png"> <title>Neuroblox course</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/getting_started">Getting Started</a> <li><a href="/course/pages/intro_julia">Introduction to Julia</a> <li><a href="/course/pages/intro_diffeq">Differential Equations with ModelingToolkit</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/blox_connections">Blox and Connections in Neuroblox</a> <li><a href="/course/pages/neuron_mass">Neurons, Neural Masses and Sources</a> <li><a href="" class=has-arrow >Circuit Models</a> <ul> <li><a href="/course/pages/circuits">Introduction</a> <li><a href="/course/pages/CS_circuit">Biomimetic Corticostriatal assemblies</a> <li><a href="/course/pages/PING_circuit">Pyramidal-Interneuron Gamma network</a> </ul> <li><a href="/course/pages/decision_making">Decision Making</a> <li><a href="/course/pages/learning">Synaptic Plasticity and Reinforcement Learning</a> <li><a href="/course/pages/optimization">Parameter Fitting using Optimization</a> <li><a href="/course/pages/DCM">Parameter fitting using Spectral Dynamic Causal Modeling</a> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Parameter Fitting using Spectral Dynamic Causal Modeling</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#introduction">Introduction</a><li><a href="#define_the_model">Define the model</a><li><a href="#run_the_simulation_and_plot_the_results">Run the simulation and plot the results</a><li><a href="#estimate_and_plot_the_cross-spectral_densities">Estimate and plot the cross-spectral densities</a><li><a href="#model_inference">Model Inference</a><li><a href="#setup_spectral_dcm">Setup spectral DCM</a><li><a href="#results">Results</a><li><a href="#challenge_problems">Challenge Problems</a><li><a href="#references">References</a></ol></div> <h1 id=parameter_fitting_using_spectral_dynamic_causal_modeling ><a href="#parameter_fitting_using_spectral_dynamic_causal_modeling" class=header-anchor >Parameter Fitting using Spectral Dynamic Causal Modeling</a></h1> <blockquote> <p><strong><em>Jupyter Notebook</em>:</strong> Please work on <code>DCM.ipynb</code>.</p> </blockquote> <h2 id=introduction ><a href="#introduction" class=header-anchor >Introduction</a></h2> <p>Neuroblox provides you with a comprehensive environment for simulations as we have explored previously, but its functionality doesn&#39;t stop there. We will now pivot and turn our attention to a different kind of problem: inferring model parameters, that is solving inverse problems, from time series. The method of choice is one of the most widely spread in imaging neuroscience, spectral Dynamic Causal Modeling &#40;spDCM&#41;&#91;1,2&#93;. In this tutorial we will introduce how to perform a spDCM analysis on simulated data. To do so we roughly reproduce the procedure in the <a href="https://www.fil.ion.ucl.ac.uk/spm/software/spm12/">SPM</a> script <code>DEM_demo_induced_fMRI.m</code> in <a href="https://www.neuroblox.org/">Neuroblox</a>. This work was also presented in Hofmann et al.&#91;2&#93;</p> <p>In this session we will define a circuit of three linear neuronal mass models, all driven by an Ornstein-Uhlenbeck process. We will model fMRI data by a balloon model and BOLD signal on top. After simulation of this simple model we will use spDCM to infer some of the model parameters from the simulation time series.</p> <p><img src="/course/assets/spectral_DCM_illustration.png" alt="spDCM Workflow" /> <em>Figure 1: Workflow for Spectral DCM analysis.</em></p> <p><em>Figure 1</em> describes the procedure we will pursue:</p> <ul> <li><p>define the graph and add blocks &#40;sections A, B and C in the Figure&#41;</p> <li><p>simulate the model, instead we could also use actual data &#40;section D in Figure&#41;</p> <li><p>compute the cross spectral density</p> <li><p>setup the DCM</p> <li><p>estimate parameters</p> <li><p>plot the results</p> </ul> <p>Learning goals</p> <ul> <li><p>perform the entire workflow of an spDCM analysis.</p> <li><p>use observer Blox to simulate experimental measurements.</p> </ul> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Neuroblox
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/course/libs/katex/katex.min.css"> <link rel=stylesheet  href="/course/libs/highlight/styles/github.min.css"> <link href="/course/css/franklin.css" rel=stylesheet > <link href="/course/css/vela.css" rel=stylesheet > <script src="/course/libs/vela/jquery.min.js"></script> <link rel=icon  href="/course/assets/NB_favicon.png"> <title>Neuroblox course</title> <div class="main-nav slideout-menu slideout-menu-left" id=menu > <div class=flex-container > <span class=sidebar-brand > <h3 style='font-size: 25px'>Neuroblox course</h3> </span> </div> <nav class=sidebar-nav > <ul class=metismenu  id=metismenu  > <li><a href="/course/index.html">Home</a> <li><a href="/course/pages/getting_started">Getting Started</a> <li><a href="/course/pages/intro_julia">Introduction to Julia</a> <li><a href="/course/pages/intro_diffeq">Differential Equations with ModelingToolkit</a> <li><a href="/course/pages/intro_plot">Plotting with Makie</a> <li><a href="/course/pages/blox_connections">Blox and Connections in Neuroblox</a> <li><a href="/course/pages/neuron_mass">Neurons, Neural Masses and Sources</a> <li><a href="" class=has-arrow >Circuit Models</a> <ul> <li><a href="/course/pages/circuits">Introduction</a> <li><a href="/course/pages/CS_circuit">Biomimetic Corticostriatal assemblies</a> <li><a href="/course/pages/PING_circuit">Pyramidal-Interneuron Gamma network</a> </ul> <li><a href="/course/pages/decision_making">Decision Making</a> <li><a href="/course/pages/learning">Synaptic Plasticity and Reinforcement Learning</a> <li><a href="/course/pages/optimization">Parameter Fitting using Optimization</a> <li><a href="/course/pages/DCM">Parameter fitting using Spectral Dynamic Causal Modeling</a> </ul> </nav> </div> <main id=panel  class="slidout-panel slideout-panel-left"> <div class="toggle-button hamburger hamburger--spin"> <div class=hamburger-box > <div class=hamburger-inner ></div> </div> </div> <h1 class="page title">Parameter Fitting using Spectral Dynamic Causal Modeling</h1> <hr> <div class=franklin-content ><div class=franklin-toc ><ol><li><a href="#introduction">Introduction</a><li><a href="#define_the_model">Define the model</a><li><a href="#run_the_simulation_and_plot_the_results">Run the simulation and plot the results</a><li><a href="#add_measurement_noise_and_rescale_data">Add measurement noise and rescale data</a><li><a href="#estimate_and_plot_the_cross-spectral_densities">Estimate and plot the cross-spectral densities</a><li><a href="#model_inference">Model Inference</a><li><a href="#setup_spectral_dcm">Setup spectral DCM</a><li><a href="#results">Results</a><li><a href="#challenge_problems">Challenge Problems</a><li><a href="#references">References</a></ol></div> <h1 id=parameter_fitting_using_spectral_dynamic_causal_modeling ><a href="#parameter_fitting_using_spectral_dynamic_causal_modeling" class=header-anchor >Parameter Fitting using Spectral Dynamic Causal Modeling</a></h1> <blockquote> <p><strong><em>Jupyter Notebook</em>:</strong> Please work on <code>DCM.ipynb</code>.</p> </blockquote> <h2 id=introduction ><a href="#introduction" class=header-anchor >Introduction</a></h2> <p>Neuroblox provides you with a comprehensive environment for simulations as we have explored previously, but its functionality doesn&#39;t stop there. We will now pivot and turn our attention to a different kind of problem: inferring model parameters, that is solving inverse problems, from time series. The method of choice is one of the most widely spread in imaging neuroscience, spectral Dynamic Causal Modeling &#40;spDCM&#41;&#91;1,2&#93;. In this tutorial we will introduce how to perform a spDCM analysis on simulated data. To do so we roughly reproduce the procedure in the <a href="https://www.fil.ion.ucl.ac.uk/spm/software/spm12/">SPM</a> script <code>DEM_demo_induced_fMRI.m</code> in <a href="https://www.neuroblox.org/">Neuroblox</a>. This work was also presented in Hofmann et al.&#91;2&#93;</p> <p>In this session we will define a circuit of three linear neuronal mass models, all driven by an Ornstein-Uhlenbeck process. We will model fMRI data by a balloon model and BOLD signal on top. After simulation of this simple model we will use spDCM to infer some of the model parameters from the simulation time series.</p> <p><img src="/course/assets/spectral_DCM_illustration.png" alt="spDCM Workflow" /> <em>Figure 1: Workflow for Spectral DCM analysis.</em></p> <p><em>Figure 1</em> describes the procedure we will pursue:</p> <ul> <li><p>define the graph and add blocks &#40;sections A, B and C in the Figure&#41;</p> <li><p>simulate the model, instead we could also use actual data &#40;section D in Figure&#41;</p> <li><p>compute the cross spectral density</p> <li><p>setup the DCM</p> <li><p>estimate parameters</p> <li><p>plot the results</p> </ul> <p>Learning goals</p> <ul> <li><p>perform the entire workflow of an spDCM analysis.</p> <li><p>use observer Blox to simulate experimental measurements.</p> </ul> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Neuroblox
 <span class=hljs-keyword >using</span> LinearAlgebra
 <span class=hljs-keyword >using</span> StochasticDiffEq
 <span class=hljs-keyword >using</span> DataFrames
 <span class=hljs-keyword >using</span> OrderedCollections
 <span class=hljs-keyword >using</span> CairoMakie
 <span class=hljs-keyword >using</span> ModelingToolkit
-<span class=hljs-keyword >using</span> Random</code></pre> <h2 id=define_the_model ><a href="#define_the_model" class=header-anchor >Define the model</a></h2> <p>We will define a model of 3 regions. This means first of all to define a graph. To this graph we will add three linear neuronal mass models which constitute the &#40;hidden&#41; neuronal dynamics. These constitute three nodes of the graph. Next we will also need some input that stimulates the activity, we use simple Ornstein-Uhlenbeck blocks to create stochastic inputs. One per region. We want to simulate fMRI signals thus we will need to also add a BalloonModel per region. Note that the Ornstein-Uhlenbeck block will feed into the linear neural mass which in turn will feed into the BalloonModel blox. This needs to be represented by the way we define the edges.</p> <pre><code class="julia hljs">Random.seed!(<span class=hljs-number >17</span>)   <span class=hljs-comment ># set seed for reproducibility</span>
+<span class=hljs-keyword >using</span> Random
+<span class=hljs-keyword >using</span> StatsBase</code></pre><pre><code class="plaintext hljs">ArgumentError: Package StatsBase not found in current path.
+- Run `import Pkg; Pkg.add(&quot;StatsBase&quot;)` to install the StatsBase package.
+</code></pre> <h2 id=define_the_model ><a href="#define_the_model" class=header-anchor >Define the model</a></h2> <p>We will define a model of 3 regions. This means first of all to define a graph. To this graph we will add three linear neuronal mass models which constitute the &#40;hidden&#41; neuronal dynamics. These constitute three nodes of the graph. Next we will also need some input that stimulates the activity, we use simple Ornstein-Uhlenbeck blocks to create stochastic inputs. One per region. We want to simulate fMRI signals thus we will need to also add a BalloonModel per region. Note that the Ornstein-Uhlenbeck block will feed into the linear neural mass which in turn will feed into the BalloonModel blox. This needs to be represented by the way we define the edges.</p> <pre><code class="julia hljs">Random.seed!(<span class=hljs-number >17</span>)   <span class=hljs-comment ># set seed for reproducibility</span>
 
 nr = <span class=hljs-number >3</span>             <span class=hljs-comment ># number of regions</span>
 g = MetaDiGraph()
@@ -13,20 +16,22 @@ regions = [];      <span class=hljs-comment ># list of neural mass blocks to the
     region = LinearNeuralMass(;name=<span class=hljs-built_in >Symbol</span>(<span class=hljs-string >&quot;r<span class=hljs-subst >$(i)</span>₊lm&quot;</span>))
     push!(regions, region)          <span class=hljs-comment ># store neural mass model in list. We need this list below. If you haven&#x27;t seen the Julia command `push!` before [see here](http://jlhub.com/julia/manual/en/function/push-exclamation).</span>
 
-    input = OUBlox(;name=<span class=hljs-built_in >Symbol</span>(<span class=hljs-string >&quot;r<span class=hljs-subst >$(i)</span>₊ou&quot;</span>), σ=<span class=hljs-number >0.1</span>) <span class=hljs-comment >## add Ornstein-Uhlenbeck as noisy input to the current region</span>
+    input = OUBlox(;name=<span class=hljs-built_in >Symbol</span>(<span class=hljs-string >&quot;r<span class=hljs-subst >$(i)</span>₊ou&quot;</span>), σ=<span class=hljs-number >0.2</span>, τ=<span class=hljs-number >2</span>)
     add_edge!(g, input =&gt; region, weight=<span class=hljs-number >1</span>/<span class=hljs-number >16</span>)
 
     measurement = BalloonModel(;name=<span class=hljs-built_in >Symbol</span>(<span class=hljs-string >&quot;r<span class=hljs-subst >$(i)</span>₊bm&quot;</span>)) <span class=hljs-comment >## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics</span>
     add_edge!(g, region =&gt; measurement, weight=<span class=hljs-number >1.0</span>)
-<span class=hljs-keyword >end</span></code></pre> <p>Note that <code>weight&#61;1/16</code> in the connection between the OU process and the Neural Mass Blox is taken from SPM12. This stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability. Next we define the between-region connectivity matrix and connect regions; we use the same matrix as is defined in &#91;3&#93;</p> <pre><code class="julia hljs">A_true = [[-<span class=hljs-number >0.5</span> -<span class=hljs-number >2</span> <span class=hljs-number >0</span>]; [<span class=hljs-number >0.4</span> -<span class=hljs-number >0.5</span> -<span class=hljs-number >0.3</span>]; [<span class=hljs-number >0</span> <span class=hljs-number >0.2</span> -<span class=hljs-number >0.5</span>]]
-<span class=hljs-keyword >for</span> idx <span class=hljs-keyword >in</span> <span class=hljs-built_in >CartesianIndices</span>(A_true)
-    add_edge!(g, regions[idx[<span class=hljs-number >1</span>]] =&gt; regions[idx[<span class=hljs-number >2</span>]], weight=A_true[idx[<span class=hljs-number >1</span>], idx[<span class=hljs-number >2</span>]])
+<span class=hljs-keyword >end</span></code></pre> <p>Note that <code>weight&#61;1/16</code> in the connection between the OU process and the Neural Mass Blox is taken from SPM12. This stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability. Next we define the between-region connectivity matrix and connect regions; we use the same matrix as is defined in &#91;3&#93;</p> <pre><code class="julia hljs">A_true = [[-<span class=hljs-number >0.5</span> -<span class=hljs-number >0.2</span> <span class=hljs-number >0</span>]; [<span class=hljs-number >0.4</span> -<span class=hljs-number >0.5</span> -<span class=hljs-number >0.3</span>]; [<span class=hljs-number >0</span> <span class=hljs-number >0.2</span> -<span class=hljs-number >0.5</span>]]</code></pre><pre><code class="plaintext hljs">3×3 Matrix{Float64}:
+ -0.5  -0.2   0.0
+  0.4  -0.5  -0.3
+  0.0   0.2  -0.5</code></pre> <p>Note that in SPM DCM connection matrices column variables denote output from and rows denote inputs to a particular region. This is different from the usual Neuroblox definition of connection matrices. Thus we flip the indices in what follows:</p> <pre><code class="julia hljs"><span class=hljs-keyword >for</span> idx <span class=hljs-keyword >in</span> <span class=hljs-built_in >CartesianIndices</span>(A_true)
+    add_edge!(g, regions[idx[<span class=hljs-number >1</span>]] =&gt; regions[idx[<span class=hljs-number >2</span>]], weight=A_true[idx[<span class=hljs-number >2</span>], idx[<span class=hljs-number >1</span>]])   <span class=hljs-comment ># Note the definition of columns as outputs and rows as inputs. For consistency with SPM we keep this notation.</span>
 <span class=hljs-keyword >end</span></code></pre> <p>finally we compose the simulation model</p> <pre><code class="julia hljs"><span class=hljs-meta >@named</span> simmodel = system_from_graph(g);</code></pre>
 <h2 id=run_the_simulation_and_plot_the_results ><a href="#run_the_simulation_and_plot_the_results" class=header-anchor >Run the simulation and plot the results</a></h2>
 <p>setup simulation of the model, time in seconds</p>
-<pre><code class="julia hljs">tspan = (<span class=hljs-number >0.0</span>, <span class=hljs-number >512.0</span>)
+<pre><code class="julia hljs">tspan = (<span class=hljs-number >0</span>, <span class=hljs-number >1022</span>)
+dt = <span class=hljs-number >2</span>   <span class=hljs-comment ># 2 seconds as measurement interval for fMRI</span>
 prob = SDEProblem(simmodel, [], tspan)
-dt = <span class=hljs-number >2</span>   <span class=hljs-comment ># 2 seconds (units are seconds) as measurement interval for fMRI</span>
 sol = solve(prob, ImplicitRKMil(), saveat=dt);</code></pre>
 <p>we now want to extract all the variables in our model which carry the tag &quot;measurement&quot;. For this purpose we can use the Neuroblox function <code>get_idx_tagged_vars</code> the observable quantity in our model is the BOLD signal, the variable of the Blox <code>BalloonModel</code> that represents the BOLD signal is tagged with &quot;measurement&quot; tag. other tags that are defined are &quot;input&quot; which denotes variables representing a stimulus, like for instance an <code>OUBlox</code>.</p>
 <pre><code class="julia hljs">idx_m = get_idx_tagged_vars(simmodel, <span class=hljs-string >&quot;measurement&quot;</span>)    <span class=hljs-comment ># get index of bold signal</span></code></pre><pre><code class="plaintext hljs">3-element Vector{Int64}:
@@ -44,25 +49,51 @@ lines!(ax, sol, idxs=idx_m)
 f</code></pre>
 <img src="/course/assets/pages/DCM/code/output/fmriseries.svg" alt="">
 <p>We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.</p>
-<pre><code class="julia hljs">dfsol = DataFrame(sol[ceil(<span class=hljs-built_in >Int</span>, <span class=hljs-number >101</span>/dt):<span class=hljs-keyword >end</span>]);</code></pre>
+<pre><code class="julia hljs">dfsol = DataFrame(sol);</code></pre>
+<h2 id=add_measurement_noise_and_rescale_data ><a href="#add_measurement_noise_and_rescale_data" class=header-anchor >Add measurement noise and rescale data</a></h2>
+<pre><code class="julia hljs">data = <span class=hljs-built_in >Matrix</span>(dfsol[:, idx_m .+ <span class=hljs-number >1</span>]);    <span class=hljs-comment ># +1 due to the additional time-dimension in the data frame.</span></code></pre>
+<p>add measurement noise</p>
+<pre><code class="julia hljs">data += randn(size(data))/<span class=hljs-number >4</span>;</code></pre>
+<p>center and rescale data &#40;as done in SPM&#41;:</p>
+<pre><code class="julia hljs">data .-= mean(data, dims=<span class=hljs-number >1</span>);
+data *= <span class=hljs-number >1</span>/std(data[:])/<span class=hljs-number >4</span>;
+dfsol = DataFrame(data, :auto);</code></pre><pre><code class="plaintext hljs">UndefVarError: `mean` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+Hint: a global variable of this name may be made accessible by importing Statistics in the current active module Main
+Hint: a global variable of this name may be made accessible by importing StatsBase in the current active module Main
+Hint: a global variable of this name may be made accessible by importing Distributions in the current active module Main
+</code></pre>
+<p>Add correct names to columns of the data frame</p>
+<pre><code class="julia hljs">_, obsvars = get_eqidx_tagged_vars(simmodel, <span class=hljs-string >&quot;measurement&quot;</span>);  <span class=hljs-comment ># get index of equation of bold state</span>
+rename!(dfsol, <span class=hljs-built_in >Symbol</span>.(obsvars))</code></pre><pre><code class="plaintext hljs">DimensionMismatch: Length of nms doesn&#x27;t match length of x.
+</code></pre>
 <h2 id=estimate_and_plot_the_cross-spectral_densities ><a href="#estimate_and_plot_the_cross-spectral_densities" class=header-anchor >Estimate and plot the cross-spectral densities</a></h2>
-<pre><code class="julia hljs">data = <span class=hljs-built_in >Matrix</span>(dfsol[:, idx_m]);</code></pre>
 <p>We compute the cross-spectral density by fitting a linear model of order <code>p</code> and then compute the csd analytically from the parameters of the multivariate autoregressive model</p>
 <pre><code class="julia hljs">p = <span class=hljs-number >8</span>
 mar = mar_ml(data, p)   <span class=hljs-comment ># maximum likelihood estimation of the MAR coefficients and noise covariance matrix</span>
 ns = size(data, <span class=hljs-number >1</span>)
 freq = range(min(<span class=hljs-number >128</span>, ns*dt)^-<span class=hljs-number >1</span>, max(<span class=hljs-number >8</span>, <span class=hljs-number >2</span>*dt)^-<span class=hljs-number >1</span>, <span class=hljs-number >32</span>)
 csd = mar2csd(mar, freq, dt^-<span class=hljs-number >1</span>);</code></pre>
-<p>Now plot the cross-spectrum:</p>
+<p>Now plot the real part of the cross-spectra. Most part of the signal is in the lower frequencies:</p>
 <pre><code class="julia hljs">fig = Figure(size=(<span class=hljs-number >1200</span>, <span class=hljs-number >800</span>))
 grid = fig[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>] = GridLayout()
 <span class=hljs-keyword >for</span> i = <span class=hljs-number >1</span>:nr
     <span class=hljs-keyword >for</span> j = <span class=hljs-number >1</span>:nr
-        ax = Axis(grid[i, j])
+        <span class=hljs-keyword >if</span> i == <span class=hljs-number >1</span> &amp;&amp; j == <span class=hljs-number >1</span>
+            ax = Axis(grid[i, j], xlabel=<span class=hljs-string >&quot;Frequency [Hz]&quot;</span>, ylabel=<span class=hljs-string >&quot;real value of CSD&quot;</span>)
+        <span class=hljs-keyword >else</span>
+            ax = Axis(grid[i, j])
+        <span class=hljs-keyword >end</span>
         lines!(ax, freq, real.(csd[:, i, j]))
     <span class=hljs-keyword >end</span>
 <span class=hljs-keyword >end</span>
-fig</code></pre>
+Label(grid[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>:<span class=hljs-number >3</span>, Top()], <span class=hljs-string >&quot;Cross-spectral densities&quot;</span>, valign = :bottom,
+    font = :bold,
+    fontsize = <span class=hljs-number >32</span>,
+    padding = (<span class=hljs-number >0</span>, <span class=hljs-number >0</span>, <span class=hljs-number >5</span>, <span class=hljs-number >0</span>))
+fig</code></pre><pre><code class="plaintext hljs">Figure()</code></pre>
+<p>These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.</p>
+
 <img src="/course/assets/pages/DCM/code/output/csd.svg" alt="">
 <h2 id=model_inference ><a href="#model_inference" class=header-anchor >Model Inference</a></h2>
 <p>We will now assemble a new model that is used for fitting the previous simulations. This procedure is similar to before with the difference that we will define global parameters and use tags such as &#91;tunable&#61;false/true&#93; to define which parameters we will want to estimate. Note that parameters are tunable by default.</p>
@@ -84,9 +115,9 @@ regions = [];   <span class=hljs-comment ># list of neural mass blocks to then c
 <p>Here we define the prior expectation values of the effective connectivity matrix we wish to infer:</p>
 <pre><code class="julia hljs">A_prior = <span class=hljs-number >0.01</span>*randn(nr, nr)
 A_prior -= diagm(diag(A_prior))    <span class=hljs-comment ># remove the diagonal</span></code></pre><pre><code class="plaintext hljs">3×3 Matrix{Float64}:
-  0.0         0.00345049  -0.0122152
-  0.0148102   0.0          0.00437472
- -0.00716553  0.00429191   0.0</code></pre>
+  0.0         0.0138076   -0.000870584
+ -0.0110173   0.0         -0.000945151
+ -0.0153045  -0.00676341   0.0</code></pre>
 <p>Since we want to optimize these weights we turn them into symbolic parameters: Add the symbolic weights to the edges and connect regions.</p>
 <pre><code class="julia hljs">A = []
 <span class=hljs-keyword >for</span> (i, a) <span class=hljs-keyword >in</span> enumerate(vec(A_prior))
@@ -103,10 +134,10 @@ A_prior -= diagm(diag(A_prior))    <span class=hljs-comment ># remove the diagon
 <span class=hljs-keyword >end</span>
 <span class=hljs-comment ># Avoid simplification of the model in order to be able to exclude some parameters from fitting</span>
 <span class=hljs-meta >@named</span> fitmodel = system_from_graph(g, simplify=<span class=hljs-literal >false</span>);</code></pre>
-<p>With the Neuroblox function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure. Assume we want to exclude the connections that were set to zero in the simulation:</p>
-<pre><code class="julia hljs">untune = <span class=hljs-built_in >Dict</span>(A[<span class=hljs-number >3</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >7</span>] =&gt; <span class=hljs-literal >false</span>)
-fitmodel = changetune(fitmodel, untune)                 <span class=hljs-comment ># A[3] and A[7] were set to 0 in the simulation</span>
-fitmodel = structural_simplify(fitmodel, split=<span class=hljs-literal >false</span>)   <span class=hljs-comment ># and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don&#x27;t lose time with it ;)</span></code></pre><pre><code class="plaintext hljs">Model fitmodel:
+<p>With the function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure. For instance the effective connections that are set to zero in the simulation and the self-connections:</p>
+<pre><code class="julia hljs">untune = <span class=hljs-built_in >Dict</span>(A[<span class=hljs-number >3</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >7</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >1</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >5</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >9</span>] =&gt; <span class=hljs-literal >false</span>)
+fitmodel = changetune(fitmodel, untune)           <span class=hljs-comment ># 3 and 7 are not present in the simulation model</span>
+fitmodel = structural_simplify(fitmodel)          <span class=hljs-comment ># and now simplify the euqations</span></code></pre><pre><code class="plaintext hljs">Model fitmodel:
 Equations (21):
   21 standard: see equations(fitmodel)
 Unknowns (21): see unknowns(fitmodel)
@@ -132,44 +163,44 @@ Unknowns (21): see unknowns(fitmodel)
   r2₊bm₊bold(t) [defaults to 0.0]: measurement
   r3₊bm₊bold(t) [defaults to 0.0]: measurement
 Parameters (16): see parameters(fitmodel)
+  A4 [defaults to 0.0138076]
+  A6 [defaults to -0.00676341]
+  A8 [defaults to -0.000945151]
+  A2 [defaults to -0.0110173]
   C [defaults to 0.0625]
+  lnϵ [defaults to 0.0]
+  A3 [defaults to -0.0153045]
+  A7 [defaults to -0.000870584]
   A1 [defaults to 0.0]
-  w_r1₊lm_r1₊bm [defaults to 1.0]
-  A2 [defaults to 0.0148102]
-  A3 [defaults to -0.00716553]
-  A4 [defaults to 0.00345049]
   A5 [defaults to 0.0]
-  w_r2₊lm_r2₊bm [defaults to 1.0]
-  A6 [defaults to 0.00429191]
-  A7 [defaults to -0.0122152]
-  A8 [defaults to 0.00437472]
   A9 [defaults to 0.0]
-  w_r3₊lm_r3₊bm [defaults to 1.0]
   lnκ [defaults to 0.0]
   lnτ [defaults to 0.0]
-  lnϵ [defaults to 0.0]
+  w_r1₊lm_r1₊bm [defaults to 1.0]
+  w_r2₊lm_r2₊bm [defaults to 1.0]
+  w_r3₊lm_r3₊bm [defaults to 1.0]
 Observed (6): see observed(fitmodel)</code></pre>
 <h2 id=setup_spectral_dcm ><a href="#setup_spectral_dcm" class=header-anchor >Setup spectral DCM</a></h2>
 <pre><code class="julia hljs">max_iter = <span class=hljs-number >128</span>; <span class=hljs-comment ># maximum number of iterations</span>
 <span class=hljs-comment ># attribute initial conditions or default values to dynamic states of our model</span>
 sts, _ = get_dynamic_states(fitmodel);</code></pre>
 <p>the following step is needed if the model&#39;s Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 &#40;which is the default expansion&#41;. We simply add small random values to avoid this degeneracy:</p>
-<pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >0.001</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">Dict{SymbolicUtils.BasicSymbolic{Real}, Float64} with 15 entries:
-  r3₊lm₊x(t) =&gt; 0.000489568
-  r3₊bm₊lnq(t) =&gt; 0.000198145
-  r2₊bm₊lnq(t) =&gt; 0.000210419
-  r1₊bm₊lnν(t) =&gt; 0.000541726
-  r2₊bm₊s(t) =&gt; 0.000397204
-  r3₊bm₊lnu(t) =&gt; 0.000169086
-  r2₊bm₊lnν(t) =&gt; 0.000646358
-  r1₊bm₊s(t) =&gt; 0.000138322
-  r3₊bm₊lnν(t) =&gt; 0.000570881
-  r1₊lm₊x(t) =&gt; 4.49163e-6
-  r1₊bm₊lnu(t) =&gt; 0.000896385
-  r3₊bm₊s(t) =&gt; 0.000388604
-  r2₊lm₊x(t) =&gt; 0.000928402
-  r2₊bm₊lnu(t) =&gt; 0.000747008
-  r1₊bm₊lnq(t) =&gt; 0.000808084</code></pre>
+<pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >10</span>^-<span class=hljs-number >10</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">Dict{SymbolicUtils.BasicSymbolic{Real}, Float64} with 15 entries:
+  r3₊lm₊x(t) =&gt; 1.10897e-11
+  r3₊bm₊lnq(t) =&gt; 8.56768e-11
+  r2₊bm₊lnq(t) =&gt; 4.80233e-11
+  r1₊bm₊lnν(t) =&gt; 5.27927e-11
+  r2₊bm₊s(t) =&gt; 6.51909e-11
+  r3₊bm₊lnu(t) =&gt; 6.74234e-11
+  r2₊bm₊lnν(t) =&gt; 1.89427e-11
+  r1₊bm₊s(t) =&gt; 3.51678e-11
+  r3₊bm₊lnν(t) =&gt; 3.39346e-11
+  r1₊lm₊x(t) =&gt; 2.54735e-11
+  r1₊bm₊lnu(t) =&gt; 5.47787e-12
+  r3₊bm₊s(t) =&gt; 6.77173e-11
+  r2₊lm₊x(t) =&gt; 6.93896e-11
+  r2₊bm₊lnu(t) =&gt; 5.51802e-11
+  r1₊bm₊lnq(t) =&gt; 7.86157e-11</code></pre>
 <p>For convenience we can use the default prior function to use standardized prior values as given in SPM:</p>
 <pre><code class="julia hljs">pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
@@ -182,10 +213,8 @@ priors = (μθ_pr = pmean,
                   );</code></pre>
 <p>To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:</p>
 <pre><code class="julia hljs">csdsetup = (mar_order = p, freq = freq, dt = dt);</code></pre>
-<p>earlier we used the function <code>get_idx_tagged_vars</code> to get the indices of tagged variables. Here we don&#39;t want to get the indices but rather the symbolic variable names themselves in order to get the correct columns of the dataframe of the simulation that correspond to the BOLD signal or measurement:</p>
-<pre><code class="julia hljs">_, s_bold = get_eqidx_tagged_vars(fitmodel, <span class=hljs-string >&quot;measurement&quot;</span>);    <span class=hljs-comment ># get bold signal variables</span></code></pre>
 <p>Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series &#40;as opposed to LFPs, which is the other modality that is currently available in Neuroblox&#41;.</p>
-<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol[:, <span class=hljs-built_in >String</span>.(<span class=hljs-built_in >Symbol</span>.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre>
+<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre>
 <p>We are now ready to run the optimization procedure&#33; That is we loop over run<em>sDCM</em>iteration&#33; which will alter <code>state</code> after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.</p>
 <pre><code class="julia hljs"><span class=hljs-keyword >for</span> iter <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:max_iter
     state.iter = iter
@@ -198,32 +227,44 @@ priors = (μθ_pr = pmean,
             <span class=hljs-keyword >break</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:-3568.7760918980375 - dF predicted:1151.645766454491
-iteration: 2 - F:-2848.221318281628 - dF predicted:570.6511079776284
-iteration: 3 - F:-2353.124223513176 - dF predicted:524.3646402335239
-iteration: 4 - F:-1903.0539222087557 - dF predicted:478.7683995365453
-iteration: 5 - F:-1485.7828414859953 - dF predicted:453.24897986773
-iteration: 6 - F:-1097.4378176106563 - dF predicted:365.08220043722986
-iteration: 7 - F:-804.3167412039887 - dF predicted:210.20136064530323
-iteration: 8 - F:-644.067088799874 - dF predicted:100.06125194193328
-iteration: 9 - F:-564.1829538620348 - dF predicted:53.19735621839973
-iteration: 10 - F:-522.2850500696704 - dF predicted:24.073777898251162
-iteration: 11 - F:-504.332256636407 - dF predicted:8.90206505171124
-iteration: 12 - F:-497.41183927510514 - dF predicted:3.901165216298112
-iteration: 13 - F:-494.1998992115703 - dF predicted:2.236425597485452
-iteration: 14 - F:-492.3211011849102 - dF predicted:1.4295039738173054
-iteration: 15 - F:-491.13201457437907 - dF predicted:0.8876270589141387
-iteration: 16 - F:-490.4043700126819 - dF predicted:0.5419600356377521
-iteration: 17 - F:-489.9584637595599 - dF predicted:0.3246239358903075
-iteration: 18 - F:-489.7081937124897 - dF predicted:0.195392314645522
-iteration: 19 - F:-489.55336541439794 - dF predicted:0.13565672152996391
-iteration: 20 - F:-489.50792749659803 - dF predicted:0.18761426801744138
-iteration: 21 - F:-489.4985241958013 - dF predicted:0.6009586127600766
-iteration: 22 - F:-489.4985241958013 - dF predicted:0.002476062697948794
-iteration: 23 - F:-489.496699219244 - dF predicted:0.0037885150816135745
-iteration: 24 - F:-489.49346468129704 - dF predicted:0.0059329865925671806
-iteration: 25 - F:-489.4882480161087 - dF predicted:0.009058419423405585
-convergence
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">TaskFailedException
+
+    nested task error: BoundsError: attempt to access Tuple{Vector{Float64}, Vector{Any}, Symbolics.Num} at index [4]
+    Stacktrace:
+      [1] getindex
+        @ ./tuple.jl:31 [inlined]
+      [2] macro expansion
+        @ ~/.julia/packages/RuntimeGeneratedFunctions/M9ZX8/src/RuntimeGeneratedFunctions.jl:162 [inlined]
+      [3] macro expansion
+        @ ./none:0 [inlined]
+      [4] generated_callfunc
+        @ ./none:0 [inlined]
+      [5] (::RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr})(::Vector{Float64}, ::Vector{Any}, ::Symbolics.Num)
+        @ RuntimeGeneratedFunctions ~/.julia/packages/RuntimeGeneratedFunctions/M9ZX8/src/RuntimeGeneratedFunctions.jl:150
+      [6] (::Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}})(par::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}})
+        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:414
+      [7] transferfunction(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, derivatives::Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}, indices::Dict{Symbol, Vector{Int64}})
+        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:110
+      [8] csd_approx(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, derivatives::Function, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}, indices::Dict{Symbol, Vector{Int64}})
+        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:181
+      [9] csd_mtf(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, p::Int64, derivatives::Function, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}, params_idx::Dict{Symbol, Vector{Int64}}, modality::String)
+        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:232
+     [10] #52
+        @ ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:429 [inlined]
+     [11] vector_mode_dual_eval!
+        @ ~/.julia/packages/ForwardDiff/UBbGT/src/apiutils.jl:24 [inlined]
+     [12] vector_mode_jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11, Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}})
+        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:129
+     [13] jacobian
+        @ ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:22 [inlined]
+     [14] jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11, Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}})
+        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:19
+     [15] jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64})
+        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:19
+     [16] _run_sDCM_iteration!(state::Neuroblox.VLState, setup::Neuroblox.VLSetup{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Array{ComplexF64, 3}, Matrix{ComplexF64}})
+        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:481
+     [17] (::Neuroblox.var&quot;#55#56&quot;{Neuroblox.VLState, Neuroblox.VLSetup{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Array{ComplexF64, 3}, Matrix{ComplexF64}}})()
+        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:467
 </code></pre>
 <p>Note that the output <code>F</code> is the free energy at each iteration step and <code>dF</code> is the predicted change of free energy at each step which approximates the actual free energy change and is used as stopping criterion by requiring that it does not excede the <code>tolerance</code> level for 4 consecutive times.</p>
 <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2>
@@ -253,7 +294,7 @@ convergence
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: February 18, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: February 21, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>

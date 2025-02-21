@@ -8,6 +8,7 @@ using OrderedCollections
 using CairoMakie
 using ModelingToolkit
 using Random
+using StatsBase
 
 Random.seed!(17)   # set seed for reproducibility
 
@@ -19,23 +20,24 @@ for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)          # store neural mass model in list. We need this list below. If you haven't seen the Julia command `push!` before [see here](http://jlhub.com/julia/manual/en/function/push-exclamation).
 
-    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1) ## add Ornstein-Uhlenbeck as noisy input to the current region
+    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.2, τ=2)
     add_edge!(g, input => region, weight=1/16)
 
     measurement = BalloonModel(;name=Symbol("r$(i)₊bm")) ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
     add_edge!(g, region => measurement, weight=1.0)
 end
 
-A_true = [[-0.5 -2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
+A_true = [[-0.5 -0.2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
+
 for idx in CartesianIndices(A_true)
-    add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[1], idx[2]])
+    add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[2], idx[1]])   # Note the definition of columns as outputs and rows as inputs. For consistency with SPM we keep this notation.
 end
 
 @named simmodel = system_from_graph(g);
 
-tspan = (0.0, 512.0)
+tspan = (0, 1022)
+dt = 2   # 2 seconds as measurement interval for fMRI
 prob = SDEProblem(simmodel, [], tspan)
-dt = 2   # 2 seconds (units are seconds) as measurement interval for fMRI
 sol = solve(prob, ImplicitRKMil(), saveat=dt);
 
 idx_m = get_idx_tagged_vars(simmodel, "measurement")    # get index of bold signal
@@ -50,9 +52,18 @@ lines!(ax, sol, idxs=idx_m)
 f
 save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
 
-dfsol = DataFrame(sol[ceil(Int, 101/dt):end]);
+dfsol = DataFrame(sol);
 
-data = Matrix(dfsol[:, idx_m]);
+data = Matrix(dfsol[:, idx_m .+ 1]);    # +1 due to the additional time-dimension in the data frame.
+
+data += randn(size(data))/4;
+
+data .-= mean(data, dims=1);
+data *= 1/std(data[:])/4;
+dfsol = DataFrame(data, :auto);
+
+_, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equation of bold state
+rename!(dfsol, Symbol.(obsvars))
 
 p = 8
 mar = mar_ml(data, p)   # maximum likelihood estimation of the MAR coefficients and noise covariance matrix
@@ -64,11 +75,20 @@ fig = Figure(size=(1200, 800))
 grid = fig[1, 1] = GridLayout()
 for i = 1:nr
     for j = 1:nr
-        ax = Axis(grid[i, j])
+        if i == 1 && j == 1
+            ax = Axis(grid[i, j], xlabel="Frequency [Hz]", ylabel="real value of CSD")
+        else
+            ax = Axis(grid[i, j])
+        end
         lines!(ax, freq, real.(csd[:, i, j]))
     end
 end
+Label(grid[1, 1:3, Top()], "Cross-spectral densities", valign = :bottom,
+    font = :bold,
+    fontsize = 32,
+    padding = (0, 0, 5, 0))
 fig
+
 save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 
 g = MetaDiGraph()
@@ -106,15 +126,15 @@ end
 # Avoid simplification of the model in order to be able to exclude some parameters from fitting
 @named fitmodel = system_from_graph(g, simplify=false);
 
-untune = Dict(A[3] => false, A[7] => false)
-fitmodel = changetune(fitmodel, untune)                 # A[3] and A[7] were set to 0 in the simulation
-fitmodel = structural_simplify(fitmodel, split=false)   # and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don't lose time with it ;)
+untune = Dict(A[3] => false, A[7] => false, A[1] => false, A[5] => false, A[9] => false)
+fitmodel = changetune(fitmodel, untune)           # 3 and 7 are not present in the simulation model
+fitmodel = structural_simplify(fitmodel)          # and now simplify the euqations
 
 max_iter = 128; # maximum number of iterations
 # attribute initial conditions or default values to dynamic states of our model
 sts, _ = get_dynamic_states(fitmodel);
 
-perturbedfp = Dict(sts .=> abs.(0.001*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
+perturbedfp = Dict(sts .=> abs.(10^-10*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
 
 pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
@@ -128,9 +148,7 @@ hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precisi
 
 csdsetup = (mar_order = p, freq = freq, dt = dt);
 
-_, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal variables
-
-(state, setup) = setup_sDCM(dfsol[:, String.(Symbol.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
+(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
 
 for iter in 1:max_iter
     state.iter = iter

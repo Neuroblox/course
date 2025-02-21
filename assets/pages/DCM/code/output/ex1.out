@@ -1,0 +1,2 @@
+ArgumentError: Package StatsBase not found in current path.
+- Run `import Pkg; Pkg.add("StatsBase")` to install the StatsBase package.

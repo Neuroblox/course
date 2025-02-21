@@ -1,3 +1,4 @@
 # This file was generated, do not modify it. # hide
-f1 = freeenergy(state)
-save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
+hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precision, needs to be a matrix
+                   :μλ_pr => [8.0]               # prior metaparameter mean, needs to be a vector
+                  );

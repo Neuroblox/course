@@ -39,6 +39,7 @@ using OrderedCollections
 using CairoMakie
 using ModelingToolkit
 using Random
+using StatsBase
 ````
 
 ## Define the model
@@ -67,7 +68,7 @@ for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)          # store neural mass model in list. We need this list below. If you haven't seen the Julia command `push!` before [see here](http://jlhub.com/julia/manual/en/function/push-exclamation).
 
-    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1) ## add Ornstein-Uhlenbeck as noisy input to the current region
+    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.2, τ=2)
     add_edge!(g, input => region, weight=1/16)
 
     measurement = BalloonModel(;name=Symbol("r$(i)₊bm")) ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
@@ -79,15 +80,21 @@ Note that `weight=1/16` in the connection between the OU process and the Neural 
 Next we define the between-region connectivity matrix and connect regions; we use the same matrix as is defined in [3]
 
 ````julia:ex4
-A_true = [[-0.5 -2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
+A_true = [[-0.5 -0.2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
+````
+
+Note that in SPM DCM connection matrices column variables denote output from and rows denote inputs to a particular region.
+This is different from the usual Neuroblox definition of connection matrices. Thus we flip the indices in what follows:
+
+````julia:ex5
 for idx in CartesianIndices(A_true)
-    add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[1], idx[2]])
+    add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[2], idx[1]])   # Note the definition of columns as outputs and rows as inputs. For consistency with SPM we keep this notation.
 end
 ````
 
 finally we compose the simulation model
 
-````julia:ex5
+````julia:ex6
 @named simmodel = system_from_graph(g);
 ````
 
@@ -95,10 +102,10 @@ finally we compose the simulation model
 
 setup simulation of the model, time in seconds
 
-````julia:ex6
-tspan = (0.0, 512.0)
+````julia:ex7
+tspan = (0, 1022)
+dt = 2   # 2 seconds as measurement interval for fMRI
 prob = SDEProblem(simmodel, [], tspan)
-dt = 2   # 2 seconds (units are seconds) as measurement interval for fMRI
 sol = solve(prob, ImplicitRKMil(), saveat=dt);
 ````
 
@@ -106,13 +113,13 @@ we now want to extract all the variables in our model which carry the tag "measu
 the observable quantity in our model is the BOLD signal, the variable of the Blox `BalloonModel` that represents the BOLD signal is tagged with "measurement" tag.
 other tags that are defined are "input" which denotes variables representing a stimulus, like for instance an `OUBlox`.
 
-````julia:ex7
+````julia:ex8
 idx_m = get_idx_tagged_vars(simmodel, "measurement")    # get index of bold signal
 ````
 
 plot bold signal time series
 
-````julia:ex8
+````julia:ex9
 f = Figure()
 ax = Axis(f[1, 1],
     title = "fMRI time series",
@@ -128,19 +135,42 @@ save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
 
 We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.
 
-````julia:ex9
-dfsol = DataFrame(sol[ceil(Int, 101/dt):end]);
+````julia:ex10
+dfsol = DataFrame(sol);
+````
+
+## Add measurement noise and rescale data
+
+````julia:ex11
+data = Matrix(dfsol[:, idx_m .+ 1]);    # +1 due to the additional time-dimension in the data frame.
+````
+
+add measurement noise
+
+````julia:ex12
+data += randn(size(data))/4;
+````
+
+center and rescale data (as done in SPM):
+
+````julia:ex13
+data .-= mean(data, dims=1);
+data *= 1/std(data[:])/4;
+dfsol = DataFrame(data, :auto);
+````
+
+Add correct names to columns of the data frame
+
+````julia:ex14
+_, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equation of bold state
+rename!(dfsol, Symbol.(obsvars))
 ````
 
 ## Estimate and plot the cross-spectral densities
 
-````julia:ex10
-data = Matrix(dfsol[:, idx_m]);
-````
-
 We compute the cross-spectral density by fitting a linear model of order `p` and then compute the csd analytically from the parameters of the multivariate autoregressive model
 
-````julia:ex11
+````julia:ex15
 p = 8
 mar = mar_ml(data, p)   # maximum likelihood estimation of the MAR coefficients and noise covariance matrix
 ns = size(data, 1)
@@ -148,18 +178,31 @@ freq = range(min(128, ns*dt)^-1, max(8, 2*dt)^-1, 32)
 csd = mar2csd(mar, freq, dt^-1);
 ````
 
-Now plot the cross-spectrum:
+Now plot the real part of the cross-spectra. Most part of the signal is in the lower frequencies:
 
-````julia:ex12
+````julia:ex16
 fig = Figure(size=(1200, 800))
 grid = fig[1, 1] = GridLayout()
 for i = 1:nr
     for j = 1:nr
-        ax = Axis(grid[i, j])
+        if i == 1 && j == 1
+            ax = Axis(grid[i, j], xlabel="Frequency [Hz]", ylabel="real value of CSD")
+        else
+            ax = Axis(grid[i, j])
+        end
         lines!(ax, freq, real.(csd[:, i, j]))
     end
 end
+Label(grid[1, 1:3, Top()], "Cross-spectral densities", valign = :bottom,
+    font = :bold,
+    fontsize = 32,
+    padding = (0, 0, 5, 0))
 fig
+````
+
+These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.
+
+````julia:ex17
 save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 ````
 
@@ -171,7 +214,7 @@ We will now assemble a new model that is used for fitting the previous simulatio
 This procedure is similar to before with the difference that we will define global parameters and use tags such as [tunable=false/true] to define which parameters we will want to estimate.
 Note that parameters are tunable by default.
 
-````julia:ex13
+````julia:ex18
 g = MetaDiGraph()
 regions = [];   # list of neural mass blocks to then connect them to each other with an adjacency matrix `A`
 ````
@@ -181,7 +224,7 @@ Since we want some parameters to be shared across several regions we define them
 For this purpose use the ModelingToolkit macro `@parameters` which is used to define symbolic parameters for models.
 Note that we can set the tunable flag right away thereby defining whether we will include this parameter in the optimization procedure or rather keep it fixed to its predefined value.
 
-````julia:ex14
+````julia:ex19
 @parameters lnκ=0.0 [tunable=false] lnϵ=0.0 [tunable=false] lnτ=0.0 [tunable=false];   # lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale
 @parameters C=1/16 [tunable=false];   # note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.
 ````
@@ -189,7 +232,7 @@ Note that we can set the tunable flag right away thereby defining whether we wil
 We now define a similar model as above for the simulation but instead of using an actual stimulus Blox we here add ExternalInput which represents a simple linear external input that is not specified any further.
 We simply say that our model gets some input with a proportional factor $C$. This is mostly only to make sure that our results are consistent with those produced by SPM
 
-````julia:ex15
+````julia:ex20
 for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)
@@ -203,7 +246,7 @@ end
 
 Here we define the prior expectation values of the effective connectivity matrix we wish to infer:
 
-````julia:ex16
+````julia:ex21
 A_prior = 0.01*randn(nr, nr)
 A_prior -= diagm(diag(A_prior))    # remove the diagonal
 ````
@@ -211,7 +254,7 @@ A_prior -= diagm(diag(A_prior))    # remove the diagonal
 Since we want to optimize these weights we turn them into symbolic parameters:
 Add the symbolic weights to the edges and connect regions.
 
-````julia:ex17
+````julia:ex22
 A = []
 for (i, a) in enumerate(vec(A_prior))
     symb = Symbol("A$(i)")
@@ -229,18 +272,18 @@ end
 @named fitmodel = system_from_graph(g, simplify=false);
 ````
 
-With the Neuroblox function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
-Assume we want to exclude the connections that were set to zero in the simulation:
+With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
+For instance the effective connections that are set to zero in the simulation and the self-connections:
 
-````julia:ex18
-untune = Dict(A[3] => false, A[7] => false)
-fitmodel = changetune(fitmodel, untune)                 # A[3] and A[7] were set to 0 in the simulation
-fitmodel = structural_simplify(fitmodel, split=false)   # and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don't lose time with it ;)
+````julia:ex23
+untune = Dict(A[3] => false, A[7] => false, A[1] => false, A[5] => false, A[9] => false)
+fitmodel = changetune(fitmodel, untune)           # 3 and 7 are not present in the simulation model
+fitmodel = structural_simplify(fitmodel)          # and now simplify the euqations
 ````
 
 ## Setup spectral DCM
 
-````julia:ex19
+````julia:ex24
 max_iter = 128; # maximum number of iterations
 # attribute initial conditions or default values to dynamic states of our model
 sts, _ = get_dynamic_states(fitmodel);
@@ -248,13 +291,13 @@ sts, _ = get_dynamic_states(fitmodel);
 
 the following step is needed if the model's Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 (which is the default expansion). We simply add small random values to avoid this degeneracy:
 
-````julia:ex20
-perturbedfp = Dict(sts .=> abs.(0.001*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
+````julia:ex25
+perturbedfp = Dict(sts .=> abs.(10^-10*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
 ````
 
 For convenience we can use the default prior function to use standardized prior values as given in SPM:
 
-````julia:ex21
+````julia:ex26
 pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
 priors = (μθ_pr = pmean,
@@ -264,7 +307,7 @@ priors = (μθ_pr = pmean,
 
 Setup hyper parameter prior as well:
 
-````julia:ex22
+````julia:ex27
 hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precision, needs to be a matrix
                    :μλ_pr => [8.0]               # prior metaparameter mean, needs to be a vector
                   );
@@ -272,26 +315,20 @@ hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precisi
 
 To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:
 
-````julia:ex23
+````julia:ex28
 csdsetup = (mar_order = p, freq = freq, dt = dt);
-````
-
-earlier we used the function `get_idx_tagged_vars` to get the indices of tagged variables. Here we don't want to get the indices but rather the symbolic variable names themselves in order to get the correct columns of the dataframe of the simulation that correspond to the BOLD signal or measurement:
-
-````julia:ex24
-_, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal variables
 ````
 
 Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series (as opposed to LFPs, which is the other modality that is currently available in Neuroblox).
 
-````julia:ex25
-(state, setup) = setup_sDCM(dfsol[:, String.(Symbol.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
+````julia:ex29
+(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
 ````
 
 We are now ready to run the optimization procedure!
 That is we loop over run_sDCM_iteration! which will alter `state` after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.
 
-````julia:ex26
+````julia:ex30
 for iter in 1:max_iter
     state.iter = iter
     run_sDCM_iteration!(state, setup)
@@ -312,7 +349,7 @@ Note that the output `F` is the free energy at each iteration step and `dF` is t
 Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound (ELBO).
 Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a (potentially local) optimum:
 
-````julia:ex27
+````julia:ex31
 f1 = freeenergy(state)
 save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
 ````
@@ -322,7 +359,7 @@ save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
 Plot the estimated posterior of the effective connectivity and compare that to the true parameter values.
 Bar height are the posterior mean and error bars are the standard deviation of the posterior.
 
-````julia:ex28
+````julia:ex32
 f2 = ecbarplot(state, setup, A_true)
 save(joinpath(@OUTPUT, "ecbar.svg"), f2); # hide
 ````
