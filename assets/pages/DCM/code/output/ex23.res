@@ -3,23 +3,23 @@ Equations (21):
   21 standard: see equations(fitmodel)
 Unknowns (21): see unknowns(fitmodel)
   r1₊lm₊x(t) [defaults to 0.0]
-  r1₊bm₊s(t) [defaults to 1.0]
+  r1₊bm₊s(t) [defaults to 0.0]
   r1₊bm₊lnu(t) [defaults to 0.0]
   r1₊bm₊lnν(t) [defaults to 0.0]
   r1₊bm₊lnq(t) [defaults to 0.0]
   r2₊lm₊x(t) [defaults to 0.0]
-  r2₊bm₊s(t) [defaults to 1.0]
+  r2₊bm₊s(t) [defaults to 0.0]
   r2₊bm₊lnu(t) [defaults to 0.0]
   r2₊bm₊lnν(t) [defaults to 0.0]
   r2₊bm₊lnq(t) [defaults to 0.0]
   r3₊lm₊x(t) [defaults to 0.0]
-  r3₊bm₊s(t) [defaults to 1.0]
+  r3₊bm₊s(t) [defaults to 0.0]
   r3₊bm₊lnu(t) [defaults to 0.0]
   r3₊bm₊lnν(t) [defaults to 0.0]
   r3₊bm₊lnq(t) [defaults to 0.0]
-  r1₊ei₊u(t): ext_input
-  r2₊ei₊u(t): ext_input
-  r3₊ei₊u(t): ext_input
+  r1₊ei₊u(t) [defaults to 0.0]: ext_input
+  r2₊ei₊u(t) [defaults to 0.0]: ext_input
+  r3₊ei₊u(t) [defaults to 0.0]: ext_input
   r1₊bm₊bold(t) [defaults to 0.0]: measurement
   r2₊bm₊bold(t) [defaults to 0.0]: measurement
   r3₊bm₊bold(t) [defaults to 0.0]: measurement

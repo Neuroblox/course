@@ -142,23 +142,23 @@ Equations (21):
   21 standard: see equations(fitmodel)
 Unknowns (21): see unknowns(fitmodel)
   r1₊lm₊x(t) [defaults to 0.0]
-  r1₊bm₊s(t) [defaults to 1.0]
+  r1₊bm₊s(t) [defaults to 0.0]
   r1₊bm₊lnu(t) [defaults to 0.0]
   r1₊bm₊lnν(t) [defaults to 0.0]
   r1₊bm₊lnq(t) [defaults to 0.0]
   r2₊lm₊x(t) [defaults to 0.0]
-  r2₊bm₊s(t) [defaults to 1.0]
+  r2₊bm₊s(t) [defaults to 0.0]
   r2₊bm₊lnu(t) [defaults to 0.0]
   r2₊bm₊lnν(t) [defaults to 0.0]
   r2₊bm₊lnq(t) [defaults to 0.0]
   r3₊lm₊x(t) [defaults to 0.0]
-  r3₊bm₊s(t) [defaults to 1.0]
+  r3₊bm₊s(t) [defaults to 0.0]
   r3₊bm₊lnu(t) [defaults to 0.0]
   r3₊bm₊lnν(t) [defaults to 0.0]
   r3₊bm₊lnq(t) [defaults to 0.0]
-  r1₊ei₊u(t): ext_input
-  r2₊ei₊u(t): ext_input
-  r3₊ei₊u(t): ext_input
+  r1₊ei₊u(t) [defaults to 0.0]: ext_input
+  r2₊ei₊u(t) [defaults to 0.0]: ext_input
+  r3₊ei₊u(t) [defaults to 0.0]: ext_input
   r1₊bm₊bold(t) [defaults to 0.0]: measurement
   r2₊bm₊bold(t) [defaults to 0.0]: measurement
   r3₊bm₊bold(t) [defaults to 0.0]: measurement
@@ -214,7 +214,8 @@ priors = (μθ_pr = pmean,
 <p>To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:</p>
 <pre><code class="julia hljs">csdsetup = (mar_order = p, freq = freq, dt = dt);</code></pre>
 <p>Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series &#40;as opposed to LFPs, which is the other modality that is currently available in Neuroblox&#41;.</p>
-<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre>
+<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre><pre><code class="plaintext hljs">type Dict has no field μλ_pr
+</code></pre>
 <p>We are now ready to run the optimization procedure&#33; That is we loop over run<em>sDCM</em>iteration&#33; which will alter <code>state</code> after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.</p>
 <pre><code class="julia hljs"><span class=hljs-keyword >for</span> iter <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:max_iter
     state.iter = iter
@@ -227,53 +228,21 @@ priors = (μθ_pr = pmean,
             <span class=hljs-keyword >break</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">TaskFailedException
-
-    nested task error: BoundsError: attempt to access Tuple{Vector{Float64}, Vector{Any}, Symbolics.Num} at index [4]
-    Stacktrace:
-      [1] getindex
-        @ ./tuple.jl:31 [inlined]
-      [2] macro expansion
-        @ ~/.julia/packages/RuntimeGeneratedFunctions/M9ZX8/src/RuntimeGeneratedFunctions.jl:162 [inlined]
-      [3] macro expansion
-        @ ./none:0 [inlined]
-      [4] generated_callfunc
-        @ ./none:0 [inlined]
-      [5] (::RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr})(::Vector{Float64}, ::Vector{Any}, ::Symbolics.Num)
-        @ RuntimeGeneratedFunctions ~/.julia/packages/RuntimeGeneratedFunctions/M9ZX8/src/RuntimeGeneratedFunctions.jl:150
-      [6] (::Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}})(par::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:414
-      [7] transferfunction(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, derivatives::Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}, indices::Dict{Symbol, Vector{Int64}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:110
-      [8] csd_approx(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, derivatives::Function, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}, indices::Dict{Symbol, Vector{Int64}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:181
-      [9] csd_mtf(freq::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}, p::Int64, derivatives::Function, params::Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}, params_idx::Dict{Symbol, Vector{Int64}}, modality::String)
-        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:232
-     [10] #52
-        @ ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:429 [inlined]
-     [11] vector_mode_dual_eval!
-        @ ~/.julia/packages/ForwardDiff/UBbGT/src/apiutils.jl:24 [inlined]
-     [12] vector_mode_jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11, Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}})
-        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:129
-     [13] jacobian
-        @ ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:22 [inlined]
-     [14] jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11, Vector{ForwardDiff.Dual{ForwardDiff.Tag{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Float64}, Float64, 11}}})
-        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:19
-     [15] jacobian(f::Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, x::Vector{Float64})
-        @ ForwardDiff ~/.julia/packages/ForwardDiff/UBbGT/src/jacobian.jl:19
-     [16] _run_sDCM_iteration!(state::Neuroblox.VLState, setup::Neuroblox.VLSetup{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Array{ComplexF64, 3}, Matrix{ComplexF64}})
-        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:481
-     [17] (::Neuroblox.var&quot;#55#56&quot;{Neuroblox.VLState, Neuroblox.VLSetup{Neuroblox.var&quot;#52#54&quot;{Dict{Symbol, Vector{Int64}}, String, Neuroblox.var&quot;#51#53&quot;{ModelingToolkit.ODESystem, Vector{Float64}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :ˍ₋arg3, :t), Symbolics.var&quot;#_RGF_ModTag&quot;, Symbolics.var&quot;#_RGF_ModTag&quot;, (0x0ccb9cee, 0x524cf697, 0xeefc179e, 0xe0d08f4d, 0xe0d13df3), Expr}}, Int64, StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}, Array{ComplexF64, 3}, Matrix{ComplexF64}}})()
-        @ Neuroblox ~/.julia/packages/Neuroblox/YqgtU/src/datafitting/spDCM_VL.jl:467
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
 </code></pre>
 <p>Note that the output <code>F</code> is the free energy at each iteration step and <code>dF</code> is the predicted change of free energy at each step which approximates the actual free energy change and is used as stopping criterion by requiring that it does not excede the <code>tolerance</code> level for 4 consecutive times.</p>
 <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2>
 <p>Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound &#40;ELBO&#41;. Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a &#40;potentially local&#41; optimum:</p>
-<pre><code class="julia hljs">f1 = freeenergy(state)</code></pre>
-<img src="/course/assets/pages/DCM/code/output/freeenergy.svg" alt="">
+<pre><code class="julia hljs">f1 = freeenergy(state)</code></pre><pre><code class="plaintext hljs">UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/DCM/code/freeenergy' not found. //</span></p>
 <p>Plot the estimated posterior of the effective connectivity and compare that to the true parameter values. Bar height are the posterior mean and error bars are the standard deviation of the posterior.</p>
-<pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)</code></pre>
-<img src="/course/assets/pages/DCM/code/output/ecbar.svg" alt="">
+<pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)</code></pre><pre><code class="plaintext hljs">UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/DCM/code/ecbar' not found. //</span></p>
 <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2>
 <ul>
 <li><p><strong>Explore susceptibility with respect to noise.</strong> Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy &#40;compare the different free energies of the models and their respective parameter values with ground truth&#41;?</p>
