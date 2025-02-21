@@ -38,6 +38,7 @@ using OrderedCollections
 using CairoMakie
 using ModelingToolkit
 using Random
+using StatsBase
 
 # ## Define the model
 # We will define a model of 3 regions. This means first of all to define a graph.
@@ -59,7 +60,7 @@ for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)          # store neural mass model in list. We need this list below. If you haven't seen the Julia command `push!` before [see here](http://jlhub.com/julia/manual/en/function/push-exclamation).
 
-    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.1) ## add Ornstein-Uhlenbeck as noisy input to the current region
+    input = OUBlox(;name=Symbol("r$(i)₊ou"), σ=0.2, τ=2)
     add_edge!(g, input => region, weight=1/16)  
 
     measurement = BalloonModel(;name=Symbol("r$(i)₊bm")) ## simulate fMRI signal with BalloonModel which includes the BOLD signal on top of the balloon model dynamics
@@ -67,9 +68,11 @@ for i = 1:nr
 end
 # Note that `weight=1/16` in the connection between the OU process and the Neural Mass Blox is taken from SPM12. This stabilizes the balloon model simulation. Alternatively the noise of the Ornstein-Uhlenbeck block or the weight of the edge connecting neuronal activity and balloon model could be reduced to guarantee numerical stability.
 # Next we define the between-region connectivity matrix and connect regions; we use the same matrix as is defined in [3]
-A_true = [[-0.5 -2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
+A_true = [[-0.5 -0.2 0]; [0.4 -0.5 -0.3]; [0 0.2 -0.5]]
+# Note that in SPM DCM connection matrices column variables denote output from and rows denote inputs to a particular region.
+# This is different from the usual Neuroblox definition of connection matrices. Thus we flip the indices in what follows:
 for idx in CartesianIndices(A_true)
-    add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[1], idx[2]])
+    add_edge!(g, regions[idx[1]] => regions[idx[2]], weight=A_true[idx[2], idx[1]])   # Note the definition of columns as outputs and rows as inputs. For consistency with SPM we keep this notation.
 end
 
 # finally we compose the simulation model
@@ -78,9 +81,9 @@ end
 # ## Run the simulation and plot the results
 
 # setup simulation of the model, time in seconds
-tspan = (0.0, 512.0)
+tspan = (0, 1022)
+dt = 2   # 2 seconds as measurement interval for fMRI
 prob = SDEProblem(simmodel, [], tspan)
-dt = 2   # 2 seconds (units are seconds) as measurement interval for fMRI
 sol = solve(prob, ImplicitRKMil(), saveat=dt);
 
 # we now want to extract all the variables in our model which carry the tag "measurement". For this purpose we can use the Neuroblox function `get_idx_tagged_vars`
@@ -100,26 +103,47 @@ save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
 #!nb # \fig{fmriseries}
 
 # We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.
-dfsol = DataFrame(sol[ceil(Int, 101/dt):end]);
+dfsol = DataFrame(sol);
+
+# ## Add measurement noise and rescale data
+data = Matrix(dfsol[:, idx_m .+ 1]);    # +1 due to the additional time-dimension in the data frame.
+# add measurement noise
+data += randn(size(data))/4;
+# center and rescale data (as done in SPM):
+data .-= mean(data, dims=1);
+data *= 1/std(data[:])/4;
+dfsol = DataFrame(data, :auto);
+# Add correct names to columns of the data frame
+_, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equation of bold state
+rename!(dfsol, Symbol.(obsvars))
 
 # ## Estimate and plot the cross-spectral densities
-data = Matrix(dfsol[:, idx_m]);
+
 # We compute the cross-spectral density by fitting a linear model of order `p` and then compute the csd analytically from the parameters of the multivariate autoregressive model
 p = 8
 mar = mar_ml(data, p)   # maximum likelihood estimation of the MAR coefficients and noise covariance matrix
 ns = size(data, 1)
 freq = range(min(128, ns*dt)^-1, max(8, 2*dt)^-1, 32)
 csd = mar2csd(mar, freq, dt^-1);
-# Now plot the cross-spectrum:
+# Now plot the real part of the cross-spectra. Most part of the signal is in the lower frequencies:
 fig = Figure(size=(1200, 800))
 grid = fig[1, 1] = GridLayout()
 for i = 1:nr
     for j = 1:nr
-        ax = Axis(grid[i, j])
+        if i == 1 && j == 1
+            ax = Axis(grid[i, j], xlabel="Frequency [Hz]", ylabel="real value of CSD")
+        else
+            ax = Axis(grid[i, j])
+        end
         lines!(ax, freq, real.(csd[:, i, j]))
     end
 end
+Label(grid[1, 1:3, Top()], "Cross-spectral densities", valign = :bottom,
+    font = :bold,
+    fontsize = 32,
+    padding = (0, 0, 5, 0))
 fig
+# These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.
 save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 #!nb # \fig{csd}
 
@@ -168,18 +192,18 @@ for (i, idx) in enumerate(CartesianIndices(A_prior))
 end
 ## Avoid simplification of the model in order to be able to exclude some parameters from fitting
 @named fitmodel = system_from_graph(g, simplify=false);
-# With the Neuroblox function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
-# Assume we want to exclude the connections that were set to zero in the simulation:
-untune = Dict(A[3] => false, A[7] => false)
-fitmodel = changetune(fitmodel, untune)                 # A[3] and A[7] were set to 0 in the simulation
-fitmodel = structural_simplify(fitmodel, split=false)   # and now simplify the euqations; the `split` parameter is necessary for some ModelingToolkit peculiarities and will soon be removed. So don't lose time with it ;)
+# With the function `changetune`` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
+# For instance the effective connections that are set to zero in the simulation and the self-connections:
+untune = Dict(A[3] => false, A[7] => false, A[1] => false, A[5] => false, A[9] => false)
+fitmodel = changetune(fitmodel, untune)           # 3 and 7 are not present in the simulation model
+fitmodel = structural_simplify(fitmodel)          # and now simplify the euqations
 
 # ## Setup spectral DCM
 max_iter = 128; # maximum number of iterations
 ## attribute initial conditions or default values to dynamic states of our model
 sts, _ = get_dynamic_states(fitmodel);
 # the following step is needed if the model's Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 (which is the default expansion). We simply add small random values to avoid this degeneracy:
-perturbedfp = Dict(sts .=> abs.(0.001*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
+perturbedfp = Dict(sts .=> abs.(10^-10*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
 # For convenience we can use the default prior function to use standardized prior values as given in SPM:
 pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
@@ -192,10 +216,8 @@ hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precisi
                   );
 # To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:
 csdsetup = (mar_order = p, freq = freq, dt = dt);
-# earlier we used the function `get_idx_tagged_vars` to get the indices of tagged variables. Here we don't want to get the indices but rather the symbolic variable names themselves in order to get the correct columns of the dataframe of the simulation that correspond to the BOLD signal or measurement:
-_, s_bold = get_eqidx_tagged_vars(fitmodel, "measurement");    # get bold signal variables
 # Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series (as opposed to LFPs, which is the other modality that is currently available in Neuroblox).
-(state, setup) = setup_sDCM(dfsol[:, String.(Symbol.(s_bold))], fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
+(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
 
 # We are now ready to run the optimization procedure!
 # That is we loop over run_sDCM_iteration! which will alter `state` after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters. 
