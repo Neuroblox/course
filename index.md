@@ -1,5 +1,6 @@
 @def title = "Introduction to Computational Neuroscience with Neuroblox"
-![Neuroblox logo](/assets/NB_Logo_Full_Transparent@1920px.png)
+
+@@img-small ![](/assets/NB_Logo_Vert_Full_Light.png) @@
 
 # Introduction
 Computational neuroscience aims to simulate the brain in silico, from single synapses to brain-wide networks. The field has matured in tandem with experimental neuroscience, to the point where computational modeling has become an indispensable tool for understanding neuroscience data and motivating future experiments. However, building such models can involve a painstaking process of translating concepts from the literature into working code, then optimizing it to run in a reasonable timeframe.
@@ -21,4 +22,5 @@ We will go over the following units in this course :
 * [Circuit Models](/pages/circuits/) 
 * [Decision Making](/pages/decision_making)
 * [Synaptic Plasticity and Reinforcement Learning](/pages/learning)
-* [Spectral Dynamic Causal Modeling](/pages/DCM)
+* [Parameter Fitting using Optimization](/pages/optimization)
+* [Parameter Fitting using Spectral Dynamic Causal Modeling](/pages/DCM)
