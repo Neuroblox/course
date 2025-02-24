@@ -116,7 +116,7 @@ data *= 1/std(data[:])/4;
 dfsol = DataFrame(data, :auto);
 # Add correct names to columns of the data frame
 _, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equation of bold state
-rename!(dfsol, Symbol.(obsvars))
+rename!(dfsol, Symbol.(obsvars));
 
 # ## Estimate and plot the cross-spectral densities
 
@@ -144,9 +144,9 @@ Label(grid[1, 1:3, Top()], "Cross-spectral densities", valign = :bottom,
     fontsize = 32,
     padding = (0, 0, 5, 0))
 fig
-# These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.
 save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 #!nb # \fig{csd}
+# These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.
 
 # ## Model Inference
 
