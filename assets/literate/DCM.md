@@ -40,6 +40,7 @@ using CairoMakie
 using ModelingToolkit
 using Random
 using StatsBase
+using Statistics
 ````
 
 ## Define the model

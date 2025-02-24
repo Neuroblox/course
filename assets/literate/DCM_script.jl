@@ -9,6 +9,7 @@ using CairoMakie
 using ModelingToolkit
 using Random
 using StatsBase
+using Statistics
 
 Random.seed!(17)   # set seed for reproducibility
 

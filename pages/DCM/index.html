@@ -6,7 +6,8 @@
 <span class=hljs-keyword >using</span> CairoMakie
 <span class=hljs-keyword >using</span> ModelingToolkit
 <span class=hljs-keyword >using</span> Random
-<span class=hljs-keyword >using</span> StatsBase</code></pre><pre><code class="plaintext hljs">ArgumentError: Package StatsBase not found in current path.
+<span class=hljs-keyword >using</span> StatsBase
+<span class=hljs-keyword >using</span> Statistics</code></pre><pre><code class="plaintext hljs">ArgumentError: Package StatsBase not found in current path.
 - Run `import Pkg; Pkg.add(&quot;StatsBase&quot;)` to install the StatsBase package.
 </code></pre> <h2 id=define_the_model ><a href="#define_the_model" class=header-anchor >Define the model</a></h2> <p>We will define a model of 3 regions. This means first of all to define a graph. To this graph we will add three linear neuronal mass models which constitute the &#40;hidden&#41; neuronal dynamics. These constitute three nodes of the graph. Next we will also need some input that stimulates the activity, we use simple Ornstein-Uhlenbeck blocks to create stochastic inputs. One per region. We want to simulate fMRI signals thus we will need to also add a BalloonModel per region. Note that the Ornstein-Uhlenbeck block will feed into the linear neural mass which in turn will feed into the BalloonModel blox. This needs to be represented by the way we define the edges.</p> <pre><code class="julia hljs">Random.seed!(<span class=hljs-number >17</span>)   <span class=hljs-comment ># set seed for reproducibility</span>
 
@@ -263,7 +264,7 @@ Suggestion: check for spelling errors or missing imports.
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: February 21, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: February 24, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
