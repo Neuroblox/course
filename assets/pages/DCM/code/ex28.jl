@@ -1,2 +1,2 @@
 # This file was generated, do not modify it. # hide
-csdsetup = (mar_order = p, freq = freq, dt = dt);
+(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");

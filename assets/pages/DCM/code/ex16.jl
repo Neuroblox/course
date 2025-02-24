@@ -16,3 +16,4 @@ Label(grid[1, 1:3, Top()], "Cross-spectral densities", valign = :bottom,
     fontsize = 32,
     padding = (0, 0, 5, 0))
 fig
+save(joinpath(@OUTPUT, "csd.svg"), fig); # hide

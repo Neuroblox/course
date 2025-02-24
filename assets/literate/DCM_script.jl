@@ -64,7 +64,7 @@ data *= 1/std(data[:])/4;
 dfsol = DataFrame(data, :auto);
 
 _, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equation of bold state
-rename!(dfsol, Symbol.(obsvars))
+rename!(dfsol, Symbol.(obsvars));
 
 p = 8
 mar = mar_ml(data, p)   # maximum likelihood estimation of the MAR coefficients and noise covariance matrix
@@ -89,7 +89,6 @@ Label(grid[1, 1:3, Top()], "Cross-spectral densities", valign = :bottom,
     fontsize = 32,
     padding = (0, 0, 5, 0))
 fig
-
 save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 
 g = MetaDiGraph()

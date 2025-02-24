@@ -164,7 +164,7 @@ Add correct names to columns of the data frame
 
 ````julia:ex14
 _, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equation of bold state
-rename!(dfsol, Symbol.(obsvars))
+rename!(dfsol, Symbol.(obsvars));
 ````
 
 ## Estimate and plot the cross-spectral densities
@@ -199,15 +199,11 @@ Label(grid[1, 1:3, Top()], "Cross-spectral densities", valign = :bottom,
     fontsize = 32,
     padding = (0, 0, 5, 0))
 fig
-````
-
-These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.
-
-````julia:ex17
 save(joinpath(@OUTPUT, "csd.svg"), fig); # hide
 ````
 
 \fig{csd}
+These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.
 
 ## Model Inference
 
@@ -215,7 +211,7 @@ We will now assemble a new model that is used for fitting the previous simulatio
 This procedure is similar to before with the difference that we will define global parameters and use tags such as [tunable=false/true] to define which parameters we will want to estimate.
 Note that parameters are tunable by default.
 
-````julia:ex18
+````julia:ex17
 g = MetaDiGraph()
 regions = [];   # list of neural mass blocks to then connect them to each other with an adjacency matrix `A`
 ````
@@ -225,7 +221,7 @@ Since we want some parameters to be shared across several regions we define them
 For this purpose use the ModelingToolkit macro `@parameters` which is used to define symbolic parameters for models.
 Note that we can set the tunable flag right away thereby defining whether we will include this parameter in the optimization procedure or rather keep it fixed to its predefined value.
 
-````julia:ex19
+````julia:ex18
 @parameters lnκ=0.0 [tunable=false] lnϵ=0.0 [tunable=false] lnτ=0.0 [tunable=false];   # lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale
 @parameters C=1/16 [tunable=false];   # note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.
 ````
@@ -233,7 +229,7 @@ Note that we can set the tunable flag right away thereby defining whether we wil
 We now define a similar model as above for the simulation but instead of using an actual stimulus Blox we here add ExternalInput which represents a simple linear external input that is not specified any further.
 We simply say that our model gets some input with a proportional factor $C$. This is mostly only to make sure that our results are consistent with those produced by SPM
 
-````julia:ex20
+````julia:ex19
 for i = 1:nr
     region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
     push!(regions, region)
@@ -247,7 +243,7 @@ end
 
 Here we define the prior expectation values of the effective connectivity matrix we wish to infer:
 
-````julia:ex21
+````julia:ex20
 A_prior = 0.01*randn(nr, nr)
 A_prior -= diagm(diag(A_prior))    # remove the diagonal
 ````
@@ -255,7 +251,7 @@ A_prior -= diagm(diag(A_prior))    # remove the diagonal
 Since we want to optimize these weights we turn them into symbolic parameters:
 Add the symbolic weights to the edges and connect regions.
 
-````julia:ex22
+````julia:ex21
 A = []
 for (i, a) in enumerate(vec(A_prior))
     symb = Symbol("A$(i)")
@@ -276,7 +272,7 @@ end
 With the function `changetune` we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure.
 For instance the effective connections that are set to zero in the simulation and the self-connections:
 
-````julia:ex23
+````julia:ex22
 untune = Dict(A[3] => false, A[7] => false, A[1] => false, A[5] => false, A[9] => false)
 fitmodel = changetune(fitmodel, untune)           # 3 and 7 are not present in the simulation model
 fitmodel = structural_simplify(fitmodel)          # and now simplify the euqations
@@ -284,7 +280,7 @@ fitmodel = structural_simplify(fitmodel)          # and now simplify the euqatio
 
 ## Setup spectral DCM
 
-````julia:ex24
+````julia:ex23
 max_iter = 128; # maximum number of iterations
 # attribute initial conditions or default values to dynamic states of our model
 sts, _ = get_dynamic_states(fitmodel);
@@ -292,13 +288,13 @@ sts, _ = get_dynamic_states(fitmodel);
 
 the following step is needed if the model's Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 (which is the default expansion). We simply add small random values to avoid this degeneracy:
 
-````julia:ex25
+````julia:ex24
 perturbedfp = Dict(sts .=> abs.(10^-10*rand(length(sts))))     # slight noise to avoid issues with Automatic Differentiation.
 ````
 
 For convenience we can use the default prior function to use standardized prior values as given in SPM:
 
-````julia:ex26
+````julia:ex25
 pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
 priors = (μθ_pr = pmean,
@@ -308,7 +304,7 @@ priors = (μθ_pr = pmean,
 
 Setup hyper parameter prior as well:
 
-````julia:ex27
+````julia:ex26
 hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precision, needs to be a matrix
                    :μλ_pr => [8.0]               # prior metaparameter mean, needs to be a vector
                   );
@@ -316,20 +312,20 @@ hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precisi
 
 To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:
 
-````julia:ex28
+````julia:ex27
 csdsetup = (mar_order = p, freq = freq, dt = dt);
 ````
 
 Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series (as opposed to LFPs, which is the other modality that is currently available in Neuroblox).
 
-````julia:ex29
+````julia:ex28
 (state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, "fMRI");
 ````
 
 We are now ready to run the optimization procedure!
 That is we loop over run_sDCM_iteration! which will alter `state` after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.
 
-````julia:ex30
+````julia:ex29
 for iter in 1:max_iter
     state.iter = iter
     run_sDCM_iteration!(state, setup)
@@ -350,7 +346,7 @@ Note that the output `F` is the free energy at each iteration step and `dF` is t
 Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound (ELBO).
 Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a (potentially local) optimum:
 
-````julia:ex31
+````julia:ex30
 f1 = freeenergy(state)
 save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
 ````
@@ -360,7 +356,7 @@ save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
 Plot the estimated posterior of the effective connectivity and compare that to the true parameter values.
 Bar height are the posterior mean and error bars are the standard deviation of the posterior.
 
-````julia:ex32
+````julia:ex31
 f2 = ecbarplot(state, setup, A_true)
 save(joinpath(@OUTPUT, "ecbar.svg"), f2); # hide
 ````

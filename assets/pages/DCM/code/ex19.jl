@@ -1,3 +1,10 @@
 # This file was generated, do not modify it. # hide
-@parameters lnκ=0.0 [tunable=false] lnϵ=0.0 [tunable=false] lnτ=0.0 [tunable=false];   # lnκ: decay parameter for hemodynamics; lnϵ: ratio of intra- to extra-vascular components, lnτ: transit time scale
-@parameters C=1/16 [tunable=false];   # note that C=1/16 is taken from SPM12 and stabilizes the balloon model simulation. See also comment above.
+for i = 1:nr
+    region = LinearNeuralMass(;name=Symbol("r$(i)₊lm"))
+    push!(regions, region)
+    input = ExternalInput(;name=Symbol("r$(i)₊ei"))
+    add_edge!(g, input => region, weight=C)
+
+    measurement = BalloonModel(;name=Symbol("r$(i)₊bm"), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ) ## assume fMRI signal and model them with a BalloonModel
+    add_edge!(g, region => measurement, weight=1.0)
+end
