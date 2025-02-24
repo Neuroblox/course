@@ -304,9 +304,9 @@ priors = (μθ_pr = pmean,
 Setup hyper parameter prior as well:
 
 ````julia:ex26
-hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precision, needs to be a matrix
-                   :μλ_pr => [8.0]               # prior metaparameter mean, needs to be a vector
-                  );
+hyperpriors = (Πλ_pr = 128.0*ones(1, 1),   # prior metaparameter precision, needs to be a matrix
+               μλ_pr = [8.0]               # prior metaparameter mean, needs to be a vector
+              );
 ````
 
 To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:

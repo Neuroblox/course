@@ -198,14 +198,13 @@ priors = (μθ_pr = pmean,
           Σθ_pr = pcovariance
          );</code></pre>
 <p>Setup hyper parameter prior as well:</p>
-<pre><code class="julia hljs">hyperpriors = <span class=hljs-built_in >Dict</span>(:Πλ_pr =&gt; <span class=hljs-number >128.0</span>*ones(<span class=hljs-number >1</span>, <span class=hljs-number >1</span>),   <span class=hljs-comment ># prior metaparameter precision, needs to be a matrix</span>
-                   :μλ_pr =&gt; [<span class=hljs-number >8.0</span>]               <span class=hljs-comment ># prior metaparameter mean, needs to be a vector</span>
-                  );</code></pre>
+<pre><code class="julia hljs">hyperpriors = (Πλ_pr = <span class=hljs-number >128.0</span>*ones(<span class=hljs-number >1</span>, <span class=hljs-number >1</span>),   <span class=hljs-comment ># prior metaparameter precision, needs to be a matrix</span>
+               μλ_pr = [<span class=hljs-number >8.0</span>]               <span class=hljs-comment ># prior metaparameter mean, needs to be a vector</span>
+              );</code></pre>
 <p>To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:</p>
 <pre><code class="julia hljs">csdsetup = (mar_order = p, freq = freq, dt = dt);</code></pre>
 <p>Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series &#40;as opposed to LFPs, which is the other modality that is currently available in Neuroblox&#41;.</p>
-<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre><pre><code class="plaintext hljs">type Dict has no field μλ_pr
-</code></pre>
+<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre>
 <p>We are now ready to run the optimization procedure&#33; That is we loop over run<em>sDCM</em>iteration&#33; which will alter <code>state</code> after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.</p>
 <pre><code class="julia hljs"><span class=hljs-keyword >for</span> iter <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:max_iter
     state.iter = iter
@@ -218,21 +217,35 @@ priors = (μθ_pr = pmean,
             <span class=hljs-keyword >break</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
-Suggestion: check for spelling errors or missing imports.
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:-907.3966193403191 - dF predicted:19.610107795070086
+iteration: 2 - F:-887.6275474677687 - dF predicted:31.40104402110513
+iteration: 3 - F:-855.4769075570323 - dF predicted:50.595718262731104
+iteration: 4 - F:-803.9165611081502 - dF predicted:72.90454096304227
+iteration: 5 - F:-732.0898390246193 - dF predicted:89.00520964639644
+iteration: 6 - F:-646.3334018845117 - dF predicted:93.51009926659631
+iteration: 7 - F:-560.8349944421104 - dF predicted:72.20904509395687
+iteration: 8 - F:-500.6187945923262 - dF predicted:38.532762074546206
+iteration: 9 - F:-470.1061625730007 - dF predicted:20.330861579482715
+iteration: 10 - F:-453.2295973592579 - dF predicted:14.891274373244485
+iteration: 11 - F:-439.8206931905005 - dF predicted:13.657969737513561
+iteration: 12 - F:-427.5949769680233 - dF predicted:9.499125150604186
+iteration: 13 - F:-419.9402353219268 - dF predicted:3.496951754205867
+iteration: 14 - F:-417.3280987225607 - dF predicted:0.9289019009261253
+iteration: 15 - F:-416.66698097881226 - dF predicted:0.17799335876672592
+iteration: 16 - F:-416.5485385297137 - dF predicted:0.021533323176999283
+iteration: 17 - F:-416.5310449931578 - dF predicted:0.004069639140175212
+iteration: 18 - F:-416.5283523852918 - dF predicted:0.0006809889532180617
+iteration: 19 - F:-416.52809470966923 - dF predicted:0.00012220291755110722
+convergence
 </code></pre>
 <p>Note that the output <code>F</code> is the free energy at each iteration step and <code>dF</code> is the predicted change of free energy at each step which approximates the actual free energy change and is used as stopping criterion by requiring that it does not excede the <code>tolerance</code> level for 4 consecutive times.</p>
 <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2>
 <p>Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound &#40;ELBO&#41;. Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a &#40;potentially local&#41; optimum:</p>
-<pre><code class="julia hljs">f1 = freeenergy(state)</code></pre><pre><code class="plaintext hljs">UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
-Suggestion: check for spelling errors or missing imports.
-</code></pre>
-<p><span style="color:red;">// Image matching '/assets/pages/DCM/code/freeenergy' not found. //</span></p>
+<pre><code class="julia hljs">f1 = freeenergy(state)</code></pre>
+<img src="/course/assets/pages/DCM/code/output/freeenergy.svg" alt="">
 <p>Plot the estimated posterior of the effective connectivity and compare that to the true parameter values. Bar height are the posterior mean and error bars are the standard deviation of the posterior.</p>
-<pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)</code></pre><pre><code class="plaintext hljs">UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
-Suggestion: check for spelling errors or missing imports.
-</code></pre>
-<p><span style="color:red;">// Image matching '/assets/pages/DCM/code/ecbar' not found. //</span></p>
+<pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)</code></pre>
+<img src="/course/assets/pages/DCM/code/output/ecbar.svg" alt="">
 <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2>
 <ul>
 <li><p><strong>Explore susceptibility with respect to noise.</strong> Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy &#40;compare the different free energies of the models and their respective parameter values with ground truth&#41;?</p>
