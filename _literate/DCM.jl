@@ -211,9 +211,9 @@ priors = (μθ_pr = pmean,
           Σθ_pr = pcovariance
          );
 # Setup hyper parameter prior as well:
-hyperpriors = Dict(:Πλ_pr => 128.0*ones(1, 1),   # prior metaparameter precision, needs to be a matrix
-                   :μλ_pr => [8.0]               # prior metaparameter mean, needs to be a vector
-                  );
+hyperpriors = (Πλ_pr = 128.0*ones(1, 1),   # prior metaparameter precision, needs to be a matrix
+               μλ_pr = [8.0]               # prior metaparameter mean, needs to be a vector
+              );
 # To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:
 csdsetup = (mar_order = p, freq = freq, dt = dt);
 # Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series (as opposed to LFPs, which is the other modality that is currently available in Neuroblox).
