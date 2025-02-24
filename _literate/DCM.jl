@@ -39,6 +39,7 @@ using CairoMakie
 using ModelingToolkit
 using Random
 using StatsBase
+using Statistics
 
 # ## Define the model
 # We will define a model of 3 regions. This means first of all to define a graph.
