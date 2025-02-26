@@ -357,6 +357,7 @@ Bar height are the posterior mean and error bars are the standard deviation of t
 
 ````julia:ex31
 f2 = ecbarplot(state, setup, A_true)
+axislegend(position=:lt)
 save(joinpath(@OUTPUT, "ecbar.svg"), f2); # hide
 ````
 

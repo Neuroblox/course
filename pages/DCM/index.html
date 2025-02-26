@@ -244,7 +244,8 @@ convergence
 <pre><code class="julia hljs">f1 = freeenergy(state)</code></pre>
 <img src="/course/assets/pages/DCM/code/output/freeenergy.svg" alt="">
 <p>Plot the estimated posterior of the effective connectivity and compare that to the true parameter values. Bar height are the posterior mean and error bars are the standard deviation of the posterior.</p>
-<pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)</code></pre>
+<pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)
+axislegend(position=:lt)</code></pre>
 <img src="/course/assets/pages/DCM/code/output/ecbar.svg" alt="">
 <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2>
 <ul>
@@ -266,7 +267,7 @@ convergence
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: February 24, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: February 26, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
