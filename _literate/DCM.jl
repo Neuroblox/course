@@ -245,6 +245,7 @@ save(joinpath(@OUTPUT, "freeenergy.svg"), f1); # hide
 # Plot the estimated posterior of the effective connectivity and compare that to the true parameter values.
 # Bar height are the posterior mean and error bars are the standard deviation of the posterior.
 f2 = ecbarplot(state, setup, A_true)
+axislegend(position=:lt)
 save(joinpath(@OUTPUT, "ecbar.svg"), f2); # hide
 #!nb # \fig{ecbar}
 
