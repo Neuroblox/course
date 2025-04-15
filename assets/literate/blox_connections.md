@@ -2,6 +2,10 @@
 # Blox and Connections in Neuroblox
 > **_Jupyter Notebook_:** Please work on `blox_connections.ipynb`.
 
+~~~
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8XcN9j5njgg?si=l1UdDZFCqm-qkHS4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+~~~
+
 ## Introduction
 Neuroblox comes with a library of many components already, which we call Blox. Such Blox are neuron models, neural masses, circuits of these, input sources, observers etc. Additionally there are connection rules that dictate how types of components connect with one another. Over the rest of this course we will encounter multiple examples of models made by Neuroblox components and connected by rules already implemented in the package.
 
