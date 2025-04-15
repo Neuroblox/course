@@ -2,6 +2,10 @@
 # Parameter Fitting using Spectral Dynamic Causal Modeling
 > **_Jupyter Notebook_:** Please work on `DCM.ipynb`.
 
+~~~
+<iframe width="560" height="315" src="https://www.youtube.com/embed/OEeyks_HIMI?si=1wZRVeAaY9rmdGeI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+~~~
+
 ## Introduction
 Neuroblox provides you with a comprehensive environment for simulations as we have explored previously, but its functionality doesn't stop there.
 We will now pivot and turn our attention to a different kind of problem:

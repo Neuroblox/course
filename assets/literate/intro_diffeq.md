@@ -2,6 +2,10 @@
 # Differential Equations with ModelingToolkit
 > **_Jupyter Notebook_:** Please work on `intro_diffeq.ipynb`.
 
+~~~
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6EaolLVhnug?si=eC7OGnwzSrOWvmyr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+~~~
+
 Introduction
 In this session we will learn how to define and solve differential equation systems using a symbolic representation with [ModelingToolkit](https://docs.sciml.ai/ModelingToolkit/stable/). First we will work with a popular two-dimensional model called the Lotka-Volterra system.
 
