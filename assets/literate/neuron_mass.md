@@ -16,7 +16,7 @@ Learning goals :
 - introduce external sources as Blox
 - drive single neuron and neural mass activity using external sources
 
-## Neurons and neural masses
+## Neurons and Neural Masses
 As a first example we will consider a neural mass `WilsonCowan` Blox of Excitation-Inhibition (E-I) balance. This is a two-dimensional reduction over a population of excitatory and inhibitory neurons with continuous dynamics.
 
 ````julia:ex1
@@ -126,7 +126,7 @@ External sources in Neuroblox are a particular Blox subtype (`<: AbstractBlox`) 
 Naturally source Bloxs can only connect **to** other (non-source) Blox and can not receive connections from any Blox.
 There are two main categories of sources, ones with continuous dynamics for their variables and ones that operate through events (callbacks).
 
-### Continuous input sources
+### Continuous Input Sources
 These sources are comprised of algebraic (and potentially differential) equations that become part of the dynamics of Bloxs that the source connects to.
 We will drive the `WilsonCowan` Blox above with a `ConstantInput` source. The connection between the two Bloxs looks like
 
@@ -158,7 +158,7 @@ Notice how the E-I balance has shifted after adding our input. We will work with
 
 We can create custom sources with continuous input the same way we create custom Bloxs and write custom connection rules for them as we have seen in the previous session.
 
-### Event-based spike sources
+### Event-based Spike Sources
 This type of source operates entirely through callbacks. One common example is a source that simulates spiking from presynaptic neurons that we do not explicitly include in our model.
 Each time the source's callback is triggered, it affects parameters and/or variables of its postsynaptic neurons which are part of our model.
 Commonly it is assumed that the spiking of neurons follows a Poisson process. Therefore we have implemented a source in Neuroblox that generates spikes that are distributed according to a Poisson distribution for any finite length of time.
