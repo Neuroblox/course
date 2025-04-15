@@ -17,7 +17,7 @@ Learning goals:
 - Learn about ModelingToolkit, the symbolic way to define differential equation systems.
 - Implement a neuron model using ModelingToolkit and simulate spiking
 
-## Lotka-Volterra system
+## Lotka-Volterra System
 
 ````julia:ex1
 # Import the packages we need
@@ -74,7 +74,7 @@ We will shortly see more plot types and options.
 
 ## Izhikevich Neuron
 
-### Simulating spikes
+### Simulating Spikes
 
 The Izhikevich neuron is a similar system of ODEs like the Lotka-Volterra example above. One notable difference however is the spiking mechanism.
 Spiking in the Izhikevich neuron needs to be implemented "manually". That is we need to detect when the voltage variable crosses a spiking threshold and every time this event happens we need to reset the neuron's voltage to a more polarized value and potentially alter other variables too.
@@ -131,7 +131,7 @@ save(joinpath(@OUTPUT, "mtk3.svg"), fig); # hide
 
 \fig{mtk3}
 
-### Changing parameter values and initial conditions
+### Changing Parameter Values and Initial Conditions
 After defining and simulating a system we might want to run another simulation by changing either or both of the parameter values and the initial conditions.
 The Izhikevich neuron that we simulated above has multiple spiking regimes that correspond to different parameter value combinations. If we have our `ODEProblem` already defined as the `izh_prob` variable above, we can remake it by keeping everything the same except for the fields that we choose to alter.
 Here we will change only the model parameters to change from chattering to fast spiking.
@@ -152,7 +152,7 @@ save(joinpath(@OUTPUT, "mtk4.svg"), fig); # hide
 
 Notice how the spiking pattern has changed compared to the previous simulation.
 
-### Adding external currents
+### Adding External Currents
 Until now we have been simulating the Izhikevich neuron by injecting it with a constant external DC current `I=10`. We'll now see how we can expand the `I` input to a dynamic current, which is more realistic (currents do not remain constant in the brain for too long).
 Since `I` will change dynamically in time, it will be a time-dependent variable of the system and not a constant parameter.
 

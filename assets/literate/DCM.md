@@ -46,7 +46,7 @@ using Random
 using StatsBase
 ````
 
-## Define the model
+## Define the Model
 We will define a model of 3 regions. This means first of all to define a graph.
 To this graph we will add three linear neuronal mass models which constitute the (hidden) neuronal dynamics.
 These constitute three nodes of the graph.
@@ -102,7 +102,7 @@ finally we compose the simulation model
 @named simmodel = system_from_graph(g);
 ````
 
-## Run the simulation and plot the results
+## Run the Simulation and Plot the Results
 
 setup simulation of the model, time in seconds
 
@@ -143,7 +143,7 @@ We note that the initial spike is not meaningful and a result of the equilibrati
 dfsol = DataFrame(sol);
 ````
 
-## Add measurement noise and rescale data
+## Add Measurement Noise and Rescale Data
 
 ````julia:ex11
 data = Matrix(dfsol[:, idx_m .+ 1]);    # +1 due to the additional time-dimension in the data frame.
@@ -170,7 +170,7 @@ _, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equ
 rename!(dfsol, Symbol.(obsvars));
 ````
 
-## Estimate and plot the cross-spectral densities
+## Estimate and Plot the Cross-spectral Densities
 
 We compute the cross-spectral density by fitting a linear model of order `p` and then compute the csd analytically from the parameters of the multivariate autoregressive model
 
@@ -281,7 +281,7 @@ fitmodel = changetune(fitmodel, untune)           # 3 and 7 are not present in t
 fitmodel = structural_simplify(fitmodel)          # and now simplify the euqations
 ````
 
-## Setup spectral DCM
+## Setup Spectral DCM
 
 ````julia:ex23
 max_iter = 128; # maximum number of iterations

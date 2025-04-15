@@ -74,7 +74,7 @@ save(joinpath(@OUTPUT, "adj_open.svg"), fig); # hide
 \fig{adj_open}
 Notice how the weight values in the upper left corner (connections with `HebbianPlasticity`) have changed after simulation.
 
-## Cortico-Striatal Circuit performing Category Learning
+## Cortico-Striatal Circuit Performing Category Learning
 This is one simplified biological instantiation of an RL system. It is carrying out a simple RL behavior but not faithfully simulating physiology. The experiment we are simulating here is the category learning experiment [Antzoulatos2014] which was successfully modeled through a detailed corticostriatal model [2].
 
 ````julia:ex2

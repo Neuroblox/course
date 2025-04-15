@@ -7,7 +7,7 @@ This tutorial provides a simple example of how to use the Neuroblox package to s
 These networks are generally useful in modeling cortical oscillations and are used in a variety of contexts.
 This particular example is based on Börgers, Epstein, and Kopell [1] and is a simple example of how to replicate their initial network in Neuroblox.
 
-# Conceptual definition
+# Conceptual Definition
 The PING network is a simple model of a cortical network that consists of two populations of neurons: excitatory and inhibitory.
 We omit the detailed equations of the neurons here, but note they are Hodgkin-Huxley-like equations with a few modifications.
 Excitatory neurons are reduced Traub-Miles cells [2] and inhibitory neurons are Wang-Buzasaki cells [3].
@@ -19,7 +19,7 @@ Figure 1 shows a visual representation of the network structure and which neuron
 ![PING network structure](/assets/basic_ping_illustration.png)
 *Figure 1: Structure of the the PING network.*
 
-# Model setup
+# Model Setup
 This section sets up the model parameters and the network structure. The network consists of 200 neurons: 40 driven excitatory neurons, 120 other excitatory neurons, and 40 inhibitory neurons.
 The network is set up as a directed graph with excitatory neurons driving inhibitory neurons and vice versa, with self-inhibition but not self-excitation present.
 
@@ -73,10 +73,10 @@ I_undriven = Normal(0, 0.4) ## Additional noise current for undriven excitatory 
 I_bath = -0.7; ## External inhibitory bath for inhibitory neurons - value from p. 11 of the SI Appendix
 ````
 
-# Creating a network in Neuroblox
+# Creating a Network in Neuroblox
 Creating and running a network of neurons in Neuroblox consists of three steps: defining the neurons, defining the graph of connections between the neurons, and simulating the system represented by the graph.
 
-## Define the neurons
+## Define the Neurons
 The neurons from Börgers et al. [1] are implemented in Neuroblox as `PINGNeuronExci` and `PINGNeuronInhib`. We can specify their initial current drives and create the neurons as follows:
 
 ````julia:ex5
@@ -90,7 +90,7 @@ inhib       = [PINGNeuronInhib(name=Symbol("ID$i"), I_ext=rand(I_driveI) + rand(
 > to see the full details of the blocks. If you really want to dig into the details,
 > type ``@edit PINGNeuronExci()`` to open the source code and see how the equations are written.
 
-## Define the graph of network connections
+## Define the Graph of Network Connections
 This portion illustrates how we go about creating a network of neuronal connections.
 
 ````julia:ex6
@@ -110,7 +110,7 @@ for ni1 ∈ inhib
 end
 ````
 
-## Alternative graph creation
+## Alternative Graph Creation
 If you are creating a very large network of neurons, it may be more efficient to add all of the nodes first and then all of the edges via an adjacency matrix.
 To illustrate this, here is **an alternative to the graph construction we have just performed above** that will initialize the same graph.
 
@@ -132,7 +132,7 @@ end
 create_adjacency_edges!(g, adj);
 ````
 
-## Simulate the network
+## Simulate the Network
 Now that we have the neurons and the graph, we can simulate the network. We use the `system_from_graph` function to create a system of ODEs from the graph and then solve it.
 We choose to solve this system using the ``Tsit5()`` solver. If you're coming from Matlab, this is a more efficient solver analogous to ``ode45``. It's a good first try for systems that aren't really stiff. If you want to try other solvers, we'd recommend trying with ``Vern7()`` (higher precision but still efficient). If you're **really** interested in solver choices, one of the great things about Julia is the [wide variety of solvers available.](https://docs.sciml.ai/DiffEqDocs/stable/solvers/ode_solve/)
 
@@ -144,7 +144,7 @@ sol = solve(prob, Tsit5(), saveat=0.1); ## Solve the problem and save at 0.1ms r
 ````
 
 > **_NOTE_:** Setting `graphdynamics=true` will enable an alternative compilation mode for the neural system. Not every model is compatible with GraphDynamics.jl [4] yet, but for ones that are compatible, it is usually significantly faster to compile. This option will make the biggest difference when you care about very large numbers of neurons, or if you are running the same model with small changes to the number of neurons or connectivity graph many times.
-# Plotting the results
+# Plotting the Results
 Now that we have a whole simulation, let's plot the results and see how they line up with the original figures. We're looking to reproduce the dynamics shown in Figure 1 of Börgers et al. [1].
 To create raster plots in Neuroblox for the excitatory and inhibitory populations, it is as simple as:
 

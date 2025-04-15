@@ -16,7 +16,7 @@ Learning goals
 - Use circuit models in a behavioral task with stimulus inputs and action outputs.
 - Model synaptic receptors explicitly and interventions on them.
 
-## Model definition
+## Model Definition
 
 ````julia:ex1
 using Neuroblox
@@ -75,7 +75,7 @@ spike_rate_B = (distribution=Normal(μ_B, σ), dt=dt_spike_rate) # spike rate di
 As we can see, each selective population `n_A` and `n_B` receives a separate spike train input `stim_A` and `stim_B` respectively. These inputs model visual processing that is selective for the left and right dot directions. All Bloxs also receive background inputs of the same rate from neurons we do not explicitly model.
 The Bloxs we use here are subtypes of `CompositeBlox` and contain either `LIFExciNeuron`s or `LIFInhNeuron`s in them.
 
-## System construction & Simulation
+## System Construction & Simulation
 We construct the graph with all connections and weights according to [1]. Please note that the `system_from_graph` call and the subsequent `ODEProblem` construction will take some minutes (probably 4-5, depending on your machine) as the system size is larger compared to other examples. The `graphdynamics=true` flag that we set in `system_from_graph` though will greatly enhance performance here.
 
 ````julia:ex3
