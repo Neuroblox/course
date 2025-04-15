@@ -1,5 +1,9 @@
 # Circuit Models in Neuroblox
 
+~~~
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ih7IELQ5W50?si=iMDL0B0ISBVP6pAN" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+~~~
+
 ## Introduction
 
 We saw how Bloxs and their connection rules are defined and we can connect external sources to single neuron or neural mass Bloxs. Now we are ready to expand our models to resemble more closely the neuronal circuits of the brain.

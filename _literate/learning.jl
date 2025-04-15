@@ -1,6 +1,10 @@
 # # Synaptic Plasticity and Reinforcement Learning
 #md # > **_Jupyter Notebook_:** Please work on `learning.ipynb`.
 
+# ~~~
+#md # <iframe width="560" height="315" src="https://www.youtube.com/embed/pBvgcIHK6GY?si=SxGU7CNdErHnvVKc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+# ~~~
+
 # ## Introduction
 # In Neuroblox, we can add plasticity rules to our circuit models. The symbolic weights that are defined for every connection are the ones that are updated according to these plasticity rules after every simulation run.
 # Weight updates are automatically handled after each simulation when doing reinforcement learning in Neuroblox. This is the topic that we will cover here. 

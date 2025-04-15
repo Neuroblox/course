@@ -2,6 +2,14 @@
 
 @@img-small ![](/assets/NB_Logo_Vert_Full_Light.png) @@
 
+~~~
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2dbAePEmbhQ?si=tm7QBzDXT53PofA-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+~~~
+
+~~~
+<iframe width="560" height="315" src="https://www.youtube.com/embed/NU9K8l-gg-Q?si=92w5K3FBZuJ0dNkK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+~~~
+
 # Introduction
 Computational neuroscience aims to simulate the brain in silico, from single synapses to brain-wide networks. The field has matured in tandem with experimental neuroscience, to the point where computational modeling has become an indispensable tool for understanding neuroscience data and motivating future experiments. However, building such models can involve a painstaking process of translating concepts from the literature into working code, then optimizing it to run in a reasonable timeframe.
 

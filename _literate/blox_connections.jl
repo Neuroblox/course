@@ -2,7 +2,7 @@
 #md # > **_Jupyter Notebook_:** Please work on `blox_connections.ipynb`.
 
 # ~~~
-# <iframe width="560" height="315" src="https://www.youtube.com/embed/8XcN9j5njgg?si=l1UdDZFCqm-qkHS4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+#md # <iframe width="560" height="315" src="https://www.youtube.com/embed/8XcN9j5njgg?si=l1UdDZFCqm-qkHS4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 # ~~~
 
 # ## Introduction
