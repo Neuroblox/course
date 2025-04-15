@@ -44,7 +44,7 @@ equations(lif)
 
 # Using these functions we can learn everything about a Blox that will be useful when we want to use it or connect our own custom Bloxs to it. 
 
-# ## Inspecting a connection between Bloxs
+# ## Inspecting a Connection Between Bloxs
 # Getting information about how two Bloxs connect is equally important to inspecting the Bloxs themselves. There are two functions in Neuroblox that help us gain more information about a connection.
 # The first one will print only the connection equations 
 @named ifn = IFNeuron() ## create an Integrate-and-Fire neuron, simpler than the `LIFNeuron`
@@ -54,7 +54,7 @@ connection_equations(lif, ifn, weight=1, connection_rule="basic")
 connection_rule(lif, ifn, weight=1, connection_rule="psp")
 # The `weight` and `connection_rule` are keyword arguments that can be ommitted. If we ommit them then we will get a message informing us about the default values that they take. The `connection_rule` argument applies to connections between `Neuron` types; `"basic"` is a simple weighted connection and `"psp"` applies a postsynaptic potential type of connection. The output of both `connection_equations` and `connection_rule` functions now seems very similar. However `connection_rule` will be more useful later on when we start using more complex Bloxs and connection rules that do more than just adding an equation and a symbolic weight.
 
-# ## Simulating connected Bloxs
+# ## Simulating Connected Bloxs
 # We are now ready to define a couple of Bloxs, connect them and simulate the final model.
 # Every Neuroblox model starts off as a graph. Every vertex of the graph is a Blox and every edge is a connection between two Bloxs.
 # Let's build a simple circuit by using the two neurons we created above; `lif` connects to `ifn`.
@@ -118,7 +118,7 @@ connection_equations(lif, izh, weight=1, connection_rule="basic") ## connection 
 # ## Custom Connections
 # Often times genric connection rules are not sufficient and we need ones specialized to our custom Bloxs. There are two elements that allow for great customization variety when it comes to connection rules, connection equations and callbacks.
 
-# ### Connection equations
+# ### Connection Equations
 # Let's define a custom equation that connects a `LIFNeuron` to our `IzhNeuron`. The first thing we need to do is to import the `connection_equations` function from Neuroblox so that we can add a new dispatch to it. 
 import Neuroblox: connection_equations
 
@@ -169,7 +169,7 @@ sol = solve(prob, Tsit5());
 # > **_Exercise:_** Define another connection equation from a `LIFNeuron` to an `IzhNeuron`, 
 # > then create a graph with one connection of this kind and simulate it. 
 
-# ### Connection callbacks
+# ### Connection Callbacks
 # Algebraic connection equations is not the only way that a blox can interact with another one. Discrete callbacks are also possible.
 # These callbacks will be applied at every timepoint during simulation where the callback condition is fulfilled. 
 # This mechanism is particularly useful for neuron models like the Izhikevich and the LIF neurons we saw above that use callbacks to implement spiking. 
