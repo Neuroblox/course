@@ -13,6 +13,10 @@ In this course, you will learn the basics of computational neuroscience via hand
 <iframe width="560" height="315" src="https://www.youtube.com/embed/2dbAePEmbhQ?si=tm7QBzDXT53PofA-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 ~~~
 
+~~~
+<iframe width="560" height="315" src="https://www.youtube.com/embed/XlBRJps84zE?si=5zDZYG61bIr1CNtu" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+~~~
+
 # Course Units
 
 We will go over the following units in this course :
