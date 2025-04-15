@@ -12,7 +12,7 @@
 # - implement parameter fitting using optimization methods.
 # - introduce this workflow as a first step in any parameter fitting analysis to check the limits of our approach.
 
-# ## Model definition
+# ## Model Definition
 # We will be using a next generation neural mass model of E-I balance here, which we have seen before. We will treat the four coupling coefficients between the excitatory and inhibitory componenets of the model (excitatory-excitatory, excitatory-inhibitory, inhibitory-excitatory and inhibitory-inhibitory) as the unknown parameters to be fitted. 
 using Neuroblox
 using OrdinaryDiffEq

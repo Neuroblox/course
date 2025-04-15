@@ -9,7 +9,7 @@
 # - Design layouts with multiple axes in figures.
 # - Use Makie's functionality to plot neuron-specific figures.
 
-# ## Plotting layouts
+# ## Plotting Layouts
 # We'll now see how to create layouts of multiple subplots within a single window. We'll use the same data from the Makie tutorial linked above.
 using CairoMakie
 
@@ -44,7 +44,7 @@ fig
 save(joinpath(@OUTPUT, "layout_hidex.svg"), fig); # hide
 #!nb # \fig{layout_hidex}
 
-# ## Plotting spikes
+# ## Plotting Spikes
 
 # We will now combine the Makie and the Differential Equations ecosystems to start plotting more meaningful results after simulating neuronal models. 
 # We will use the Izhikevich model from the last section in its fast-spiking regime. Besides the spiking event, we will add a second event that increases the external current flowing into the neuron at a specific time during simulation. 

@@ -44,7 +44,7 @@ using ModelingToolkit
 using Random
 using StatsBase
 
-# ## Define the model
+# ## Define the Model
 # We will define a model of 3 regions. This means first of all to define a graph.
 # To this graph we will add three linear neuronal mass models which constitute the (hidden) neuronal dynamics.
 # These constitute three nodes of the graph.
@@ -82,7 +82,7 @@ end
 # finally we compose the simulation model
 @named simmodel = system_from_graph(g);
 
-# ## Run the simulation and plot the results
+# ## Run the Simulation and Plot the Results
 
 # setup simulation of the model, time in seconds
 tspan = (0, 1022)
@@ -109,7 +109,7 @@ save(joinpath(@OUTPUT, "fmriseries.svg"), f); # hide
 # We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.
 dfsol = DataFrame(sol);
 
-# ## Add measurement noise and rescale data
+# ## Add Measurement Noise and Rescale Data
 data = Matrix(dfsol[:, idx_m .+ 1]);    # +1 due to the additional time-dimension in the data frame.
 # add measurement noise
 data += randn(size(data))/4;
@@ -121,7 +121,7 @@ dfsol = DataFrame(data, :auto);
 _, obsvars = get_eqidx_tagged_vars(simmodel, "measurement");  # get index of equation of bold state
 rename!(dfsol, Symbol.(obsvars));
 
-# ## Estimate and plot the cross-spectral densities
+# ## Estimate and Plot the Cross-spectral Densities
 
 # We compute the cross-spectral density by fitting a linear model of order `p` and then compute the csd analytically from the parameters of the multivariate autoregressive model
 p = 8
@@ -202,7 +202,7 @@ untune = Dict(A[3] => false, A[7] => false, A[1] => false, A[5] => false, A[9] =
 fitmodel = changetune(fitmodel, untune)           # 3 and 7 are not present in the simulation model
 fitmodel = structural_simplify(fitmodel)          # and now simplify the euqations
 
-# ## Setup spectral DCM
+# ## Setup Spectral DCM
 max_iter = 128; # maximum number of iterations
 ## attribute initial conditions or default values to dynamic states of our model
 sts, _ = get_dynamic_states(fitmodel);

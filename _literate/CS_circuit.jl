@@ -2,7 +2,7 @@ macro OUTPUT()# hideall
     return isdefined(Main, :Franklin) ? Franklin.OUT_PATH[] : "/tmp/"
 end;
 
-# # Biomimetic model of corticostriatal micro-assemblies
+# # Biomimetic Model of Corticostriatal Micro-assemblies
 #md # > **_Jupyter Notebook_:** Please work on `CS_circuit.ipynb`.
 
 # ## Introduction
@@ -172,7 +172,7 @@ save(joinpath(@OUTPUT, "cort_power.svg"), fig); # hide
 # Notice the peak at 16 Hz, representing beta oscillations.
 # > **_Exercise:_** Try changing parameters of `ASC1` to generate different cortical rhythms.
 
-# ## Visual Processing in the extended Cortical model
+# ## Visual Processing in the Extended Cortical Model
 
 # Finally we will simulate visual processing in our model by adding a `CorticalBlox` representing visual area cortex (VAC) and an `ImageStimulus` connected to it. This extended model is shown in *Figure 3*.
 #!nb # ![Extended circuit with Cortex, Brainstem and Image Stimulus components](/assets/CS_extended.png)
