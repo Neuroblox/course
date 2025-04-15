@@ -80,6 +80,12 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://neuroblox.github.io/course/pages/experimental_design/index.html</loc>
+    <lastmod>2025-04-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://neuroblox.github.io/course/pages/optimization/index.html</loc>
     <lastmod>2025-04-15</lastmod>
     <changefreq>monthly</changefreq>
