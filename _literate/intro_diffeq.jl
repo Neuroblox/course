@@ -5,7 +5,7 @@
 #md # <iframe width="560" height="315" src="https://www.youtube.com/embed/6EaolLVhnug?si=eC7OGnwzSrOWvmyr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 # ~~~
 
-# Introduction
+# ## Introduction
 # In this session we will learn how to define and solve differential equation systems using a symbolic representation with [ModelingToolkit](https://docs.sciml.ai/ModelingToolkit/stable/). First we will work with a popular two-dimensional model called the Lotka-Volterra system.
 
 # The Lotka-Volterra equations, while originally developed to model predator-prey dynamics in ecology, serve as an excellent starting point for computational neuroscience. They introduce fundamental concepts of dynamical systems that are crucial in neuroscience. These equations demonstrate how two variables can interact and influence each other over time - similar to how neurons or neural populations interact. Understanding this behavior helps build intuition for more complex systems where neurons form feedback and feedforward connections with one another.
