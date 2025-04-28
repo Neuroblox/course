@@ -1,8 +1,8 @@
-@def title = "Introduction to Computational Neuroscience with [Neuroblox](https://www.neuroblox.org/)"
+# Introduction to Computational Neuroscience with [Neuroblox](https://www.neuroblox.org/)
 
 @@img-small ![](/assets/NB_Logo_Vert_Full_Light.png) @@
 
-# Introduction
+## Introduction
 Computational neuroscience aims to simulate the brain in silico, from single synapses to brain-wide networks. The field has matured in tandem with experimental neuroscience, to the point where computational modeling has become an indispensable tool for understanding neuroscience data and motivating future experiments. However, building such models can involve a painstaking process of translating concepts from the literature into working code, then optimizing it to run in a reasonable timeframe.
 
 Neuroblox is a new software platform for computational neuroscience that aims to break down these barriers. It is based on the Julia programming language, and is built with simplicity, modularity, and performance in mind. It consists of a library of modular computational building blocks (“Blox”) that can be easily assembled to simulate brain dynamics, either in code or via an easy-to-use graphical interface. Our tools bridge scales from spiking neurons to brain waves and fMRI, and have applications to neurology and psychiatry. Moreover, the behavior of multiple model variants can be compared to discriminate between competing hypotheses.
@@ -17,7 +17,7 @@ In this course, you will learn the basics of computational neuroscience via hand
 <iframe width="560" height="315" src="https://www.youtube.com/embed/XlBRJps84zE?si=5zDZYG61bIr1CNtu" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 ~~~
 
-# Course Units
+## Course Units
 
 We will go over the following units in this course :
 
