@@ -1,4 +1,4 @@
-@def title = "Introduction to Computational Neuroscience with Neuroblox"
+@def title = "Introduction to Computational Neuroscience with [Neuroblox](https://www.neuroblox.org/)"
 
 @@img-small ![](/assets/NB_Logo_Vert_Full_Light.png) @@
 
