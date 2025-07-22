@@ -1,1 +1,1 @@
-connection_equations (generic function with 5 methods)
+connection_equations (generic function with 8 methods)

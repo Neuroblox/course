@@ -137,8 +137,9 @@ stimulus = stim.stimulus.(time)
 fig = Figure();
 ax1 = Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;stimulus&quot;</span>)
 lines!(ax1, time, stimulus)
-fig</code></pre>
-<img src="/course/assets/pages/neuron_mass/code/output/stim.svg" alt="">
+fig</code></pre><pre><code class="plaintext hljs">type DBS has no field stimulus
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim' not found. //</span></p>
 <p>We can also generate a smoothed pulse train as</p>
 <pre><code class="julia hljs"><span class=hljs-meta >@named</span> stim_smooth = DBS(
                 frequency=<span class=hljs-number >100.0</span>,
@@ -160,8 +161,9 @@ ax2 = Axis(fig[<span class=hljs-number >2</span>,<span class=hljs-number >1</spa
 lines!(ax2, time, smooth_stimulus) <span class=hljs-comment >## plot the smoothed stimulus</span>
 xlims!(ax2, <span class=hljs-number >4.9</span>, <span class=hljs-number >5.6</span>) <span class=hljs-comment >## set the x-axis limits for better visibility of a smoothed pulse</span>
 
-fig</code></pre>
-<img src="/course/assets/pages/neuron_mass/code/output/stim_comparison.svg" alt="">
+fig</code></pre><pre><code class="plaintext hljs">type DBS has no field stimulus
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim_comparison' not found. //</span></p>
 <p>It is also possible to create a stimulus protocol that does not follow a simple periodic stimulation schedule as above and contains multiple pulses before a quiet time window:</p>
 <pre><code class="julia hljs">frequency = <span class=hljs-number >20.0</span>
 amplitude = <span class=hljs-number >1.0</span>
@@ -197,8 +199,9 @@ stimulus = dbs.stimulus.(time)
 fig = Figure();
 ax1 = Axis(fig[<span class=hljs-number >1</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;stimulus&quot;</span>)
 lines!(ax1, time, stimulus)
-fig</code></pre>
-<img src="/course/assets/pages/neuron_mass/code/output/stim_protocol.svg" alt="">
+fig</code></pre><pre><code class="plaintext hljs">type ProtocolDBS has no field stimulus
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim_protocol' not found. //</span></p>
 <p>Now let&#39;s finally connect our <code>ProtocolDBS</code> source to an HH excitatory neuron and simulate</p>
 <pre><code class="julia hljs"><span class=hljs-meta >@named</span> nn = HHNeuronExciBlox(I_bg=<span class=hljs-number >0.4</span>)
 
@@ -211,7 +214,9 @@ prob = ODEProblem(sys, [], tspan)
 transitions_inds = detect_transitions(time, stimulus; atol=<span class=hljs-number >0.001</span>)
 transition_times = time[transitions_inds]
 transition_values = stimulus[transitions_inds]
-sol = solve(prob, Vern7(), saveat=dt, tstops = transition_times);</code></pre>
+sol = solve(prob, Vern7(), saveat=dt, tstops = transition_times);</code></pre><pre><code class="plaintext hljs">UndefVarError: `stimulus` not defined in `Main.FD_SANDBOX_15689578915208419032`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <blockquote>
 <p><strong><em>NOTE</em>:</strong> We have used <code>detect_transitions</code> to find all points where the stimulation switches on and off. Such points can lead to discontinuities in the dynamics of our model and thus to imprecise solutions. Adding the transition points explicitly as <code>tstops</code> when solving will force the chosen solver to stop righ before and after each transition and evaluate the equations for greater precision and stability.</p>
 </blockquote>
@@ -225,8 +230,9 @@ lines!(ax1, sol.t, v)
 
 ax2 = Axis(fig[<span class=hljs-number >2</span>,<span class=hljs-number >1</span>]; xlabel = <span class=hljs-string >&quot;time (ms)&quot;</span>, ylabel = <span class=hljs-string >&quot;Stimulus (μA/cm²)&quot;</span>)
 lines!(ax2, sol.t, stimulus)
-fig</code></pre>
-<img src="/course/assets/pages/neuron_mass/code/output/stim_hh.svg" alt="">
+fig</code></pre><pre><code class="plaintext hljs">KeyError: key :nn₊V not found
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/neuron_mass/code/stim_hh' not found. //</span></p>
 <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2>
 <ul>
 <li><p>Implement a custom <code>SpikeSource</code> of your choice. Hint: the <code>BernoulliSpikes</code> implementation above.</p>
@@ -245,7 +251,7 @@ fig</code></pre>
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: April 28, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: July 22, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>

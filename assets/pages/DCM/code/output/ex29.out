@@ -1,20 +1,3 @@
-iteration: 1 - F:-907.3966193403191 - dF predicted:19.610107795070086
-iteration: 2 - F:-887.6275474677687 - dF predicted:31.40104402110513
-iteration: 3 - F:-855.4769075570323 - dF predicted:50.595718262731104
-iteration: 4 - F:-803.9165611081502 - dF predicted:72.90454096304227
-iteration: 5 - F:-732.0898390246193 - dF predicted:89.00520964639644
-iteration: 6 - F:-646.3334018845117 - dF predicted:93.51009926659631
-iteration: 7 - F:-560.8349944421104 - dF predicted:72.20904509395687
-iteration: 8 - F:-500.6187945923262 - dF predicted:38.532762074546206
-iteration: 9 - F:-470.1061625730007 - dF predicted:20.330861579482715
-iteration: 10 - F:-453.2295973592579 - dF predicted:14.891274373244485
-iteration: 11 - F:-439.8206931905005 - dF predicted:13.657969737513561
-iteration: 12 - F:-427.5949769680233 - dF predicted:9.499125150604186
-iteration: 13 - F:-419.9402353219268 - dF predicted:3.496951754205867
-iteration: 14 - F:-417.3280987225607 - dF predicted:0.9289019009261253
-iteration: 15 - F:-416.66698097881226 - dF predicted:0.17799335876672592
-iteration: 16 - F:-416.5485385297137 - dF predicted:0.021533323176999283
-iteration: 17 - F:-416.5310449931578 - dF predicted:0.004069639140175212
-iteration: 18 - F:-416.5283523852918 - dF predicted:0.0006809889532180617
-iteration: 19 - F:-416.52809470966923 - dF predicted:0.00012220291755110722
-convergence
+UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+Hint: a global variable of this name may be made accessible by importing BaseDirs in the current active module Main

@@ -32,10 +32,9 @@ dt = <span class=hljs-number >2</span>   <span class=hljs-comment ># 2 seconds a
 prob = SDEProblem(simmodel, [], tspan)
 sol = solve(prob, ImplicitRKMil(), saveat=dt);</code></pre>
 <p>we now want to extract all the variables in our model which carry the tag &quot;measurement&quot;. For this purpose we can use the Neuroblox function <code>get_idx_tagged_vars</code> the observable quantity in our model is the BOLD signal, the variable of the Blox <code>BalloonModel</code> that represents the BOLD signal is tagged with &quot;measurement&quot; tag. other tags that are defined are &quot;input&quot; which denotes variables representing a stimulus, like for instance an <code>OUBlox</code>.</p>
-<pre><code class="julia hljs">idx_m = get_idx_tagged_vars(simmodel, <span class=hljs-string >&quot;measurement&quot;</span>)    <span class=hljs-comment ># get index of bold signal</span></code></pre><pre><code class="plaintext hljs">3-element Vector{Int64}:
- 19
- 20
- 21</code></pre>
+<pre><code class="julia hljs">idx_m = get_idx_tagged_vars(simmodel, <span class=hljs-string >&quot;measurement&quot;</span>)    <span class=hljs-comment ># get index of bold signal</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `get_idx_tagged_vars` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>plot bold signal time series</p>
 <pre><code class="julia hljs">f = Figure()
 ax = Axis(f[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>],
@@ -44,28 +43,42 @@ ax = Axis(f[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>
     ylabel = <span class=hljs-string >&quot;BOLD&quot;</span>,
 )
 lines!(ax, sol, idxs=idx_m)
-f</code></pre>
-<img src="/course/assets/pages/DCM/code/output/fmriseries.svg" alt="">
+f</code></pre><pre><code class="plaintext hljs">UndefVarError: `idx_m` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/DCM/code/fmriseries' not found. //</span></p>
 <p>We note that the initial spike is not meaningful and a result of the equilibration of the stochastic process thus we remove it.</p>
 <pre><code class="julia hljs">dfsol = DataFrame(sol);</code></pre>
 <h2 id=add_measurement_noise_and_rescale_data ><a href="#add_measurement_noise_and_rescale_data" class=header-anchor >Add Measurement Noise and Rescale Data</a></h2>
-<pre><code class="julia hljs">data = <span class=hljs-built_in >Matrix</span>(dfsol[:, idx_m .+ <span class=hljs-number >1</span>]);    <span class=hljs-comment ># +1 due to the additional time-dimension in the data frame.</span></code></pre>
+<pre><code class="julia hljs">data = <span class=hljs-built_in >Matrix</span>(dfsol[:, idx_m .+ <span class=hljs-number >1</span>]);    <span class=hljs-comment ># +1 due to the additional time-dimension in the data frame.</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `idx_m` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>add measurement noise</p>
-<pre><code class="julia hljs">data += randn(size(data))/<span class=hljs-number >4</span>;</code></pre>
+<pre><code class="julia hljs">data += randn(size(data))/<span class=hljs-number >4</span>;</code></pre><pre><code class="plaintext hljs">UndefVarError: `data` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+Hint: a global variable of this name may be made accessible by importing BaseDirs in the current active module Main
+</code></pre>
 <p>center and rescale data &#40;as done in SPM&#41;:</p>
 <pre><code class="julia hljs">data .-= mean(data, dims=<span class=hljs-number >1</span>);
 data *= <span class=hljs-number >1</span>/std(data[:])/<span class=hljs-number >4</span>;
-dfsol = DataFrame(data, :auto);</code></pre>
+dfsol = DataFrame(data, :auto);</code></pre><pre><code class="plaintext hljs">UndefVarError: `data` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+Hint: a global variable of this name may be made accessible by importing BaseDirs in the current active module Main
+</code></pre>
 <p>Add correct names to columns of the data frame</p>
 <pre><code class="julia hljs">_, obsvars = get_eqidx_tagged_vars(simmodel, <span class=hljs-string >&quot;measurement&quot;</span>);  <span class=hljs-comment ># get index of equation of bold state</span>
-rename!(dfsol, <span class=hljs-built_in >Symbol</span>.(obsvars));</code></pre>
+rename!(dfsol, <span class=hljs-built_in >Symbol</span>.(obsvars));</code></pre><pre><code class="plaintext hljs">UndefVarError: `get_eqidx_tagged_vars` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <h2 id=estimate_and_plot_the_cross-spectral_densities ><a href="#estimate_and_plot_the_cross-spectral_densities" class=header-anchor >Estimate and Plot the Cross-spectral Densities</a></h2>
 <p>We compute the cross-spectral density by fitting a linear model of order <code>p</code> and then compute the csd analytically from the parameters of the multivariate autoregressive model</p>
 <pre><code class="julia hljs">p = <span class=hljs-number >8</span>
 mar = mar_ml(data, p)   <span class=hljs-comment ># maximum likelihood estimation of the MAR coefficients and noise covariance matrix</span>
 ns = size(data, <span class=hljs-number >1</span>)
 freq = range(min(<span class=hljs-number >128</span>, ns*dt)^-<span class=hljs-number >1</span>, max(<span class=hljs-number >8</span>, <span class=hljs-number >2</span>*dt)^-<span class=hljs-number >1</span>, <span class=hljs-number >32</span>)
-csd = mar2csd(mar, freq, dt^-<span class=hljs-number >1</span>);</code></pre>
+csd = mar2csd(mar, freq, dt^-<span class=hljs-number >1</span>);</code></pre><pre><code class="plaintext hljs">UndefVarError: `mar_ml` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>Now plot the real part of the cross-spectra. Most part of the signal is in the lower frequencies:</p>
 <pre><code class="julia hljs">fig = Figure(size=(<span class=hljs-number >1200</span>, <span class=hljs-number >800</span>))
 grid = fig[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>] = GridLayout()
@@ -83,8 +96,10 @@ Label(grid[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>:
     font = :bold,
     fontsize = <span class=hljs-number >32</span>,
     padding = (<span class=hljs-number >0</span>, <span class=hljs-number >0</span>, <span class=hljs-number >5</span>, <span class=hljs-number >0</span>))
-fig</code></pre>
-<p><img src="/course/assets/pages/DCM/code/output/csd.svg" alt=""> These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.</p>
+fig</code></pre><pre><code class="plaintext hljs">UndefVarError: `freq` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
+<p><p><span style="color:red;">// Image matching '/assets/pages/DCM/code/csd' not found. //</span></p> These cross-spectral densities are the data we use in spectral DCM to fit our model to and perform the inference of connection strengths.</p>
 <h2 id=model_inference ><a href="#model_inference" class=header-anchor >Model Inference</a></h2>
 <p>We will now assemble a new model that is used for fitting the previous simulations. This procedure is similar to before with the difference that we will define global parameters and use tags such as &#91;tunable&#61;false/true&#93; to define which parameters we will want to estimate. Note that parameters are tunable by default.</p>
 <pre><code class="julia hljs">g = MetaDiGraph()
@@ -101,13 +116,15 @@ regions = [];   <span class=hljs-comment ># list of neural mass blocks to then c
 
     measurement = BalloonModel(;name=<span class=hljs-built_in >Symbol</span>(<span class=hljs-string >&quot;r<span class=hljs-subst >$(i)</span>₊bm&quot;</span>), lnτ=lnτ, lnκ=lnκ, lnϵ=lnϵ) <span class=hljs-comment >## assume fMRI signal and model them with a BalloonModel</span>
     add_edge!(g, region =&gt; measurement, weight=<span class=hljs-number >1.0</span>)
-<span class=hljs-keyword >end</span></code></pre>
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `ExternalInput` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>Here we define the prior expectation values of the effective connectivity matrix we wish to infer:</p>
 <pre><code class="julia hljs">A_prior = <span class=hljs-number >0.01</span>*randn(nr, nr)
 A_prior -= diagm(diag(A_prior))    <span class=hljs-comment ># remove the diagonal</span></code></pre><pre><code class="plaintext hljs">3×3 Matrix{Float64}:
-  0.0         0.0138076   -0.000870584
- -0.0110173   0.0         -0.000945151
- -0.0153045  -0.00676341   0.0</code></pre>
+  0.0         0.00345049  -0.0122152
+  0.0148102   0.0          0.00437472
+ -0.00716553  0.00429191   0.0</code></pre>
 <p>Since we want to optimize these weights we turn them into symbolic parameters: Add the symbolic weights to the edges and connect regions.</p>
 <pre><code class="julia hljs">A = []
 <span class=hljs-keyword >for</span> (i, a) <span class=hljs-keyword >in</span> enumerate(vec(A_prior))
@@ -123,88 +140,44 @@ A_prior -= diagm(diag(A_prior))    <span class=hljs-comment ># remove the diagon
     <span class=hljs-keyword >end</span>
 <span class=hljs-keyword >end</span>
 <span class=hljs-comment ># Avoid simplification of the model in order to be able to exclude some parameters from fitting</span>
-<span class=hljs-meta >@named</span> fitmodel = system_from_graph(g, simplify=<span class=hljs-literal >false</span>);</code></pre>
+<span class=hljs-meta >@named</span> fitmodel = system_from_graph(g, simplify=<span class=hljs-literal >false</span>);</code></pre><pre><code class="plaintext hljs">BoundsError: attempt to access 1-element Vector{Any} at index [2]
+</code></pre>
 <p>With the function <code>changetune</code> we can provide a dictionary of parameters whose tunable flag should be changed, for instance set to false to exclude them from the optimization procedure. For instance the effective connections that are set to zero in the simulation and the self-connections:</p>
 <pre><code class="julia hljs">untune = <span class=hljs-built_in >Dict</span>(A[<span class=hljs-number >3</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >7</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >1</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >5</span>] =&gt; <span class=hljs-literal >false</span>, A[<span class=hljs-number >9</span>] =&gt; <span class=hljs-literal >false</span>)
 fitmodel = changetune(fitmodel, untune)           <span class=hljs-comment ># 3 and 7 are not present in the simulation model</span>
-fitmodel = structural_simplify(fitmodel)          <span class=hljs-comment ># and now simplify the euqations</span></code></pre><pre><code class="plaintext hljs">Model fitmodel:
-Equations (21):
-  21 standard: see equations(fitmodel)
-Unknowns (21): see unknowns(fitmodel)
-  r1₊lm₊x(t) [defaults to 0.0]
-  r1₊bm₊s(t) [defaults to 0.0]
-  r1₊bm₊lnu(t) [defaults to 0.0]
-  r1₊bm₊lnν(t) [defaults to 0.0]
-  r1₊bm₊lnq(t) [defaults to 0.0]
-  r2₊lm₊x(t) [defaults to 0.0]
-  r2₊bm₊s(t) [defaults to 0.0]
-  r2₊bm₊lnu(t) [defaults to 0.0]
-  r2₊bm₊lnν(t) [defaults to 0.0]
-  r2₊bm₊lnq(t) [defaults to 0.0]
-  r3₊lm₊x(t) [defaults to 0.0]
-  r3₊bm₊s(t) [defaults to 0.0]
-  r3₊bm₊lnu(t) [defaults to 0.0]
-  r3₊bm₊lnν(t) [defaults to 0.0]
-  r3₊bm₊lnq(t) [defaults to 0.0]
-  r1₊ei₊u(t) [defaults to 0.0]: ext_input
-  r2₊ei₊u(t) [defaults to 0.0]: ext_input
-  r3₊ei₊u(t) [defaults to 0.0]: ext_input
-  r1₊bm₊bold(t) [defaults to 0.0]: measurement
-  r2₊bm₊bold(t) [defaults to 0.0]: measurement
-  r3₊bm₊bold(t) [defaults to 0.0]: measurement
-Parameters (16): see parameters(fitmodel)
-  A4 [defaults to 0.0138076]
-  A6 [defaults to -0.00676341]
-  A8 [defaults to -0.000945151]
-  A2 [defaults to -0.0110173]
-  C [defaults to 0.0625]
-  lnϵ [defaults to 0.0]
-  A3 [defaults to -0.0153045]
-  A7 [defaults to -0.000870584]
-  A1 [defaults to 0.0]
-  A5 [defaults to 0.0]
-  A9 [defaults to 0.0]
-  lnκ [defaults to 0.0]
-  lnτ [defaults to 0.0]
-  w_r1₊lm_r1₊bm [defaults to 1.0]
-  w_r2₊lm_r2₊bm [defaults to 1.0]
-  w_r3₊lm_r3₊bm [defaults to 1.0]
-Observed (6): see observed(fitmodel)</code></pre>
+fitmodel = structural_simplify(fitmodel)          <span class=hljs-comment ># and now simplify the euqations</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `fitmodel` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <h2 id=setup_spectral_dcm ><a href="#setup_spectral_dcm" class=header-anchor >Setup Spectral DCM</a></h2>
 <pre><code class="julia hljs">max_iter = <span class=hljs-number >128</span>; <span class=hljs-comment ># maximum number of iterations</span>
 <span class=hljs-comment ># attribute initial conditions or default values to dynamic states of our model</span>
-sts, _ = get_dynamic_states(fitmodel);</code></pre>
+sts, _ = get_dynamic_states(fitmodel);</code></pre><pre><code class="plaintext hljs">UndefVarError: `get_dynamic_states` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>the following step is needed if the model&#39;s Jacobian would give degenerate eigenvalues when expanded around the fixed point 0 &#40;which is the default expansion&#41;. We simply add small random values to avoid this degeneracy:</p>
-<pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >10</span>^-<span class=hljs-number >10</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">Dict{SymbolicUtils.BasicSymbolic{Real}, Float64} with 15 entries:
-  r3₊lm₊x(t) =&gt; 1.10897e-11
-  r3₊bm₊lnq(t) =&gt; 8.56768e-11
-  r2₊bm₊lnq(t) =&gt; 4.80233e-11
-  r1₊bm₊lnν(t) =&gt; 5.27927e-11
-  r2₊bm₊s(t) =&gt; 6.51909e-11
-  r3₊bm₊lnu(t) =&gt; 6.74234e-11
-  r2₊bm₊lnν(t) =&gt; 1.89427e-11
-  r1₊bm₊s(t) =&gt; 3.51678e-11
-  r3₊bm₊lnν(t) =&gt; 3.39346e-11
-  r1₊lm₊x(t) =&gt; 2.54735e-11
-  r1₊bm₊lnu(t) =&gt; 5.47787e-12
-  r3₊bm₊s(t) =&gt; 6.77173e-11
-  r2₊lm₊x(t) =&gt; 6.93896e-11
-  r2₊bm₊lnu(t) =&gt; 5.51802e-11
-  r1₊bm₊lnq(t) =&gt; 7.86157e-11</code></pre>
+<pre><code class="julia hljs">perturbedfp = <span class=hljs-built_in >Dict</span>(sts .=&gt; abs.(<span class=hljs-number >10</span>^-<span class=hljs-number >10</span>*rand(length(sts))))     <span class=hljs-comment ># slight noise to avoid issues with Automatic Differentiation.</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `sts` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>For convenience we can use the default prior function to use standardized prior values as given in SPM:</p>
 <pre><code class="julia hljs">pmean, pcovariance, indices = defaultprior(fitmodel, nr)
 
 priors = (μθ_pr = pmean,
           Σθ_pr = pcovariance
-         );</code></pre>
+         );</code></pre><pre><code class="plaintext hljs">UndefVarError: `defaultprior` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>Setup hyper parameter prior as well:</p>
 <pre><code class="julia hljs">hyperpriors = (Πλ_pr = <span class=hljs-number >128.0</span>*ones(<span class=hljs-number >1</span>, <span class=hljs-number >1</span>),   <span class=hljs-comment ># prior metaparameter precision, needs to be a matrix</span>
                μλ_pr = [<span class=hljs-number >8.0</span>]               <span class=hljs-comment ># prior metaparameter mean, needs to be a vector</span>
               );</code></pre>
 <p>To compute the cross spectral densities we need to provide the sampling interval of the time series, the frequency axis and the order of the multivariate autoregressive model:</p>
-<pre><code class="julia hljs">csdsetup = (mar_order = p, freq = freq, dt = dt);</code></pre>
+<pre><code class="julia hljs">csdsetup = (mar_order = p, freq = freq, dt = dt);</code></pre><pre><code class="plaintext hljs">UndefVarError: `freq` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>Prepare the DCM. This function will setup the computation of the Dynamic Causal Model. The last parameter specifies that we are using fMRI time series &#40;as opposed to LFPs, which is the other modality that is currently available in Neuroblox&#41;.</p>
-<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre>
+<pre><code class="julia hljs">(state, setup) = setup_sDCM(dfsol, fitmodel, perturbedfp, csdsetup, priors, hyperpriors, indices, pmean, <span class=hljs-string >&quot;fMRI&quot;</span>);</code></pre><pre><code class="plaintext hljs">UndefVarError: `setup_sDCM` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
 <p>We are now ready to run the optimization procedure&#33; That is we loop over run<em>sDCM</em>iteration&#33; which will alter <code>state</code> after each optimization iteration. It essentially computes the Variational Laplace estimation of expectation and variance of the tunable parameters.</p>
 <pre><code class="julia hljs"><span class=hljs-keyword >for</span> iter <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:max_iter
     state.iter = iter
@@ -217,36 +190,23 @@ priors = (μθ_pr = pmean,
             <span class=hljs-keyword >break</span>
         <span class=hljs-keyword >end</span>
     <span class=hljs-keyword >end</span>
-<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">iteration: 1 - F:-907.3966193403191 - dF predicted:19.610107795070086
-iteration: 2 - F:-887.6275474677687 - dF predicted:31.40104402110513
-iteration: 3 - F:-855.4769075570323 - dF predicted:50.595718262731104
-iteration: 4 - F:-803.9165611081502 - dF predicted:72.90454096304227
-iteration: 5 - F:-732.0898390246193 - dF predicted:89.00520964639644
-iteration: 6 - F:-646.3334018845117 - dF predicted:93.51009926659631
-iteration: 7 - F:-560.8349944421104 - dF predicted:72.20904509395687
-iteration: 8 - F:-500.6187945923262 - dF predicted:38.532762074546206
-iteration: 9 - F:-470.1061625730007 - dF predicted:20.330861579482715
-iteration: 10 - F:-453.2295973592579 - dF predicted:14.891274373244485
-iteration: 11 - F:-439.8206931905005 - dF predicted:13.657969737513561
-iteration: 12 - F:-427.5949769680233 - dF predicted:9.499125150604186
-iteration: 13 - F:-419.9402353219268 - dF predicted:3.496951754205867
-iteration: 14 - F:-417.3280987225607 - dF predicted:0.9289019009261253
-iteration: 15 - F:-416.66698097881226 - dF predicted:0.17799335876672592
-iteration: 16 - F:-416.5485385297137 - dF predicted:0.021533323176999283
-iteration: 17 - F:-416.5310449931578 - dF predicted:0.004069639140175212
-iteration: 18 - F:-416.5283523852918 - dF predicted:0.0006809889532180617
-iteration: 19 - F:-416.52809470966923 - dF predicted:0.00012220291755110722
-convergence
+<span class=hljs-keyword >end</span></code></pre><pre><code class="plaintext hljs">UndefVarError: `state` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+Hint: a global variable of this name may be made accessible by importing BaseDirs in the current active module Main
 </code></pre>
 <p>Note that the output <code>F</code> is the free energy at each iteration step and <code>dF</code> is the predicted change of free energy at each step which approximates the actual free energy change and is used as stopping criterion by requiring that it does not excede the <code>tolerance</code> level for 4 consecutive times.</p>
 <h2 id=results ><a href="#results" class=header-anchor >Results</a></h2>
 <p>Free energy is the objective function of the optimization scheme of spectral DCM. Note that in the machine learning literature this it is called Evidence Lower Bound &#40;ELBO&#41;. Plot the free energy evolution over optimization iterations to see how the algorithm converges towards a &#40;potentially local&#41; optimum:</p>
-<pre><code class="julia hljs">f1 = freeenergy(state)</code></pre>
-<img src="/course/assets/pages/DCM/code/output/freeenergy.svg" alt="">
+<pre><code class="julia hljs">f1 = freeenergy(state)</code></pre><pre><code class="plaintext hljs">UndefVarError: `freeenergy` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/DCM/code/freeenergy' not found. //</span></p>
 <p>Plot the estimated posterior of the effective connectivity and compare that to the true parameter values. Bar height are the posterior mean and error bars are the standard deviation of the posterior.</p>
 <pre><code class="julia hljs">f2 = ecbarplot(state, setup, A_true)
-axislegend(position=:lt)</code></pre>
-<img src="/course/assets/pages/DCM/code/output/ecbar.svg" alt="">
+axislegend(position=:lt)</code></pre><pre><code class="plaintext hljs">UndefVarError: `ecbarplot` not defined in `Main.FD_SANDBOX_2630177278844153205`
+Suggestion: check for spelling errors or missing imports.
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/pages/DCM/code/ecbar' not found. //</span></p>
 <h2 id=challenge_problems ><a href="#challenge_problems" class=header-anchor >Challenge Problems</a></h2>
 <ul>
 <li><p><strong>Explore susceptibility with respect to noise.</strong> Run the script again with a different random seed and observe how the results change. Given that we didn’t change any parameters of the ground truth, what is your take on parameter inference with this setup? How reliable is model selection based on free energy &#40;compare the different free energies of the models and their respective parameter values with ground truth&#41;?</p>
@@ -267,7 +227,7 @@ axislegend(position=:lt)</code></pre>
 </ul>
 
 <div class=page-foot >
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: April 28, 2025.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Neuroblox Inc. Last modified: July 22, 2025.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 </div>
